@@ -3,13 +3,15 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const scheduleDaySchema = new Schema({
-    day: {
-        type: Date,
+    dayOffset: {
+        type: Schema.Types.Number,
         required: true
     },
     customers: [
-        type: Schema.Types.ObjectId,
-        ref: 'ScheduledCustomer'
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'ScheduledCustomer'
+        }
     ],
     schedule: {
         type: Schema.Types.ObjectId,
