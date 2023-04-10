@@ -16,9 +16,8 @@ module.exports = {
             return bcrypt.compare(password, foundUser.password).then(isMatch => {
                 if (isMatch) {
                     const token = getJwtToken(foundUser);
-                    foundUser.token = token;
 
-                    return res.status(200).send({...foundUser._doc, password: null});
+                    return res.status(200).send({...foundUser._doc, token: token, password: null});
                 } else {
                     throw new Error('Password is incorrect.');
                 }
@@ -53,9 +52,8 @@ module.exports = {
         })
         .then((result) => {
             const token = getJwtToken(result);
-            result.token = token;
 
-            return res.status(200).send({ ...result._doc, password: null });
+            return res.status(200).send({ ...result._doc, token: token, password: null });
         })
         .catch(err => {
             return res.status(400).send({ error: err.message });
@@ -102,8 +100,7 @@ module.exports = {
                 throw new Error("User not found.");
             }
 
-            // delete user related stuff
-
+            // delete schedules -> delete scheduleDays -> delete scheduledCustomers
             return Promise.all([]);
         })
         .then((res) => {
