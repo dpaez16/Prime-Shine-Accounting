@@ -1,9 +1,10 @@
 const express = require('express');
 const { graphqlHTTP  } = require('express-graphql');
 const { buildSchema } = require('graphql');
-const { verifyToken } = require('./modules/auth');
 
+const { verifyToken } = require('./modules/auth');
 const { loginUser, createUser, editUser, deleteUser } = require('./modules/users');
+const { getSchedules, createSchedule, editSchedule, deleteSchedule } = require('./modules/schedules');
 
 const app = express();
 
@@ -40,19 +41,54 @@ app.use('/ps/api', [verifyToken, graphqlHTTP({
             token: String!
         }
 
+        type Schedule {
+            _id: ID!
+            startDay: String!
+            days: [ScheduleDay!]!
+            user: ID!
+        }
+
+        type ScheduleDay {
+            _id: ID!
+            dayOffset: Int!
+            customers: [ScheduledCustomer!]!
+            schedule: ID!
+        }
+
+        type ScheduledCustomer {
+            _id: ID!
+            customerID: ID!
+            serviceStartTime: String!
+            serviceEndTime: String!
+            scheduleDay: ID!
+        }
+
+        type RootQuery {
+            schedules(userID: ID!): [Schedule!]!
+        }
+
         type RootMutation {
             editUser(userInput: UserInput!, userID: ID!): User
-
             deleteUser(userID: ID!): Boolean
+
+            createSchedule(startDay: String!, userID: ID!): Schedule
+            editSchedule(startDay: String!, scheduleID: ID!): Schedule
+            deleteSchedule(startDay: String!, userID: ID!): Boolean
         }
 
         schema {
+            query: RootQuery
             mutation: RootMutation
         }
     `),
     rootValue: {
         editUser: editUser,
         deleteUser: deleteUser,
+
+        schedules: getSchedules,
+        createSchedule: createSchedule,
+        editSchedule: editSchedule,
+        deleteSchedule: deleteSchedule
     },
     graphiql: true
 })]);
