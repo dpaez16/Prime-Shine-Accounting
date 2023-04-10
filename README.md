@@ -1,2 +1,2 @@
 # Prime-Shine-Accounting
-Simple full-stack app that allows for easy bookkeeping for Prime Shine Cleaning.
+Full-stack React app that allows for easy bookkeeping for Prime Shine Cleaning.

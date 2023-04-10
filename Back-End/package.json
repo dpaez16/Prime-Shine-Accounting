@@ -1,0 +1,30 @@
+{
+    "name": "back-end",
+    "version": "1.0.0",
+    "description": "Back-end server for front-end react app (Prime Shine Accounting).",
+    "main": "index.js",
+    "scripts": {
+      "test": "jest --runInBand",
+      "test:coverage": "npm run test -- --coverage",
+      "start": "node index.js"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+    },
+    "devDependencies": {
+    },
+    "jest": {
+      "testEnvironment": "node",
+      "collectCoverageFrom": [
+        "modules/**/*.js",
+        "!**/tests/**/*"
+      ],
+      "coverageReporters": [
+        "cobertura",
+        "html",
+        "lcov",
+        "text"
+      ]
+    }
+  }
