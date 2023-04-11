@@ -5,7 +5,6 @@ module.exports = {
         let userID = rawArgs.userID;
         return Schedule.find({ user: userID })
         .then(schedules => {
-            console.log(schedules);
             return schedules;
         })
         .catch((err) => {
@@ -25,7 +24,6 @@ module.exports = {
 
             let newSchedule = new Schedule({
                 startDay: startDay,
-                days: [],
                 user: userID
             });
 
@@ -77,7 +75,7 @@ module.exports = {
                 throw new Error("Schedule not found.");
             }
 
-            // delete scheduleDays -> delete scheduledCustomers
+            // grab all scheduleDays associated with schedule._id and delete them
             return Promise.all([])
             .then(async _ => {
                 return Schedule.deleteOne({ 

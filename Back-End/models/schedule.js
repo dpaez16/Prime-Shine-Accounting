@@ -7,12 +7,6 @@ const scheduleSchema = new Schema({
         type: Date,
         required: true
     },
-    days: [
-        {
-            type: Schema.Types.Number,
-            ref: 'ScheduleDay'
-        }
-    ],
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User'

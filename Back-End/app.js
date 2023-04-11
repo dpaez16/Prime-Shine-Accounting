@@ -5,6 +5,7 @@ const { buildSchema } = require('graphql');
 const { verifyToken } = require('./modules/auth');
 const { loginUser, createUser, editUser, deleteUser } = require('./modules/users');
 const { getSchedules, createSchedule, editSchedule, deleteSchedule } = require('./modules/schedules');
+const { getScheduleDays, createScheduleDay, deleteScheduleDay } = require('./modules/scheduleDays');
 
 const app = express();
 
@@ -25,7 +26,7 @@ app.use((req, res, next) => {
 app.post('/ps/login', loginUser);
 app.post('/ps/register', createUser);
 
-app.use('/ps/api', [verifyToken, graphqlHTTP({
+app.use('/ps/graphql', [verifyToken, graphqlHTTP({
     schema: buildSchema(`
         type User {
             _id: ID!
@@ -44,20 +45,18 @@ app.use('/ps/api', [verifyToken, graphqlHTTP({
         type Schedule {
             _id: ID!
             startDay: String!
-            days: [ScheduleDay!]!
             user: ID!
         }
 
         type ScheduleDay {
             _id: ID!
             dayOffset: Int!
-            customers: [ScheduledCustomer!]!
             schedule: ID!
         }
 
         type ScheduledCustomer {
             _id: ID!
-            customerID: ID!
+            customerId: String!
             serviceStartTime: String!
             serviceEndTime: String!
             scheduleDay: ID!
@@ -65,6 +64,7 @@ app.use('/ps/api', [verifyToken, graphqlHTTP({
 
         type RootQuery {
             schedules(userID: ID!): [Schedule!]!
+            scheduleDays(scheduleID: ID!): [ScheduleDay!]!
         }
 
         type RootMutation {
@@ -74,6 +74,9 @@ app.use('/ps/api', [verifyToken, graphqlHTTP({
             createSchedule(startDay: String!, userID: ID!): Schedule
             editSchedule(startDay: String!, scheduleID: ID!): Schedule
             deleteSchedule(startDay: String!, userID: ID!): Boolean
+
+            createScheduleDay(dayOffset: Int!, scheduleID: ID!): ScheduleDay
+            deleteScheduleDay(dayOffset: Int!, scheduleID: ID!): Boolean
         }
 
         schema {
@@ -88,7 +91,11 @@ app.use('/ps/api', [verifyToken, graphqlHTTP({
         schedules: getSchedules,
         createSchedule: createSchedule,
         editSchedule: editSchedule,
-        deleteSchedule: deleteSchedule
+        deleteSchedule: deleteSchedule,
+
+        scheduleDays: getScheduleDays,
+        createScheduleDay: createScheduleDay,
+        deleteScheduleDay: deleteScheduleDay,
     },
     graphiql: true
 })]);
