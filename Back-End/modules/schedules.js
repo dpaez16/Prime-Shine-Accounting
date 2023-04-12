@@ -35,15 +35,15 @@ module.exports = {
         });
     },
     editSchedule: async rawArgs => {
-        let newStartDay = rawArgs.startDay;
-        let scheduleID = rawArgs.scheduleID;
+        const newStartDay = rawArgs.startDay;
+        const scheduleID = rawArgs.scheduleID;
 
-        return Schedule.findById(rawArgs.scheduleID).then(async schedule => {
+        return Schedule.findById(scheduleID).then(async schedule => {
             if (!schedule) {
                 throw new Error("Cannot find schedule.");
             }
 
-            let userID = schedule.userID;
+            const userID = schedule.user;
 
             return Schedule.findOne({
                 startDay: newStartDay,
