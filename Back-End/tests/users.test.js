@@ -102,25 +102,22 @@ describe('Users Schema', () => {
 
         // creating userA
         await UserService.createUser(reqA, res);
-        reqA.body.userID = res.data._id;
+        reqA.userID = res.data._id;
 
         // creating userB
         await UserService.createUser(reqB, res);
-        reqB.body.userID = res.data._id;
+        reqB.userID = res.data._id;
         
-        // userID is incorrect
-        let correctUserID = reqA.body.userID;
-        reqA.body.userID = randomUserID;
-        await expect(UserService.editUser({ userInput: reqA.body })).rejects.toThrow(Error);
+        // userID is non-existent
+        await expect(UserService.editUser({ userInput: reqA.body, userID: randomUserID })).rejects.toThrow(Error);
 
         // trying to change email to email that's in use
-        reqA.body.userID = correctUserID;
         reqA.body.email = reqB.body.email;
-        await expect(UserService.editUser({ userInput: reqA.body })).rejects.toThrow(Error);
+        await expect(UserService.editUser({ userInput: reqA.body, userID: reqA.userID })).rejects.toThrow(Error);
 
         // successfully updating email
         reqA.body.email = 'foobar@foobar.com';
-        let updatedUserExp = expect(await UserService.editUser({ 
+        let updatedUserExp = expect(await UserService.editUser({
             userInput: reqA.body,
             userID: res.data._id
         }));

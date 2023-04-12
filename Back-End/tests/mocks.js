@@ -11,7 +11,6 @@ class MockResponse {
 
     send(data) {
         this.data = data;
-        return this;
     }
 };
 
