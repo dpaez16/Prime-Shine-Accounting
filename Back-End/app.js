@@ -6,6 +6,7 @@ const { verifyToken } = require('./modules/auth');
 const { loginUser, createUser, editUser, deleteUser } = require('./modules/users');
 const { getSchedules, createSchedule, editSchedule, deleteSchedule } = require('./modules/schedules');
 const { getScheduleDays, createScheduleDay, deleteScheduleDay } = require('./modules/scheduleDays');
+const { getScheduledCustomers, createScheduledCustomer, editScheduledCustomer, deleteScheduledCustomer } = require('./modules/scheduledCustomers');
 
 const app = express();
 
@@ -62,9 +63,17 @@ app.use('/ps/graphql', [verifyToken, graphqlHTTP({
             scheduleDay: ID!
         }
 
+        type ScheduledCustomerInput {
+            customerId: String!
+            serviceStartTime: String!
+            serviceEndTime: String!
+            scheduleDay: ID!
+        }
+
         type RootQuery {
             schedules(userID: ID!): [Schedule!]!
             scheduleDays(scheduleID: ID!): [ScheduleDay!]!
+            scheduledCustomers(scheduleDayID: ID!): [ScheduledCustomer!]!
         }
 
         type RootMutation {
@@ -77,6 +86,10 @@ app.use('/ps/graphql', [verifyToken, graphqlHTTP({
 
             createScheduleDay(dayOffset: Int!, scheduleID: ID!): ScheduleDay
             deleteScheduleDay(dayOffset: Int!, scheduleID: ID!): Boolean
+
+            createScheduledCustomer(scheduledCustomerInput: ScheduledCustomerInput!): ScheduledCustomer!
+            editScheduledCustomer(scheduledCustomerInput: ScheduledCustomerInput!, scheduledCustomerID: ID!): ScheduledCustomer!
+            deleteScheduledCustomer(scheduledCustomerID: ID!): Boolean
         }
 
         schema {
@@ -96,6 +109,11 @@ app.use('/ps/graphql', [verifyToken, graphqlHTTP({
         scheduleDays: getScheduleDays,
         createScheduleDay: createScheduleDay,
         deleteScheduleDay: deleteScheduleDay,
+
+        scheduledCustomers: getScheduledCustomers,
+        createScheduledCustomer: createScheduledCustomer,
+        editScheduledCustomer: editScheduledCustomer,
+        deleteScheduledCustomer: deleteScheduledCustomer
     },
     graphiql: true
 })]);

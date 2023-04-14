@@ -1,4 +1,5 @@
 const Schedule = require('../models/schedule');
+const { getScheduleDays, deleteScheduleDay } = require('../modules/scheduleDays');
 
 module.exports = {
     getSchedules: async rawArgs => {
@@ -70,22 +71,26 @@ module.exports = {
         return Schedule.findOne({
             startDay: startDay,
             user: userID
-        }).then(async schedule => {
+        })
+        .then(async schedule => {
             if (!schedule) {
                 throw new Error("Schedule not found.");
             }
 
-            // grab all scheduleDays associated with schedule._id and delete them
-            return Promise.all([])
-            .then(async _ => {
-                return Schedule.deleteOne({ 
-                    startDay: startDay, 
-                    user: userID 
-                });
-            })
-            .then(result => {
-                return true;
+            return getScheduleDays({ scheduleID: schedule._id });
+        })
+        .then((scheduleDays) => {
+            let deletedResults = scheduleDays.map(async scheduleDay => await deleteScheduleDay({ dayOffset: scheduleDay.dayOffset, scheduleID: scheduleDay.schedule }));
+            return Promise.all(deletedResults);
+        })
+        .then(async _ => {
+            return Schedule.deleteOne({ 
+                startDay: startDay, 
+                user: userID 
             });
+        })
+        .then(result => {
+            return true;
         })
         .catch((err) => {
             throw err;
