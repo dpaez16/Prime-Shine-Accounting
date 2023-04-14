@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { getSchedules, deleteSchedule } = require('../modules/schedules');
 const { getJwtToken } = require('../modules/auth');
 
 const BCRYPT_SALT = 12;
@@ -100,8 +101,11 @@ module.exports = {
                 throw new Error("User not found.");
             }
 
-            // delete schedules -> delete scheduleDays -> delete scheduledCustomers
-            return Promise.all([]);
+            return getSchedules({ userID: userID });
+        })
+        .then(schedules => {
+            let deletedResults = schedules.map(async schedule => await deleteSchedule({ startDay: schedule.startDay, userID: schedule.user }));
+            return Promise.all(deletedResults);
         })
         .then((res) => {
             return User.deleteOne({ _id: userID });

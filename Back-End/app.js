@@ -6,7 +6,7 @@ const { verifyToken } = require('./modules/auth');
 const { loginUser, createUser, editUser, deleteUser } = require('./modules/users');
 const { getSchedules, createSchedule, editSchedule, deleteSchedule } = require('./modules/schedules');
 const { getScheduleDays, createScheduleDay, deleteScheduleDay } = require('./modules/scheduleDays');
-const { getScheduledCustomers, createScheduledCustomers } = require('./modules/scheduledCustomers');
+const { getScheduledCustomers, createScheduledCustomer, editScheduledCustomer, deleteScheduledCustomer } = require('./modules/scheduledCustomers');
 
 const app = express();
 
@@ -88,6 +88,8 @@ app.use('/ps/graphql', [verifyToken, graphqlHTTP({
             deleteScheduleDay(dayOffset: Int!, scheduleID: ID!): Boolean
 
             createScheduledCustomer(scheduledCustomerInput: ScheduledCustomerInput!): ScheduledCustomer!
+            editScheduledCustomer(scheduledCustomerInput: ScheduledCustomerInput!, scheduledCustomerID: ID!): ScheduledCustomer!
+            deleteScheduledCustomer(scheduledCustomerID: ID!): Boolean
         }
 
         schema {
@@ -108,8 +110,10 @@ app.use('/ps/graphql', [verifyToken, graphqlHTTP({
         createScheduleDay: createScheduleDay,
         deleteScheduleDay: deleteScheduleDay,
 
-        getScheduledCustomers: getScheduledCustomers,
-        createScheduledCustomers: createScheduledCustomers,
+        scheduledCustomers: getScheduledCustomers,
+        createScheduledCustomer: createScheduledCustomer,
+        editScheduledCustomer: editScheduledCustomer,
+        deleteScheduledCustomer: deleteScheduledCustomer
     },
     graphiql: true
 })]);

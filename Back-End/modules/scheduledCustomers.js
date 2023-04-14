@@ -1,4 +1,5 @@
 const ScheduledCustomer = require('../models/scheduledCustomer');
+const ScheduleDay = require('../models/scheduleDay');
 
 module.exports = {
     getScheduledCustomers: async rawArgs => {
@@ -10,9 +11,17 @@ module.exports = {
             throw err;
         });
     },
-    createScheduledCustomers: async rawArgs => {
+    createScheduledCustomer: async rawArgs => {
         const args = rawArgs.scheduledCustomerInput;
-        return ScheduledCustomer.find(args)
+
+        return ScheduleDay.findById(args.scheduleDay)
+        .then(scheduleDay => {
+            if (!scheduleDay) {
+                throw new Error("Schedule Day does not exist.");
+            }
+
+            return ScheduledCustomer.findOne(args);
+        })
         .then(scheduledCustomer => {
             if (scheduledCustomer) {
                 throw new Error("Scheduled Customer already exists.");
@@ -23,6 +32,50 @@ module.exports = {
         })
         .then(result => {
             return { ...result._doc };
+        })
+        .catch(err => {
+            throw err;
+        });
+    },
+    editScheduledCustomer: async rawArgs => {
+        const {scheduledCustomerInput, scheduledCustomerID} = rawArgs;
+
+        return ScheduledCustomer.findById(scheduledCustomerID)
+        .then(scheduledCustomer => {
+            if (!scheduledCustomer) {
+                throw new Error("Scheduled customer does not exist.");
+            }
+
+            return ScheduledCustomer.findOne(scheduledCustomerInput);
+        })
+        .then(foundScheduledCustomer => {
+            if (foundScheduledCustomer) {
+                throw new Error("Scheduled customer already exists.");
+            }
+
+            const newScheduledCustomer = new ScheduledCustomer(scheduledCustomerInput);
+            return newScheduledCustomer.save();
+        })
+        .then(result => {
+            return { ...result._doc };
+        })
+        .catch(err => {
+            throw err;
+        });
+    },
+    deleteScheduledCustomer: async rawArgs => {
+        const { scheduledCustomerID } = rawArgs;
+
+        return ScheduledCustomer.findById(scheduledCustomerID)
+        .then(scheduledCustomer => {
+            if (!scheduledCustomer) {
+                throw new Error("Scheduled customer does not exist.");
+            }
+
+            return ScheduledCustomer.deleteOne({ _id: scheduledCustomerID });
+        })
+        .then(result => {
+            return true;
         })
         .catch(err => {
             throw err;

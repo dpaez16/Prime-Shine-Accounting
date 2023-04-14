@@ -1,5 +1,6 @@
 const Schedule = require('../models/schedule');
 const ScheduleDay = require('../models/scheduleDay');
+const { getScheduledCustomers, deleteScheduledCustomer } = require('../modules/scheduledCustomers');
 
 
 module.exports = {
@@ -49,9 +50,16 @@ module.exports = {
                 throw new Error("Schedule day does not exist.");
             }
 
-            // delete scheduledCustomers associated with scheduleDay._id
+            return getScheduledCustomers({ scheduleDayID: scheduleDay._id });
+        })
+        .then(scheduledCustomers => {
+            let deletedResults = scheduledCustomers.map(async scheduledCustomer => await deleteScheduledCustomer({ scheduledCustomerID: scheduledCustomer._id }));
+            return Promise.all(deletedResults);
+        })
+        .then(res => {
             return ScheduleDay.deleteOne({ dayOffset: dayOffset, schedule: scheduleID });
-        }).then(_ => {
+        })
+        .then(_ => {
             return true;
         }).catch(err => {
             throw err;
