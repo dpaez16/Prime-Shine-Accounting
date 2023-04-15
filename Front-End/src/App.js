@@ -55,7 +55,7 @@ export default class App extends Component {
             customerId: this.state.demoCustomerId,
             status: "SAVED",
             currency: "USD",
-            invoiceDate: date.toLocaleDateString('en-ca'),
+            invoiceDate: date.toLocaleDateString('en-ca'), // needs to be yyyy-mm-dd format
             memo: "Memo",
             items: [
                 {
@@ -84,7 +84,7 @@ export default class App extends Component {
             customerId: this.state.demoCustomerId,
             status: "SAVED",
             currency: "USD",
-            invoiceDate: date.toLocaleDateString('en-ca'),
+            invoiceDate: date.toLocaleDateString('en-ca'), // needs to be yyyy-mm-dd format
             memo: "Memo2",
             items: [
                 {
