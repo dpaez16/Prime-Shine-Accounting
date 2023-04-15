@@ -86,11 +86,176 @@ export class WaveAPIClient {
         });
     }
 
-    // TODO: createCustomer
+    static createCustomer(customerCreateInput) {
+        const requestBody = {
+            query: `
+            mutation($input: CustomerCreateInput!) {
+                customerCreate(input: $input) {
+                    didSucceed
+                    inputErrors {
+                        code
+                        message
+                        path
+                    }
+                    customer {
+                        id
+                        name
+                        email
+                        mobile
+                        phone
+                        address {
+                            addressLine1
+                            addressLine2
+                            city
+                            province {
+                                code
+                                name
+                            }
+                            postalCode
+                        }
+                    }
+                }
+            }
+            `,
+            variables: {
+                input: customerCreateInput
+            }
+        };
 
-    // TODO: editCustomer
+        return WaveAPIClient.createFetchRequest(requestBody)
+        .then(async response => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not create customer: ${responseText}`);
+            }
 
-    // TODO: deleteCustomer
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not create customer: ${json.errors}`);
+            }
+
+            const { inputErrors, customer } = json.data.customerCreate;
+            if (inputErrors !== null) {
+                throw new Error(`Could not create customer due to input errors: ${inputErrors}`);
+            }
+
+            return customer;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+
+    static editCustomer(customerPatchInput) {
+        const requestBody = {
+            query: `
+            mutation($input: CustomerPatchInput!) {
+                customerPatch(input: $input) {
+                    didSucceed
+                    inputErrors {
+                        code
+                        message
+                        path
+                    }
+                    customer {
+                        id
+                        name
+                        email
+                        mobile
+                        phone
+                        address {
+                            addressLine1
+                            addressLine2
+                            city
+                            province {
+                                code
+                                name
+                            }
+                            postalCode
+                        }
+                    }
+                }
+            }
+            `,
+            variables: {
+                input: customerPatchInput
+            }
+        };
+
+        return WaveAPIClient.createFetchRequest(requestBody)
+        .then(async response => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not edit customer: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not edit customer: ${json.errors}`);
+            }
+
+            const { inputErrors, customer } = json.data.customerPatch;
+            if (inputErrors !== null) {
+                throw new Error(`Could not edit customer due to input errors: ${inputErrors}`);
+            }
+
+            return customer;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+
+    static deleteCustomer(customerId) {
+        const requestBody = {
+            query: `
+            mutation($input: CustomerDeleteInput!) {
+                customerDelete(input: $input) {
+                    didSucceed
+                    inputErrors {
+                        code
+                        message
+                        path
+                    }
+                }
+            }
+            `,
+            variables: {
+                input: {
+                    id: customerId
+                }
+            }
+        };
+
+        return WaveAPIClient.createFetchRequest(requestBody)
+        .then(async response => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not delete customer: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not delete customer: ${json.errors}`);
+            }
+
+            const { didSucceed, inputErrors } = json.data.customerDelete;
+            if (inputErrors !== null) {
+                throw new Error(`Could not delete customer due to input errors: ${inputErrors}`);
+            }
+
+            return didSucceed;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
 
     static fetchCustomers(businessId, pageNum=1, pageSize=1000) {
         const requestBody = {

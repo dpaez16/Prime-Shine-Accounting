@@ -11,6 +11,42 @@ export default class App extends Component {
         };
     }
 
+    getDemoCustomerInput() {
+        return {
+            "businessId": this.state.businessId,
+            "name": "TEST_CUSTOMER",
+            "email": "foo@bar.com",
+            "mobile": "773-123-4567",
+            "phone": "773-123-4567",
+            "address": {
+                "addressLine1": "123 Main St.",
+                "addressLine2": "Unit 123",
+                "city": "Chicago",
+                "provinceCode": "US-IL",
+                "countryCode": "US",
+                "postalCode": "12345"
+            }
+        };
+    }
+
+    getEditCustomerInput() {
+        return {
+            "id": this.state.demoCustomerId,
+            "name": "TEST_CUSTOMER2",
+            "email": "bar@foo.com",
+            "phone": "773-012-3456",
+            "mobile": "773-234-5678",
+            "address": {
+                "addressLine1": "1234 Main St.",
+                "addressLine2": "Unit 1234",
+                "city": "Chicago",
+                "provinceCode": "US-IL",
+                "countryCode": "US",
+                "postalCode": "12345"
+            }
+        };
+    }
+
     render() {
         return (
             <div className="App">
@@ -70,6 +106,48 @@ export default class App extends Component {
                         });
                     }}>
                         fetchInvoices
+                    </button>
+                </li>
+                <li>
+                    <button onClick={e => {
+                        e.preventDefault();
+                        const customerInput = this.getDemoCustomerInput();
+                        WaveAPIClient.createCustomer(customerInput)
+                        .then(customer => {
+                            console.log(customer);
+                            this.setState({ demoCustomerId: customer.id });
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }}>
+                        createCustomer
+                    </button>
+                </li>
+                <li>
+                    <button onClick={e => {
+                        e.preventDefault();
+                        const customerInput = this.getEditCustomerInput();
+                        WaveAPIClient.editCustomer(customerInput)
+                        .then(customer => {
+                            console.log(customer);
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }}>
+                        editCustomer
+                    </button>
+                </li>
+                <li>
+                    <button onClick={e => {
+                        e.preventDefault();
+                        WaveAPIClient.deleteCustomer(this.state.demoCustomerId)
+                        .then(didSucceed => {
+                            console.log(didSucceed);
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }}>
+                        deleteCustomer
                     </button>
                 </li>
             </ul>
