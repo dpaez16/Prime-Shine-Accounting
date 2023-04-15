@@ -1,7 +1,3 @@
-// https://developer.waveapps.com/hc/en-us/sections/360006441372-Examples
-// https://developer.waveapps.com/hc/en-us/articles/360018937431-API-Playground
-// https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#mutation
-
 export class WaveAPIClient {
     static #createFetchRequest(body) {
         return fetch(process.env.REACT_APP_WAVE_ENDPOINT_URL, {
@@ -14,6 +10,10 @@ export class WaveAPIClient {
         });
     }
 
+    /**
+     * Fetches all metadata related to the business.
+     * @return {Promise<Object>} The promise with success returning the business data, otherwise an error for rejection. 
+     */
     static fetchBusinessData() {
         const requestBody = {
             query: `
@@ -86,6 +86,11 @@ export class WaveAPIClient {
         });
     }
 
+    /**
+     * Creates a Wave Customer.
+     * @param {Object} customerCreateInput - The customer's metadata. Must follow the CustomerCreateInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#customercreateinput
+     * @return {Promise<Object>} The promise with success returning the newly created customer, otherwise an error for rejection. 
+     */
     static createCustomer(customerCreateInput) {
         const requestBody = {
             query: `
@@ -148,6 +153,11 @@ export class WaveAPIClient {
         });
     }
 
+    /**
+     * Edits a Wave Customer.
+     * @param {Object} customerPatchInput - The customer's metadata. Must follow the CustomerEditInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#customereditinput
+     * @return {Promise<Object>} - The promise with success returning the edited customer, otherwise an error for rejection. 
+     */
     static editCustomer(customerPatchInput) {
         const requestBody = {
             query: `
@@ -210,6 +220,11 @@ export class WaveAPIClient {
         });
     }
 
+    /**
+     * Deletes a Wave Customer.
+     * @param {string} customerId - The customer's unique ID.
+     * @return {Promise<boolean>} - The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection. 
+     */
     static deleteCustomer(customerId) {
         const requestBody = {
             query: `
@@ -257,6 +272,13 @@ export class WaveAPIClient {
         });
     }
 
+    /**
+     * Fetches customers from the business.
+     * @param {string} businessId - The business's unique ID.
+     * @param {number} [pageNum] - The page number to grab customers from.
+     * @param {number} [pageSize] - The number of customers to grab from pageNum.
+     * @return {Promise<Array<Object>>} - The promise with success returning the requested customers, otherwise an error for rejection. 
+     */
     static fetchCustomers(businessId, pageNum=1, pageSize=1000) {
         const requestBody = {
             query: `
@@ -306,7 +328,15 @@ export class WaveAPIClient {
         });
     }
 
-    static fetchInvoices(businessId, pageNum, pageSize, customerId) {
+    /**
+     * Fetches invoices from the business.
+     * @param {string} businessId - The business's unique ID.
+     * @param {string} customerId - The customer's unique ID.
+     * @param {number} [pageNum] - The page number to grab invoices from.
+     * @param {number} [pageSize] - The number of invoices to grab from pageNum.
+     * @return {Promise<Array<Object>>} - The promise with success returning the requested invoices, otherwise an error for rejection. 
+     */
+    static fetchInvoices(businessId, customerId, pageNum=1, pageSize=1000) {
         const requestBody = {
             query: `
             {
@@ -379,6 +409,11 @@ export class WaveAPIClient {
         });
     }
 
+    /**
+     * Creates a Wave Invoice.
+     * @param {Object} invoiceCreateInput - The invoice's metadata. Must follow the InvoiceCreateInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#invoicecreateinput
+     * @return {Promise<Object>} - The promise with success returning the newly created invoice, otherwise an error for rejection. 
+     */
     static createInvoice(invoiceCreateInput) {
         const requestBody = {
             query: `
@@ -457,6 +492,11 @@ export class WaveAPIClient {
         });
     }
 
+    /**
+     * Edits a Wave Invoice.
+     * @param {Object} invoicePatchInput - The invoice's metadata. Must follow the InvoicePatchInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#invoicepatchinput
+     * @return {Promise<Object>} - The promise with success returning the edited invoice, otherwise an error for rejection. 
+     */
     static editInvoice(invoicePatchInput) {
         const requestBody = {
             query: `
@@ -535,6 +575,11 @@ export class WaveAPIClient {
         });
     }
 
+    /**
+     * Deletes a Wave Invoice.
+     * @param {string} invoiceId - The invoice's unique ID.
+     * @return {Promise<boolean>} - The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection. 
+     */
     static deleteInvoice(invoiceId) {
         const requestBody = {
             query: `

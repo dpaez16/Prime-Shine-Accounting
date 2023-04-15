@@ -154,7 +154,7 @@ export default class App extends Component {
                         e.preventDefault();
 
                         const customerId = document.getElementById('fetchInvoices_customerId').value;
-                        WaveAPIClient.fetchInvoices(this.state.businessId, 1, 20, customerId)
+                        WaveAPIClient.fetchInvoices(this.state.businessId, customerId, 1, 20)
                         .then(data => {
                             const { pageInfo, invoices } = data;
                             console.log(pageInfo);
