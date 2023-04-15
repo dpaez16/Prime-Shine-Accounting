@@ -3,7 +3,7 @@
 // https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#mutation
 
 export class WaveAPIClient {
-    static createFetchRequest(body) {
+    static #createFetchRequest(body) {
         return fetch(process.env.REACT_APP_WAVE_ENDPOINT_URL, {
             method: "POST",
             body: JSON.stringify(body),
@@ -38,7 +38,7 @@ export class WaveAPIClient {
             `
         };
 
-        return WaveAPIClient.createFetchRequest(requestBody)
+        return WaveAPIClient.#createFetchRequest(requestBody)
         .then(async (response) => {
             if (!response || (response.status !== 200 && response.status !== 201)) {
                 const responseText = await response.text();
@@ -49,7 +49,7 @@ export class WaveAPIClient {
         })
         .then(json => {
             if (json.errors && json.errors.length > 0) {
-                throw new Error(`Could not fetch business: ${json.errors}`);
+                throw new Error(`Could not fetch business: ${JSON.stringify(json.errors)}`);
             }
 
             const businesses = json.data.businesses.edges;
@@ -122,7 +122,7 @@ export class WaveAPIClient {
             }
         };
 
-        return WaveAPIClient.createFetchRequest(requestBody)
+        return WaveAPIClient.#createFetchRequest(requestBody)
         .then(async response => {
             if (!response || (response.status !== 200 && response.status !== 201)) {
                 const responseText = await response.text();
@@ -133,7 +133,7 @@ export class WaveAPIClient {
         })
         .then(json => {
             if (json.errors !== undefined) {
-                throw new Error(`Could not create customer: ${json.errors}`);
+                throw new Error(`Could not create customer: ${JSON.stringify(json.errors)}`);
             }
 
             const { inputErrors, customer } = json.data.customerCreate;
@@ -184,7 +184,7 @@ export class WaveAPIClient {
             }
         };
 
-        return WaveAPIClient.createFetchRequest(requestBody)
+        return WaveAPIClient.#createFetchRequest(requestBody)
         .then(async response => {
             if (!response || (response.status !== 200 && response.status !== 201)) {
                 const responseText = await response.text();
@@ -195,7 +195,7 @@ export class WaveAPIClient {
         })
         .then(json => {
             if (json.errors !== undefined) {
-                throw new Error(`Could not edit customer: ${json.errors}`);
+                throw new Error(`Could not edit customer: ${JSON.stringify(json.errors)}`);
             }
 
             const { inputErrors, customer } = json.data.customerPatch;
@@ -231,7 +231,7 @@ export class WaveAPIClient {
             }
         };
 
-        return WaveAPIClient.createFetchRequest(requestBody)
+        return WaveAPIClient.#createFetchRequest(requestBody)
         .then(async response => {
             if (!response || (response.status !== 200 && response.status !== 201)) {
                 const responseText = await response.text();
@@ -242,7 +242,7 @@ export class WaveAPIClient {
         })
         .then(json => {
             if (json.errors !== undefined) {
-                throw new Error(`Could not delete customer: ${json.errors}`);
+                throw new Error(`Could not delete customer: ${JSON.stringify(json.errors)}`);
             }
 
             const { didSucceed, inputErrors } = json.data.customerDelete;
@@ -288,7 +288,7 @@ export class WaveAPIClient {
             `
         };
 
-        return WaveAPIClient.createFetchRequest(requestBody)
+        return WaveAPIClient.#createFetchRequest(requestBody)
         .then(async (response) => {
             if (!response || (response.status !== 200 && response.status !== 201)) {
                 const responseText = await response.text();
@@ -358,7 +358,7 @@ export class WaveAPIClient {
             `
         };
 
-        return WaveAPIClient.createFetchRequest(requestBody)
+        return WaveAPIClient.#createFetchRequest(requestBody)
         .then(async (response) => {
             if (!response || (response.status !== 200 && response.status !== 201)) {
                 const responseText = await response.text();
@@ -379,9 +379,206 @@ export class WaveAPIClient {
         });
     }
 
-    // TODO: createInvoice
+    static createInvoice(invoiceCreateInput) {
+        const requestBody = {
+            query: `
+            mutation($input: InvoiceCreateInput!) {
+                invoiceCreate(input: $input) {
+                    didSucceed
+                    inputErrors {
+                        code
+                        message
+                        path
+                    }
+                    invoice {
+                        id
+                        createdAt
+                        modifiedAt
+                        pdfUrl
+                        viewUrl
+                        status
+                        invoiceNumber
+                        invoiceDate
+                        customer {
+                            id
+                        }
+                        amountDue {
+                            value
+                        }
+                        amountPaid {
+                            value
+                        }
+                        total {
+                            value
+                        }
+                        memo
+                        items {
+                            product {
+                                id
+                                name
+                            }
+                            description
+                            total {
+                                value
+                            }
+                        }
+                    }
+                }
+            }
+            `,
+            variables: {
+                input: invoiceCreateInput
+            }
+        };
 
-    // TODO: editInvoice
+        return WaveAPIClient.#createFetchRequest(requestBody)
+        .then(async response => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not create invoice: ${responseText}`);
+            }
 
-    // TODO: deleteInvoice
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not create invoice: ${JSON.stringify(json.errors)}`);
+            }
+
+            const { inputErrors, invoice } = json.data.invoiceCreate;
+            if (inputErrors !== null) {
+                throw new Error(`Could not create invoice due to input errors: ${inputErrors}`);
+            }
+
+            return invoice;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+
+    static editInvoice(invoicePatchInput) {
+        const requestBody = {
+            query: `
+            mutation($input: InvoicePatchInput!) {
+                invoicePatch(input: $input) {
+                    didSucceed
+                    inputErrors {
+                        code
+                        message
+                        path
+                    }
+                    invoice {
+                        id
+                        createdAt
+                        modifiedAt
+                        pdfUrl
+                        viewUrl
+                        status
+                        invoiceNumber
+                        invoiceDate
+                        customer {
+                            id
+                        }
+                        amountDue {
+                            value
+                        }
+                        amountPaid {
+                            value
+                        }
+                        total {
+                            value
+                        }
+                        memo
+                        items {
+                            product {
+                                id
+                                name
+                            }
+                            description
+                            total {
+                                value
+                            }
+                        }
+                    }
+                }
+            }
+            `,
+            variables: {
+                input: invoicePatchInput
+            }
+        };
+
+        return WaveAPIClient.#createFetchRequest(requestBody)
+        .then(async response => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not edit invoice: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not edit invoice: ${JSON.stringify(json.errors)}`);
+            }
+
+            const { inputErrors, invoice } = json.data.invoicePatch;
+            if (inputErrors !== null) {
+                throw new Error(`Could not edit invoice due to input errors: ${inputErrors}`);
+            }
+
+            return invoice;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+
+    static deleteInvoice(invoiceId) {
+        const requestBody = {
+            query: `
+            mutation($input: InvoiceDeleteInput!) {
+                invoiceDelete(input: $input) {
+                    didSucceed
+                    inputErrors {
+                        code
+                        message
+                        path
+                    }
+                }
+            }
+            `,
+            variables: {
+                input: {
+                    invoiceId: invoiceId
+                }
+            }
+        };
+
+        return WaveAPIClient.#createFetchRequest(requestBody)
+        .then(async response => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not delete invoice: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not delete invoice: ${JSON.stringify(json.errors)}`);
+            }
+
+            const { didSucceed, inputErrors } = json.data.invoiceDelete;
+            if (inputErrors !== null) {
+                throw new Error(`Could not delete invoice due to input errors: ${inputErrors}`);
+            }
+
+            return didSucceed;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
 };

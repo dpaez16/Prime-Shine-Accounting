@@ -47,6 +47,64 @@ export default class App extends Component {
         };
     }
 
+    getCreateInvoiceInput() {
+        const date = new Date();
+
+        return {
+            businessId: this.state.businessId,
+            customerId: this.state.demoCustomerId,
+            status: "SAVED",
+            currency: "USD",
+            invoiceDate: date.toLocaleDateString('en-ca'),
+            memo: "Memo",
+            items: [
+                {
+                    productId: this.state.productId,
+                    description: "Regular Cleaning",
+                    quantity: 1,
+                    unitPrice: 120,
+                    taxes: undefined
+                },
+                {
+                    productId: this.state.productId,
+                    description: "Move Out Cleaning",
+                    quantity: 1,
+                    unitPrice: 150,
+                    taxes: undefined
+                }
+            ]
+        };
+    }
+
+    getEditInvoiceInput() {
+        const date = new Date();
+
+        return {
+            id: this.state.demoCustomerInvoiceId,
+            customerId: this.state.demoCustomerId,
+            status: "SAVED",
+            currency: "USD",
+            invoiceDate: date.toLocaleDateString('en-ca'),
+            memo: "Memo2",
+            items: [
+                {
+                    productId: this.state.productId,
+                    description: "Regular Cleaning",
+                    quantity: 1,
+                    unitPrice: 220,
+                    taxes: undefined
+                },
+                {
+                    productId: this.state.productId,
+                    description: "Move Out Cleaning",
+                    quantity: 1,
+                    unitPrice: 250,
+                    taxes: undefined
+                }
+            ]
+        };
+    }
+
     render() {
         return (
             <div className="App">
@@ -65,12 +123,12 @@ export default class App extends Component {
                     <button onClick={e => {
                         e.preventDefault();
                         WaveAPIClient.fetchBusinessData()
-                            .then(businessData => {
-                                this.setState(businessData);
-                            })
-                            .catch(err => {
-                                console.log(err);
-                            });
+                        .then(businessData => {
+                            this.setState(businessData);
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
                     }}>
                         fetchBusiness
                     </button>
@@ -140,6 +198,8 @@ export default class App extends Component {
                 <li>
                     <button onClick={e => {
                         e.preventDefault();
+
+                        // fails if there's invoices associated with customer: https://support.waveapps.com/hc/en-us/articles/360047951392
                         WaveAPIClient.deleteCustomer(this.state.demoCustomerId)
                         .then(didSucceed => {
                             console.log(didSucceed);
@@ -148,6 +208,48 @@ export default class App extends Component {
                         });
                     }}>
                         deleteCustomer
+                    </button>
+                </li>
+                <li>
+                    <button onClick={e => {
+                        e.preventDefault();
+                        const invoiceInput = this.getCreateInvoiceInput();
+                        WaveAPIClient.createInvoice(invoiceInput)
+                        .then(invoice => {
+                            console.log(invoice);
+                            this.setState({ demoCustomerInvoiceId: invoice.id });
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }}>
+                        createInvoice
+                    </button>
+                </li>
+                <li>
+                    <button onClick={e => {
+                        e.preventDefault();
+                        const invoiceInput = this.getEditInvoiceInput();
+                        WaveAPIClient.editInvoice(invoiceInput)
+                        .then(invoice => {
+                            console.log(invoice);
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }}>
+                        editInvoice
+                    </button>
+                </li>
+                <li>
+                    <button onClick={e => {
+                        e.preventDefault();
+                        WaveAPIClient.deleteInvoice(this.state.demoCustomerInvoiceId)
+                        .then(didSucceed => {
+                            console.log(didSucceed);
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }}>
+                        deleteInvoice
                     </button>
                 </li>
             </ul>
