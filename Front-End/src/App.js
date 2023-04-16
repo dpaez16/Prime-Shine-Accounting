@@ -298,6 +298,41 @@ export default class App extends Component {
                         loginUser
                     </button>
                 </li>
+                <li>
+                    <label for="editUser_userId">User ID:</label>&nbsp;&nbsp;
+                    <input type="text" id="editUser_userId" />
+                    <br />
+                    <label for="editUser_name">Name:</label>&nbsp;&nbsp;
+                    <input type="text" id="editUser_name" />
+                    <br />
+                    <label for="editUser_email">Email:</label>&nbsp;&nbsp;
+                    <input type="text" id="editUser_email" />
+                    <br />
+                    <label for="editUser_password">Password:</label>&nbsp;&nbsp;
+                    <input type="password" id="editUser_password" />
+                    <br />
+                    <button onClick={e => {
+                        e.preventDefault();
+
+                        const name = document.getElementById('editUser_name').value;
+                        const email = document.getElementById('editUser_email').value;
+                        const password = document.getElementById('editUser_password').value;
+                        const userId = document.getElementById('editUser_userId').value;
+                        PrimeShineAPIClient.editUser(name, email, password, userId)
+                        .then((user) => {
+                            this.setState({userInfo: {
+                                userId: user._id,
+                                name: user.name,
+                                email: user.email
+                            }});
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                    }}>
+                        editUser
+                    </button>
+                </li>
             </ul>
             </div>
         );
