@@ -156,7 +156,7 @@ export class WaveAPIClient {
     /**
      * Edits a Wave Customer.
      * @param {Object} customerPatchInput - The customer's metadata. Must follow the CustomerEditInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#customereditinput
-     * @return {Promise<Object>} - The promise with success returning the edited customer, otherwise an error for rejection. 
+     * @return {Promise<Object>} The promise with success returning the edited customer, otherwise an error for rejection. 
      */
     static editCustomer(customerPatchInput) {
         const requestBody = {
@@ -223,7 +223,7 @@ export class WaveAPIClient {
     /**
      * Deletes a Wave Customer.
      * @param {string} customerId - The customer's unique ID.
-     * @return {Promise<boolean>} - The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection. 
+     * @return {Promise<boolean>} The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection. 
      */
     static deleteCustomer(customerId) {
         const requestBody = {
@@ -275,16 +275,20 @@ export class WaveAPIClient {
     /**
      * Fetches customers from the business.
      * @param {string} businessId - The business's unique ID.
-     * @param {number} [pageNum] - The page number to grab customers from.
-     * @param {number} [pageSize] - The number of customers to grab from pageNum.
-     * @return {Promise<Array<Object>>} - The promise with success returning the requested customers, otherwise an error for rejection. 
+     * @param {number} [pageNum] - The page number to grab customers from. Defaults to first page.
+     * @return {Promise<Object>} The promise with success returning an object containing the requested customers and page info, otherwise an error for rejection. 
      */
-    static fetchCustomers(businessId, pageNum=1, pageSize=1000) {
+    static fetchCustomers(businessId, pageNum=1) {
         const requestBody = {
             query: `
             {
                 business(id: "${businessId}") {
-                    customers(page: ${pageNum}, pageSize: ${pageSize}, sort: [NAME_ASC]) {
+                    customers(page: ${pageNum}, sort: [NAME_ASC]) {
+                        pageInfo {
+                            currentPage
+                            totalPages
+                            totalCount
+                        }
                         edges {
                             node {
                                 id
@@ -321,7 +325,10 @@ export class WaveAPIClient {
         })
         .then(json => {
             // TODO: process raw customers into better format
-            return json.data.business.customers.edges.map(rawCustomer => rawCustomer.node);
+            return {
+                pageInfo: json.data.business.customers.pageInfo,
+                customers: json.data.business.customers.edges.map(rawCustomer => rawCustomer.node)
+            };
         })
         .catch((err) => {
             throw err;
@@ -330,18 +337,24 @@ export class WaveAPIClient {
 
     /**
      * Fetches invoices from the business.
+     * 
+     * Client can choose to include filters if they wish via the `filterParameters` argument.
+     * The filters should conform to the arguments to the `Business.invoices` field: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference
      * @param {string} businessId - The business's unique ID.
-     * @param {string} customerId - The customer's unique ID.
-     * @param {number} [pageNum] - The page number to grab invoices from.
-     * @param {number} [pageSize] - The number of invoices to grab from pageNum.
-     * @return {Promise<Array<Object>>} - The promise with success returning the requested invoices, otherwise an error for rejection. 
+     * @param {number} [pageNum] - The page number to grab invoices from. Defaults to first page.
+     * @param {Object} [filterParameters] - Parameters to filter the invoices by. Defaults to no filters.
+     * @return {Promise<Object>} The promise with success returning an object containing the requested invoices and page info, otherwise an error for rejection. 
      */
-    static fetchInvoices(businessId, customerId, pageNum=1, pageSize=1000) {
+    static fetchInvoices(businessId, pageNum=1, filterParameters={}) {
+        const parametersStr = Object.entries({ ...filterParameters, ...{ page: pageNum } }).map(([key, value]) => {
+            return `${key}: ${JSON.stringify(value)}`;
+        }).join(', ');
+
         const requestBody = {
             query: `
-            {
-                business(id: "${businessId}") {
-                    invoices(page: ${pageNum}, pageSize: ${pageSize}, customerId: "${customerId}") {
+            query($businessId: ID!) {
+                business(id: $businessId) {
+                    invoices(sort: [INVOICE_DATE_DESC], ${parametersStr}) {
                         pageInfo {
                             currentPage
                             totalPages
@@ -385,7 +398,10 @@ export class WaveAPIClient {
                     }
                 }
             }
-            `
+            `,
+            variables: {
+                businessId: businessId
+            }
         };
 
         return WaveAPIClient.#createFetchRequest(requestBody)
@@ -412,7 +428,7 @@ export class WaveAPIClient {
     /**
      * Creates a Wave Invoice.
      * @param {Object} invoiceCreateInput - The invoice's metadata. Must follow the InvoiceCreateInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#invoicecreateinput
-     * @return {Promise<Object>} - The promise with success returning the newly created invoice, otherwise an error for rejection. 
+     * @return {Promise<Object>} The promise with success returning the newly created invoice, otherwise an error for rejection. 
      */
     static createInvoice(invoiceCreateInput) {
         const requestBody = {
@@ -495,7 +511,7 @@ export class WaveAPIClient {
     /**
      * Edits a Wave Invoice.
      * @param {Object} invoicePatchInput - The invoice's metadata. Must follow the InvoicePatchInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#invoicepatchinput
-     * @return {Promise<Object>} - The promise with success returning the edited invoice, otherwise an error for rejection. 
+     * @return {Promise<Object>} The promise with success returning the edited invoice, otherwise an error for rejection. 
      */
     static editInvoice(invoicePatchInput) {
         const requestBody = {
@@ -578,7 +594,7 @@ export class WaveAPIClient {
     /**
      * Deletes a Wave Invoice.
      * @param {string} invoiceId - The invoice's unique ID.
-     * @return {Promise<boolean>} - The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection. 
+     * @return {Promise<boolean>} The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection. 
      */
     static deleteInvoice(invoiceId) {
         const requestBody = {

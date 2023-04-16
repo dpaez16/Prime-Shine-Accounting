@@ -137,7 +137,9 @@ export default class App extends Component {
                     <button onClick={e => {
                         e.preventDefault();
                         WaveAPIClient.fetchCustomers(this.state.businessId)
-                        .then(customers => {
+                        .then(data => {
+                            const { pageInfo, customers } = data;
+                            console.log(pageInfo);
                             console.log(customers);
                         }).catch(err => {
                             console.log(err);
@@ -154,7 +156,10 @@ export default class App extends Component {
                         e.preventDefault();
 
                         const customerId = document.getElementById('fetchInvoices_customerId').value;
-                        WaveAPIClient.fetchInvoices(this.state.businessId, customerId, 1, 20)
+                        const filterParameters = {
+                            customerId: customerId
+                        };
+                        WaveAPIClient.fetchInvoices(this.state.businessId, 1, filterParameters)
                         .then(data => {
                             const { pageInfo, invoices } = data;
                             console.log(pageInfo);
