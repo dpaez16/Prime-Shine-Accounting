@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { WaveAPIClient } from './api/waveApiClient';
+import { PrimeShineAPIClient } from './api/primeShineApiClient';
 import './App.css';
 
 export default class App extends Component {
@@ -149,7 +150,7 @@ export default class App extends Component {
                     </button>
                 </li>
                 <li>
-                <label for="fetchInvoices_customerId">Customer ID:</label>&nbsp;&nbsp;
+                    <label for="fetchInvoices_customerId">Customer ID:</label>&nbsp;&nbsp;
                     <input type="text" id="fetchInvoices_customerId" />
                     <br />
                     <button onClick={e => {
@@ -255,6 +256,46 @@ export default class App extends Component {
                         });
                     }}>
                         deleteInvoice
+                    </button>
+                </li>
+            </ul>
+            {
+                this.state.userInfo && 
+                <div>
+                    <p>ID: {this.state.userInfo.userId}</p>
+                    <p>Name: {this.state.userInfo.name}</p>
+                    <p>Email: {this.state.userInfo.email}</p>
+                    <p>JWT: {this.state.userInfo.jwtToken}</p>
+                </div>
+            }
+            <p>Prime Shine API:</p>
+            <ul>
+                <li>
+                    <label for="loginUser_email">Email:</label>&nbsp;&nbsp;
+                    <input type="text" id="loginUser_email" />
+                    <br />
+                    <label for="loginUser_password">Password:</label>&nbsp;&nbsp;
+                    <input type="password" id="loginUser_password" />
+                    <br />
+                    <button onClick={e => {
+                        e.preventDefault();
+
+                        const email = document.getElementById('loginUser_email').value;
+                        const password = document.getElementById('loginUser_password').value;
+                        PrimeShineAPIClient.loginUser(email, password)
+                        .then((user) => {
+                            this.setState({userInfo: {
+                                userId: user._id,
+                                name: user.name,
+                                email: user.email,
+                                jwtToken: user.token
+                            }});
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                    }}>
+                        loginUser
                     </button>
                 </li>
             </ul>
