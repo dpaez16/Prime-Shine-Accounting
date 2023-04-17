@@ -284,12 +284,14 @@ export default class App extends Component {
                         const password = document.getElementById('loginUser_password').value;
                         PrimeShineAPIClient.loginUser(email, password)
                         .then((user) => {
-                            this.setState({userInfo: {
+                            const newUserInfo = {...this.state.userInfo, ...{
                                 userId: user._id,
                                 name: user.name,
                                 email: user.email,
                                 jwtToken: user.token
-                            }});
+                            }};
+
+                            this.setState({ userInfo: newUserInfo });
                         })
                         .catch((err) => {
                             console.log(err);
@@ -318,19 +320,40 @@ export default class App extends Component {
                         const email = document.getElementById('editUser_email').value;
                         const password = document.getElementById('editUser_password').value;
                         const userId = document.getElementById('editUser_userId').value;
-                        PrimeShineAPIClient.editUser(name, email, password, userId)
+                        PrimeShineAPIClient.editUser(name, email, password, userId, this.state.userInfo.jwtToken)
                         .then((user) => {
-                            this.setState({userInfo: {
+                            const newUserInfo = {...this.state.userInfo, ...{
                                 userId: user._id,
                                 name: user.name,
                                 email: user.email
-                            }});
+                            }};
+
+                            this.setState({ userInfo: newUserInfo });
                         })
                         .catch((err) => {
                             console.log(err);
                         });
                     }}>
                         editUser
+                    </button>
+                </li>
+                <li>
+                    <label for="deleteUser_userId">User ID:</label>&nbsp;&nbsp;
+                    <input type="text" id="deleteUser_userId" />
+                    <br />
+                    <button onClick={e => {
+                        e.preventDefault();
+
+                        const userId = document.getElementById('deleteUser_userId').value;
+                        PrimeShineAPIClient.deleteUser(userId, this.state.userInfo.jwtToken)
+                        .then((didSucceed) => {
+                            console.log(didSucceed);
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                    }}>
+                        deleteUser
                     </button>
                 </li>
             </ul>
