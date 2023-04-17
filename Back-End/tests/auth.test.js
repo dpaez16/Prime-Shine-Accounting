@@ -2,6 +2,7 @@ const { expect, test } = require('@jest/globals');
 const { verifyToken, getJwtToken } = require('../modules/auth');
 
 const { MockResponse } = require('./mocks');
+const { JWT_HEADER } = require('../modules/consts');
 
 beforeAll(async () => {
     process.env.JWT_TOKEN = 'token';
@@ -19,11 +20,10 @@ describe('Auth Tests', () => {
     });
 
     test('verifyToken', async () => {
-        const req = {
-            headers: {
-                token: null
-            }
+        let req = {
+            headers: {}
         };
+        req.headers[JWT_HEADER] = null;
 
         let res = new MockResponse();
         const next = jest.fn();
@@ -34,7 +34,7 @@ describe('Auth Tests', () => {
 
         // returns error due to bad JWT secret
         process.env.JWT_TOKEN = null;
-        req.headers.token = 'token';
+        req.headers[JWT_HEADER] = 'token';
         verifyToken(req, res, next);
         expect(res.statusCode).toBe(401);
 
@@ -47,7 +47,7 @@ describe('Auth Tests', () => {
         };
 
         let token = getJwtToken(user);
-        req.headers.token = token;
+        req.headers[JWT_HEADER] = token;
         verifyToken(req, res, next);
         expect(next).toHaveBeenCalled();
     });
