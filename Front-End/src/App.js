@@ -271,6 +271,40 @@ export default class App extends Component {
             <p>Prime Shine API:</p>
             <ul>
                 <li>
+                    <label htmlFor="createUser_name">Name:</label>&nbsp;&nbsp;
+                    <input type="text" id="createUser_name" />
+                    <br />
+                    <label htmlFor="createUser_email">Email:</label>&nbsp;&nbsp;
+                    <input type="text" id="createUser_email" />
+                    <br />
+                    <label htmlFor="createUser_password">Password:</label>&nbsp;&nbsp;
+                    <input type="password" id="createUser_password" />
+                    <br />
+                    <button onClick={e => {
+                        e.preventDefault();
+
+                        const name = document.getElementById('createUser_name').value;
+                        const email = document.getElementById('createUser_email').value;
+                        const password = document.getElementById('createUser_password').value;
+                        PrimeShineAPIClient.createUser(name, email, password)
+                        .then((user) => {
+                            const newUserInfo = {...this.state.userInfo, ...{
+                                userId: user._id,
+                                name: user.name,
+                                email: user.email,
+                                jwtToken: user.token
+                            }};
+
+                            this.setState({ userInfo: newUserInfo });
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                    }}>
+                        createUser
+                    </button>
+                </li>
+                <li>
                     <label htmlFor="loginUser_email">Email:</label>&nbsp;&nbsp;
                     <input type="text" id="loginUser_email" />
                     <br />
@@ -354,6 +388,21 @@ export default class App extends Component {
                         });
                     }}>
                         deleteUser
+                    </button>
+                </li>
+                <li>
+                    <button onClick={e => {
+                        e.preventDefault();
+
+                        PrimeShineAPIClient.fetchSchedules(this.state.userInfo.userId, this.state.userInfo.jwtToken)
+                        .then((schedules) => {
+                            console.log(schedules);
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                    }}>
+                        fetchSchedules
                     </button>
                 </li>
             </ul>

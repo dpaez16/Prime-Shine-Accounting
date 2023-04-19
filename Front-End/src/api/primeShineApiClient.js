@@ -171,4 +171,61 @@ export class PrimeShineAPIClient {
             throw err;
         });
     }
+
+    /**
+     * Fetches schedules for a particular user.
+     * @param {string} userId - The user's unique ID.
+     * @param {string} jwt - The user's JSON web token.
+     * @return {Promise<Array<Object>>} The promise with success returning the requested schedules, otherwise an error for rejection.
+     */
+    static fetchSchedules(userId, jwt) {
+        const requestBody = {
+            query: `
+            query($userID: ID!) {
+                schedules(userID: $userID) {
+                    _id
+                    startDay
+                    user
+                }
+            }
+            `,
+            variables: {
+                userID: userId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not fetch schedules: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not fetch schedules: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.schedules;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+
+    // TODO: create schedule
+    // TODO: get schedules
+    // TODO: edit schedule
+    // TODO: delete schedule
+
+    // TODO: create schedule day
+    // TODO: get schedule days
+    // TODO: delete schedule day
+    
+    // TODO: create scheduled customer
+    // TODO: get scheduled customers
+    // TODO: edit scheduled customer
+    // TODO: delete scheduled customer
 };
