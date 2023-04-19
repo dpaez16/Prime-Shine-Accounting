@@ -150,7 +150,7 @@ export default class App extends Component {
                     </button>
                 </li>
                 <li>
-                    <label for="fetchInvoices_customerId">Customer ID:</label>&nbsp;&nbsp;
+                    <label htmlFor="fetchInvoices_customerId">Customer ID:</label>&nbsp;&nbsp;
                     <input type="text" id="fetchInvoices_customerId" />
                     <br />
                     <button onClick={e => {
@@ -271,10 +271,10 @@ export default class App extends Component {
             <p>Prime Shine API:</p>
             <ul>
                 <li>
-                    <label for="loginUser_email">Email:</label>&nbsp;&nbsp;
+                    <label htmlFor="loginUser_email">Email:</label>&nbsp;&nbsp;
                     <input type="text" id="loginUser_email" />
                     <br />
-                    <label for="loginUser_password">Password:</label>&nbsp;&nbsp;
+                    <label htmlFor="loginUser_password">Password:</label>&nbsp;&nbsp;
                     <input type="password" id="loginUser_password" />
                     <br />
                     <button onClick={e => {
@@ -301,16 +301,16 @@ export default class App extends Component {
                     </button>
                 </li>
                 <li>
-                    <label for="editUser_userId">User ID:</label>&nbsp;&nbsp;
+                    <label htmlFor="editUser_userId">User ID:</label>&nbsp;&nbsp;
                     <input type="text" id="editUser_userId" />
                     <br />
-                    <label for="editUser_name">Name:</label>&nbsp;&nbsp;
+                    <label htmlFor="editUser_name">Name:</label>&nbsp;&nbsp;
                     <input type="text" id="editUser_name" />
                     <br />
-                    <label for="editUser_email">Email:</label>&nbsp;&nbsp;
+                    <label htmlFor="editUser_email">Email:</label>&nbsp;&nbsp;
                     <input type="text" id="editUser_email" />
                     <br />
-                    <label for="editUser_password">Password:</label>&nbsp;&nbsp;
+                    <label htmlFor="editUser_password">Password:</label>&nbsp;&nbsp;
                     <input type="password" id="editUser_password" />
                     <br />
                     <button onClick={e => {
@@ -338,7 +338,7 @@ export default class App extends Component {
                     </button>
                 </li>
                 <li>
-                    <label for="deleteUser_userId">User ID:</label>&nbsp;&nbsp;
+                    <label htmlFor="deleteUser_userId">User ID:</label>&nbsp;&nbsp;
                     <input type="text" id="deleteUser_userId" />
                     <br />
                     <button onClick={e => {
