@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import { WaveAPIClient } from './api/waveApiClient';
 import { PrimeShineAPIClient } from './api/primeShineApiClient';
 import './App.css';
+import { constructDate } from './utils/helpers';
 
 export default class App extends Component {
     constructor(props) {
@@ -403,6 +404,64 @@ export default class App extends Component {
                         });
                     }}>
                         fetchSchedules
+                    </button>
+                </li>
+                <li>
+                    <label htmlFor="createSchedule_startDay">Start date:</label>&nbsp;&nbsp;
+                    <input  type="date"
+                            id="createSchedule_startDay"
+                            min="2010-01-01"
+                            max="2023-12-31"
+                            defaultValue=""
+                    ></input>
+                    <br />
+                    <button onClick={e => {
+                        e.preventDefault();
+
+                        const startDay = document.getElementById('createSchedule_startDay').value;
+                        
+                        if (!startDay) {
+                            return;
+                        }
+
+                        PrimeShineAPIClient.createSchedule(constructDate(startDay), this.state.userInfo.userId, this.state.userInfo.jwtToken)
+                        .then((schedule) => {
+                            console.log(schedule);
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                    }}>
+                        createSchedule
+                    </button>
+                </li>
+                <li>
+                    <label htmlFor="deleteSchedule_startDay">Start date:</label>&nbsp;&nbsp;
+                    <input  type="date"
+                            id="deleteSchedule_startDay"
+                            min="2010-01-01"
+                            max="2023-12-31"
+                            defaultValue=""
+                    ></input>
+                    <br />
+                    <button onClick={e => {
+                        e.preventDefault();
+
+                        const startDay = document.getElementById('deleteSchedule_startDay').value;
+                        
+                        if (!startDay) {
+                            return;
+                        }
+
+                        PrimeShineAPIClient.deleteSchedule(constructDate(startDay), this.state.userInfo.userId, this.state.userInfo.jwtToken)
+                        .then((didSucceed) => {
+                            console.log(didSucceed);
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                    }}>
+                        deleteSchedule
                     </button>
                 </li>
             </ul>

@@ -210,15 +210,106 @@ export class PrimeShineAPIClient {
 
             return json.data.schedules;
         })
+        .then((schedules) => {
+            return schedules.map((schedule) => {
+                const newStartDay = new Date(Number(schedule.startDay));
+                return { ...schedule, ...{startDay: newStartDay} };
+            });
+        })
         .catch(err => {
             throw err;
         });
     }
 
-    // TODO: create schedule
-    // TODO: get schedules
-    // TODO: edit schedule
-    // TODO: delete schedule
+    /**
+     * Creates a schedule.
+     * @param {Date} startDay - The day that the schedule begins with.
+     * @param {string} userId - The user's unique ID.
+     * @param {string} jwt - The user's JSON web token.
+     * @return {Promise<Object>} The promise with success returning the newly created schedule, otherwise an error for rejection.
+     */
+    static createSchedule(startDay, userId, jwt) {
+        const requestBody = {
+            query: `
+            mutation($startDay: String!, $userID: ID!) {
+                createSchedule(startDay: $startDay, userID: $userID) {
+                    _id
+                    startDay
+                    user
+                }
+            }
+            `,
+            variables: {
+                startDay: startDay,
+                userID: userId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not create schedule: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not create schedule: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.createSchedule;
+        })
+        .then(schedule => {
+            const newStartDay = new Date(Number(schedule.startDay));
+            return { ...schedule, ...{startDay: newStartDay} };
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+    
+    /**
+     * Deletes a schedule.
+     * @param {string} startDay - The start day for the schedule.
+     * @param {string} userId - The user's unique ID.
+     * @param {string} jwt - The user's JSON web token.
+     * @return {Promise<boolean>} The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection. 
+     */
+    static deleteSchedule(startDay, userId, jwt) {
+        const requestBody = {
+            query: `
+            mutation($startDay: String!, $userID: ID!) {
+                deleteSchedule(startDay: $startDay, userID: $userID)
+            }
+            `,
+            variables: {
+                startDay: startDay,
+                userID: userId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not delete schedule: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not delete schedule: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.deleteSchedule;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
 
     // TODO: create schedule day
     // TODO: get schedule days
