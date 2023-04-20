@@ -269,6 +269,55 @@ export class PrimeShineAPIClient {
             throw err;
         });
     }
+
+    /**
+     * Edits a schedule.
+     * @param {string} startDay - The start day of the schedule.
+     * @param {scheduleId} scheduleId - The schedule's unique ID.
+     * @param {string} jwt - The user's JSON web token.
+     * @return {Promise<Object>} The promise with success returning the edited schedule, otherwise an error for rejection.
+     */
+    static editSchedule(startDay, scheduleId, jwt) {
+        const requestBody = {
+            query: `
+            mutation($startDay: String!, $scheduleID: ID!) {
+                editSchedule(startDay: $startDay, scheduleID: $scheduleID) {
+                    _id
+                    startDay
+                    user
+                }
+            }
+            `,
+            variables: {
+                startDay: startDay,
+                scheduleID: scheduleId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not edit schedule: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not edit schedule: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.editSchedule;
+        })
+        .then(schedule => {
+            const newStartDay = new Date(Number(schedule.startDay));
+            return { ...schedule, ...{startDay: newStartDay} };
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
     
     /**
      * Deletes a schedule.

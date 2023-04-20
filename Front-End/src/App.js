@@ -413,7 +413,7 @@ export default class App extends Component {
                             min="2010-01-01"
                             max="2023-12-31"
                             defaultValue=""
-                    ></input>
+                    />
                     <br />
                     <button onClick={e => {
                         e.preventDefault();
@@ -436,13 +436,46 @@ export default class App extends Component {
                     </button>
                 </li>
                 <li>
+                    <label htmlFor="editSchedule_scheduleId">Schedule ID:</label>&nbsp;&nbsp;
+                    <input type="text" id="editSchedule_scheduleId" />
+                    <br />
+                    <label htmlFor="editSchedule_startDay">Start date:</label>&nbsp;&nbsp;
+                    <input  type="date"
+                            id="editSchedule_startDay"
+                            min="2010-01-01"
+                            max="2023-12-31"
+                            defaultValue=""
+                    />
+                    <br />
+                    <button onClick={e => {
+                        e.preventDefault();
+
+                        const startDay = document.getElementById('editSchedule_startDay').value;
+                        const scheduleId = document.getElementById('editSchedule_scheduleId').value;
+                        
+                        if (!startDay || !scheduleId) {
+                            return;
+                        }
+
+                        PrimeShineAPIClient.editSchedule(constructDate(startDay), scheduleId, this.state.userInfo.jwtToken)
+                        .then((schedule) => {
+                            console.log(schedule);
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                    }}>
+                        editSchedule
+                    </button>
+                </li>
+                <li>
                     <label htmlFor="deleteSchedule_startDay">Start date:</label>&nbsp;&nbsp;
                     <input  type="date"
                             id="deleteSchedule_startDay"
                             min="2010-01-01"
                             max="2023-12-31"
                             defaultValue=""
-                    ></input>
+                    />
                     <br />
                     <button onClick={e => {
                         e.preventDefault();
