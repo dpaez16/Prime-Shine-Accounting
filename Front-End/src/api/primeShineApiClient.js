@@ -1,4 +1,4 @@
-export class PrimeShineAPIClient {
+export default class PrimeShineAPIClient {
     static #createPreJWTFetchRequest(body, apiPath) {
         const url = `${process.env.REACT_APP_SCHEDULE_API_ENDPOINT_URL}/ps/${apiPath}`;
         return fetch(url, {
@@ -360,12 +360,117 @@ export class PrimeShineAPIClient {
         });
     }
 
-    // TODO: create schedule day
-    // TODO: get schedule days
-    // TODO: delete schedule day
+    static createScheduleDay(dayOffset, scheduleId, jwt) {
+        const requestBody = {
+            query: `
+            mutation($dayOffset: Int!, $scheduleID: ID!) {
+                createScheduleDay(dayOffset: $dayOffset, scheduleID: $scheduleID) {
+                    _id
+                    dayOffset
+                    schedule
+                }
+            }
+            `,
+            variables: {
+                dayOffset: dayOffset,
+                scheduleID: scheduleId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not create schedule day: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not create schedule day: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.createScheduleDay;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+
+    static getScheduleDays(scheduleId, jwt) {
+        const requestBody = {
+            query: `
+            query($scheduleID: ID!) {
+                scheduleDays(scheduleID: $scheduleID) {
+                    _id
+                    dayOffset
+                    schedule
+                }
+            }
+            `,
+            variables: {
+                scheduleID: scheduleId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not get schedule days: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not get schedule days: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.scheduleDays;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+
+    static deleteScheduleDay(dayOffset, scheduleId, jwt) {
+        const requestBody = {
+            query: `
+            mutation($dayOffset: Int!, $scheduleID: ID!) {
+                deleteScheduleDay(dayOffset: $dayOffset, scheduleID: $scheduleID)
+            }
+            `,
+            variables: {
+                dayOffset: dayOffset,
+                scheduleID: scheduleId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not delete schedule day: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not delete schedule day: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.deleteScheduleDay;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
     
-    // TODO: create scheduled customer
-    // TODO: get scheduled customers
-    // TODO: edit scheduled customer
-    // TODO: delete scheduled customer
+    // TODO: static createScheduledCustomer(customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt)
+    // TODO: static fetchScheduledCustomers(scheduleDayId, jwt)
+    // TODO: static editScheduledCustomer(scheduledCustomerId, customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt)
+    // TODO: static deleteScheduledCustomer(scheduledCustomerId, jwt)
 };

@@ -1,504 +1,59 @@
 import React, {Component} from 'react';
-import { WaveAPIClient } from './api/waveApiClient';
-import { PrimeShineAPIClient } from './api/primeShineApiClient';
+import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import HomePage from './components/homePage/homePage';
+import LoginPage from './components/loginPage/loginPage';
+import RegisterPage from './components/registerPage/registerPage';
+import EditProfilePage from './components/editProfilePage/editProfilePage';
 import './App.css';
-import { constructDate } from './utils/helpers';
 
 export default class App extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            userInfo: null
-        };
-    }
-
-    getDemoCustomerInput() {
-        return {
-            "businessId": this.state.businessId,
-            "name": "TEST_CUSTOMER",
-            "email": "foo@bar.com",
-            "mobile": "773-123-4567",
-            "phone": "773-123-4567",
-            "address": {
-                "addressLine1": "123 Main St.",
-                "addressLine2": "Unit 123",
-                "city": "Chicago",
-                "provinceCode": "US-IL",
-                "countryCode": "US",
-                "postalCode": "12345"
-            }
-        };
-    }
-
-    getEditCustomerInput() {
-        return {
-            "id": this.state.demoCustomerId,
-            "name": "TEST_CUSTOMER2",
-            "email": "bar@foo.com",
-            "phone": "773-012-3456",
-            "mobile": "773-234-5678",
-            "address": {
-                "addressLine1": "1234 Main St.",
-                "addressLine2": "Unit 1234",
-                "city": "Chicago",
-                "provinceCode": "US-IL",
-                "countryCode": "US",
-                "postalCode": "12345"
-            }
-        };
-    }
-
-    getCreateInvoiceInput() {
-        const date = new Date();
-
-        return {
-            businessId: this.state.businessId,
-            customerId: this.state.demoCustomerId,
-            status: "SAVED",
-            currency: "USD",
-            invoiceDate: date.toLocaleDateString('en-ca'), // needs to be yyyy-mm-dd format
-            memo: "Memo",
-            items: [
-                {
-                    productId: this.state.productId,
-                    description: "Regular Cleaning",
-                    quantity: 1,
-                    unitPrice: 120,
-                    taxes: undefined
-                },
-                {
-                    productId: this.state.productId,
-                    description: "Move Out Cleaning",
-                    quantity: 1,
-                    unitPrice: 150,
-                    taxes: undefined
-                }
-            ]
-        };
-    }
-
-    getEditInvoiceInput() {
-        const date = new Date();
-
-        return {
-            id: this.state.demoCustomerInvoiceId,
-            customerId: this.state.demoCustomerId,
-            status: "SAVED",
-            currency: "USD",
-            invoiceDate: date.toLocaleDateString('en-ca'), // needs to be yyyy-mm-dd format
-            memo: "Memo2",
-            items: [
-                {
-                    productId: this.state.productId,
-                    description: "Regular Cleaning",
-                    quantity: 1,
-                    unitPrice: 220,
-                    taxes: undefined
-                },
-                {
-                    productId: this.state.productId,
-                    description: "Move Out Cleaning",
-                    quantity: 1,
-                    unitPrice: 250,
-                    taxes: undefined
-                }
-            ]
-        };
+            userInfo: null,
+            businessInfo: null
+        }
     }
 
     render() {
         return (
-            <div className="App">
-            {
-                this.state.businessName && 
-                <div>
-                    <p>Business ID: {this.state.businessId}</p>
-                    <p>Business Name: {this.state.businessName}</p>
-                    <p>Product ID: {this.state.productId}</p>
-                    <p>Product Name: {this.state.productName}</p>
-                </div>
-            }
-            <p>Wave API:</p>
-            <ul>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-                        WaveAPIClient.fetchBusinessData()
-                        .then(businessData => {
-                            this.setState(businessData);
-                        })
-                        .catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        fetchBusiness
-                    </button>
-                </li>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-                        WaveAPIClient.fetchCustomers(this.state.businessId)
-                        .then(data => {
-                            const { pageInfo, customers } = data;
-                            console.log(pageInfo);
-                            console.log(customers);
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        fetchCustomers
-                    </button>
-                </li>
-                <li>
-                    <label htmlFor="fetchInvoices_customerId">Customer ID:</label>&nbsp;&nbsp;
-                    <input type="text" id="fetchInvoices_customerId" />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        const customerId = document.getElementById('fetchInvoices_customerId').value;
-                        const filterParameters = {
-                            customerId: customerId
-                        };
-                        WaveAPIClient.fetchInvoices(this.state.businessId, 1, filterParameters)
-                        .then(data => {
-                            const { pageInfo, invoices } = data;
-                            console.log(pageInfo);
-                            console.log(invoices);
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        fetchInvoices
-                    </button>
-                </li>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-                        const customerInput = this.getDemoCustomerInput();
-                        WaveAPIClient.createCustomer(customerInput)
-                        .then(customer => {
-                            console.log(customer);
-                            this.setState({ demoCustomerId: customer.id });
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        createCustomer
-                    </button>
-                </li>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-                        const customerInput = this.getEditCustomerInput();
-                        WaveAPIClient.editCustomer(customerInput)
-                        .then(customer => {
-                            console.log(customer);
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        editCustomer
-                    </button>
-                </li>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        // fails if there's invoices associated with customer: https://support.waveapps.com/hc/en-us/articles/360047951392
-                        WaveAPIClient.deleteCustomer(this.state.demoCustomerId)
-                        .then(didSucceed => {
-                            console.log(didSucceed);
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        deleteCustomer
-                    </button>
-                </li>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-                        const invoiceInput = this.getCreateInvoiceInput();
-                        WaveAPIClient.createInvoice(invoiceInput)
-                        .then(invoice => {
-                            console.log(invoice);
-                            this.setState({ demoCustomerInvoiceId: invoice.id });
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        createInvoice
-                    </button>
-                </li>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-                        const invoiceInput = this.getEditInvoiceInput();
-                        WaveAPIClient.editInvoice(invoiceInput)
-                        .then(invoice => {
-                            console.log(invoice);
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        editInvoice
-                    </button>
-                </li>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-                        WaveAPIClient.deleteInvoice(this.state.demoCustomerInvoiceId)
-                        .then(didSucceed => {
-                            console.log(didSucceed);
-                        }).catch(err => {
-                            console.log(err);
-                        });
-                    }}>
-                        deleteInvoice
-                    </button>
-                </li>
-            </ul>
-            {
-                this.state.userInfo && 
-                <div>
-                    <p>ID: {this.state.userInfo.userId}</p>
-                    <p>Name: {this.state.userInfo.name}</p>
-                    <p>Email: {this.state.userInfo.email}</p>
-                    <p>JWT: {this.state.userInfo.jwtToken}</p>
-                </div>
-            }
-            <p>Prime Shine API:</p>
-            <ul>
-                <li>
-                    <label htmlFor="createUser_name">Name:</label>&nbsp;&nbsp;
-                    <input type="text" id="createUser_name" />
-                    <br />
-                    <label htmlFor="createUser_email">Email:</label>&nbsp;&nbsp;
-                    <input type="text" id="createUser_email" />
-                    <br />
-                    <label htmlFor="createUser_password">Password:</label>&nbsp;&nbsp;
-                    <input type="password" id="createUser_password" />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        const name = document.getElementById('createUser_name').value;
-                        const email = document.getElementById('createUser_email').value;
-                        const password = document.getElementById('createUser_password').value;
-                        PrimeShineAPIClient.createUser(name, email, password)
-                        .then((user) => {
-                            const newUserInfo = {...this.state.userInfo, ...{
-                                userId: user._id,
-                                name: user.name,
-                                email: user.email,
-                                jwtToken: user.token
-                            }};
-
-                            this.setState({ userInfo: newUserInfo });
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }}>
-                        createUser
-                    </button>
-                </li>
-                <li>
-                    <label htmlFor="loginUser_email">Email:</label>&nbsp;&nbsp;
-                    <input type="text" id="loginUser_email" />
-                    <br />
-                    <label htmlFor="loginUser_password">Password:</label>&nbsp;&nbsp;
-                    <input type="password" id="loginUser_password" />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        const email = document.getElementById('loginUser_email').value;
-                        const password = document.getElementById('loginUser_password').value;
-                        PrimeShineAPIClient.loginUser(email, password)
-                        .then((user) => {
-                            const newUserInfo = {...this.state.userInfo, ...{
-                                userId: user._id,
-                                name: user.name,
-                                email: user.email,
-                                jwtToken: user.token
-                            }};
-
-                            this.setState({ userInfo: newUserInfo });
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }}>
-                        loginUser
-                    </button>
-                </li>
-                <li>
-                    <label htmlFor="editUser_userId">User ID:</label>&nbsp;&nbsp;
-                    <input type="text" id="editUser_userId" />
-                    <br />
-                    <label htmlFor="editUser_name">Name:</label>&nbsp;&nbsp;
-                    <input type="text" id="editUser_name" />
-                    <br />
-                    <label htmlFor="editUser_email">Email:</label>&nbsp;&nbsp;
-                    <input type="text" id="editUser_email" />
-                    <br />
-                    <label htmlFor="editUser_password">Password:</label>&nbsp;&nbsp;
-                    <input type="password" id="editUser_password" />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        const name = document.getElementById('editUser_name').value;
-                        const email = document.getElementById('editUser_email').value;
-                        const password = document.getElementById('editUser_password').value;
-                        const userId = document.getElementById('editUser_userId').value;
-                        PrimeShineAPIClient.editUser(name, email, password, userId, this.state.userInfo.jwtToken)
-                        .then((user) => {
-                            const newUserInfo = {...this.state.userInfo, ...{
-                                userId: user._id,
-                                name: user.name,
-                                email: user.email
-                            }};
-
-                            this.setState({ userInfo: newUserInfo });
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }}>
-                        editUser
-                    </button>
-                </li>
-                <li>
-                    <label htmlFor="deleteUser_userId">User ID:</label>&nbsp;&nbsp;
-                    <input type="text" id="deleteUser_userId" />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        const userId = document.getElementById('deleteUser_userId').value;
-                        PrimeShineAPIClient.deleteUser(userId, this.state.userInfo.jwtToken)
-                        .then((didSucceed) => {
-                            console.log(didSucceed);
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }}>
-                        deleteUser
-                    </button>
-                </li>
-                <li>
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        PrimeShineAPIClient.fetchSchedules(this.state.userInfo.userId, this.state.userInfo.jwtToken)
-                        .then((schedules) => {
-                            console.log(schedules);
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }}>
-                        fetchSchedules
-                    </button>
-                </li>
-                <li>
-                    <label htmlFor="createSchedule_startDay">Start date:</label>&nbsp;&nbsp;
-                    <input  type="date"
-                            id="createSchedule_startDay"
-                            min="2010-01-01"
-                            max="2023-12-31"
-                            defaultValue=""
-                    />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        const startDay = document.getElementById('createSchedule_startDay').value;
-                        
-                        if (!startDay) {
-                            return;
-                        }
-
-                        PrimeShineAPIClient.createSchedule(constructDate(startDay), this.state.userInfo.userId, this.state.userInfo.jwtToken)
-                        .then((schedule) => {
-                            console.log(schedule);
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }}>
-                        createSchedule
-                    </button>
-                </li>
-                <li>
-                    <label htmlFor="editSchedule_scheduleId">Schedule ID:</label>&nbsp;&nbsp;
-                    <input type="text" id="editSchedule_scheduleId" />
-                    <br />
-                    <label htmlFor="editSchedule_startDay">Start date:</label>&nbsp;&nbsp;
-                    <input  type="date"
-                            id="editSchedule_startDay"
-                            min="2010-01-01"
-                            max="2023-12-31"
-                            defaultValue=""
-                    />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        const startDay = document.getElementById('editSchedule_startDay').value;
-                        const scheduleId = document.getElementById('editSchedule_scheduleId').value;
-                        
-                        if (!startDay || !scheduleId) {
-                            return;
-                        }
-
-                        PrimeShineAPIClient.editSchedule(constructDate(startDay), scheduleId, this.state.userInfo.jwtToken)
-                        .then((schedule) => {
-                            console.log(schedule);
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }}>
-                        editSchedule
-                    </button>
-                </li>
-                <li>
-                    <label htmlFor="deleteSchedule_startDay">Start date:</label>&nbsp;&nbsp;
-                    <input  type="date"
-                            id="deleteSchedule_startDay"
-                            min="2010-01-01"
-                            max="2023-12-31"
-                            defaultValue=""
-                    />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-
-                        const startDay = document.getElementById('deleteSchedule_startDay').value;
-                        
-                        if (!startDay) {
-                            return;
-                        }
-
-                        PrimeShineAPIClient.deleteSchedule(constructDate(startDay), this.state.userInfo.userId, this.state.userInfo.jwtToken)
-                        .then((didSucceed) => {
-                            console.log(didSucceed);
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                        });
-                    }}>
-                        deleteSchedule
-                    </button>
-                </li>
-            </ul>
-            </div>
+            <Router>
+                <React.Fragment>
+                    <div className="main-content">
+                        <Routes>
+                            <Route  path="/" 
+                                    element={
+                                        <HomePage
+                                            userInfo={this.state.userInfo}
+                                            businessInfo={this.state.businessInfo}
+                                            updateUserInfo={newUserInfo => this.setState({userInfo: newUserInfo})}
+                                            updateBusinessInfo={newBusinessInfo => this.setState({businessInfo: newBusinessInfo})}
+                                        />
+                                    }
+                            />
+                            <Route  path="/login" 
+                                    element={
+                                        <LoginPage
+                                            updateUserInfo={newUserInfo => this.setState({userInfo: newUserInfo})}
+                                            updateBusinessInfo={newBusinessInfo => this.setState({businessInfo: newBusinessInfo})}
+                                        />
+                                    }
+                            />
+                            <Route  path="/editProfile" 
+                                    element={
+                                        <EditProfilePage 
+                                            updateUserInfo={newUserInfo => this.setState({userInfo: {...this.state.userInfo, ...newUserInfo}})} // passed here since we cannot serialize functions for navigation()
+                                        />
+                                    }
+                            />
+                            <Route  path="/register" 
+                                    element={<RegisterPage />}
+                            />
+                        </Routes>
+                    </div>
+                </React.Fragment>
+            </Router>
         );
     }
 };

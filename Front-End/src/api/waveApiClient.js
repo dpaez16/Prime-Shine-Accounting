@@ -1,4 +1,4 @@
-export class WaveAPIClient {
+export default class WaveAPIClient {
     static #createFetchRequest(body) {
         return fetch(process.env.REACT_APP_WAVE_ENDPOINT_URL, {
             method: "POST",
