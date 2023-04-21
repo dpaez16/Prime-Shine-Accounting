@@ -18,7 +18,6 @@ export const dateToStr = function(date) {
 }
 
 export const constructDate = function(date) {
+    // Wave likes invoice dates in yyyy-mm-dd
     return new Date(`${date} 00:00`);
 }
-
-// Wave likes invoice dates in yyyy-mm-dd

@@ -4,6 +4,7 @@ import HomePage from './components/homePage/homePage';
 import LoginPage from './components/loginPage/loginPage';
 import RegisterPage from './components/registerPage/registerPage';
 import EditProfilePage from './components/editProfilePage/editProfilePage';
+import SchedulesPage from './components/schedulesPage/schedulesPage';
 import './App.css';
 
 export default class App extends Component {
@@ -13,7 +14,7 @@ export default class App extends Component {
         this.state = {
             userInfo: null,
             businessInfo: null
-        }
+        };
     }
 
     render() {
@@ -27,8 +28,6 @@ export default class App extends Component {
                                         <HomePage
                                             userInfo={this.state.userInfo}
                                             businessInfo={this.state.businessInfo}
-                                            updateUserInfo={newUserInfo => this.setState({userInfo: newUserInfo})}
-                                            updateBusinessInfo={newBusinessInfo => this.setState({businessInfo: newBusinessInfo})}
                                         />
                                     }
                             />
@@ -49,6 +48,13 @@ export default class App extends Component {
                             />
                             <Route  path="/register" 
                                     element={<RegisterPage />}
+                            />
+                            <Route  path="/schedules"
+                                    element={
+                                        <SchedulesPage
+                                            userInfo={this.state.userInfo}
+                                        />
+                                    }
                             />
                         </Routes>
                     </div>

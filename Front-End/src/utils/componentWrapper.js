@@ -5,8 +5,12 @@ const componentWrapper = (Component) => {
     return (props) => {
         const navigation = useNavigate();
         const location = useLocation();
-
-        return <Component navigation={navigation} location={location} {...props} />
+        
+        return <Component 
+                    navigation={navigation} 
+                    location={location}
+                    {...props}
+                />
     }
 }
 

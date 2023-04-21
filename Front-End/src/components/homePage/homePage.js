@@ -40,38 +40,52 @@ class HomePage extends Component {
                     <li>Business Name: {this.props.businessInfo.businessName}</li>
                     <li>Product ID: {this.props.businessInfo.productId}</li>
                     <li>Product Name: {this.props.businessInfo.productName}</li>
-                </ul>                
-                <button onClick={e => {
-                    e.preventDefault();
+                </ul>  
+                <p>Options:</p>              
+                <ul>
+                    <li>
+                        <button onClick={e => {
+                            e.preventDefault();
 
-                    this.props.updateUserInfo(null);
-                    this.props.updateBusinessInfo(null);
-                    this.props.navigation('/');
-                }}>
-                    Logout
-                </button>
-                <br />
-                <button onClick={e => {
-                    e.preventDefault();
+                            this.props.setUserInfo(null);
+                            this.props.setBusinessInfo(null);
+                            this.props.navigation('/');
+                        }}>
+                            Logout
+                        </button>
+                    </li>
+                    <li>
+                        <button onClick={e => {
+                            e.preventDefault();
 
-                    if (window.confirm("Delete account?")) {
-                        this.handleDeleteAccount();
-                    }
-                }}>
-                    Delete Account
-                </button>
-                <button onClick={e => {
-                    e.preventDefault();
+                            if (window.confirm("Delete account?")) {
+                                this.handleDeleteAccount();
+                            }
+                        }}>
+                            Delete Account
+                        </button>
+                    </li>
+                    <li>
+                        <button onClick={e => {
+                            e.preventDefault();
 
-                    this.props.navigation('/editProfile', {
-                        state: {
-                            userId: this.props.userInfo._id,
-                            token: this.props.userInfo.token
-                        }
-                    });
-                }}>
-                    Edit Profile
-                </button>
+                            this.props.navigation('/editProfile');
+                        }}>
+                            Edit Profile
+                        </button>
+                    </li>
+                    <li>
+                        <a
+                            href="/schedules"
+                            onClick={e => {
+                                e.preventDefault(); 
+                                this.props.navigation('/schedules');
+                            }}
+                        >
+                            Get Schedules
+                        </a>
+                    </li>
+                </ul>
             </div>
         );
     }
