@@ -336,6 +336,65 @@ export default class WaveAPIClient {
     }
 
     /**
+     * Fetches a customer from the business.
+     * @param {string} businessId - The business's unique ID.
+     * @param {string} customerId - The customer's unique ID.
+     * @return {Promise<Object>} The promise with success returning an object containing the requested customer's info, otherwise an error for rejection. 
+     */
+    static fetchCustomer(businessId, customerId) {
+        const requestBody = {
+            query: `
+            query($businessId: ID!, $customerId: ID!)
+            {
+                business(id: $businessId) {
+                    customer(id: $customerId) {
+                        id
+                        name
+                        email
+                        mobile
+                        phone
+                        address {
+                            addressLine1
+                            addressLine2
+                            city
+                            province {
+                                code
+                                name
+                            }
+                            postalCode
+                        }
+                    }
+                }
+            }
+            `,
+            variables: {
+                businessId: businessId,
+                customerId: customerId
+            }
+        };
+
+        return WaveAPIClient.#createFetchRequest(requestBody)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not fetch customer: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not fetch customer: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.business.customer;
+        })
+        .catch((err) => {
+            throw err;
+        });
+    }
+
+    /**
      * Fetches invoices from the business.
      * 
      * Client can choose to include filters if they wish via the `filterParameters` argument.

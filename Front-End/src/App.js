@@ -5,6 +5,7 @@ import LoginPage from './components/loginPage/loginPage';
 import RegisterPage from './components/registerPage/registerPage';
 import EditProfilePage from './components/editProfilePage/editProfilePage';
 import SchedulesPage from './components/schedulesPage/schedulesPage';
+import IndividualSchedulePage from './components/individualSchedulePage/individualSchedulePage';
 import './App.css';
 
 export default class App extends Component {
@@ -28,6 +29,8 @@ export default class App extends Component {
                                         <HomePage
                                             userInfo={this.state.userInfo}
                                             businessInfo={this.state.businessInfo}
+                                            updateUserInfo={newUserInfo => this.setState({userInfo: newUserInfo})}
+                                            updateBusinessInfo={newBusinessInfo => this.setState({businessInfo: newBusinessInfo})}
                                         />
                                     }
                             />
@@ -53,6 +56,14 @@ export default class App extends Component {
                                     element={
                                         <SchedulesPage
                                             userInfo={this.state.userInfo}
+                                        />
+                                    }
+                            />
+                            <Route  path="/viewSchedule"
+                                    element={
+                                        <IndividualSchedulePage
+                                            userInfo={this.state.userInfo}
+                                            businessInfo={this.state.businessInfo}
                                         />
                                     }
                             />

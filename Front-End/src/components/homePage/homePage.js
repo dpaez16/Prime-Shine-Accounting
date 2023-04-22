@@ -47,8 +47,8 @@ class HomePage extends Component {
                         <button onClick={e => {
                             e.preventDefault();
 
-                            this.props.setUserInfo(null);
-                            this.props.setBusinessInfo(null);
+                            this.props.updateUserInfo(null);
+                            this.props.updateBusinessInfo(null);
                             this.props.navigation('/');
                         }}>
                             Logout

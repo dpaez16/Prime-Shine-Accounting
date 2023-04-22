@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Table, Button, Dimmer, Loader, Segment, Modal} from 'semantic-ui-react';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import componentWrapper from '../../utils/componentWrapper';
-import { constructDate } from '../../utils/helpers';
+import { constructDate, dateToStr } from '../../utils/helpers';
 //import './schedulesPage.css';
 
 class SchedulesPage extends Component {
@@ -66,16 +66,31 @@ class SchedulesPage extends Component {
             <div className="SchedulesPage">
                 <p>Schedules:</p>
                 <Table celled className="SchedulesPage_table">
+                    <Table.Body>
                     {
                         this.state.schedules.map((schedule, idx) => {
-                            const { _id, startDay } = schedule;
                             return (
-                                <Table.Row id={`SchedulesPage_table_Schedule${idx}`}>
-                                    <Table.Cell>{_id} - {startDay.toString()}</Table.Cell>
+                                <Table.Row key={`SchedulesPage_table_Schedule${idx}`}>
+                                    <Table.Cell>
+                                        <a
+                                            href='/viewSchedule'
+                                            onClick={e => {
+                                                e.preventDefault();
+                                                this.props.navigation('/viewSchedule', {
+                                                    state: {
+                                                        schedule: schedule
+                                                    }
+                                                });
+                                            }}
+                                        >
+                                            {dateToStr(schedule.startDay)}
+                                        </a>
+                                    </Table.Cell>
                                 </Table.Row>
                             );
                         })
                     }
+                    </Table.Body>
                 </Table>
                 <Modal
                     onClose={() => this.setState({
