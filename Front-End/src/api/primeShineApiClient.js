@@ -535,6 +535,51 @@ export default class PrimeShineAPIClient {
     }
     
     // TODO: static createScheduledCustomer(customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt)
-    // TODO: static editScheduledCustomer(scheduledCustomerId, customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt)
+    
+    static editScheduledCustomer(scheduledCustomerId, customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt) {
+        const requestBody = {
+            query: `
+            mutation($scheduledCustomerInput: ScheduledCustomerInput!, $scheduledCustomerID: ID!) {
+                editScheduledCustomer(scheduledCustomerInput: $scheduledCustomerInput, scheduledCustomerID: $scheduledCustomerID) {
+                    _id
+                    customerId
+                    serviceStartTime
+                    serviceEndTime
+                    scheduleDay
+                }
+            }
+            `,
+            variables: {
+                scheduledCustomerInput: {
+                    customerId: customerId,
+                    serviceStartTime: serviceStartTime,
+                    serviceEndTime: serviceEndTime,
+                    scheduleDay: scheduleDayId
+                },
+                scheduledCustomerID: scheduledCustomerId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not edit scheduled customer: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not edit scheduled customer: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.editScheduledCustomer;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
+    
     // TODO: static deleteScheduledCustomer(scheduledCustomerId, jwt)
 };
