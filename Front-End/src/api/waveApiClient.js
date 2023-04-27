@@ -281,9 +281,9 @@ export default class WaveAPIClient {
     static fetchCustomers(businessId, pageNum=1) {
         const requestBody = {
             query: `
-            {
-                business(id: "${businessId}") {
-                    customers(page: ${pageNum}, sort: [NAME_ASC]) {
+            query($businessId: ID!, $pageNum: Int!) {
+                business(id: $businessId) {
+                    customers(page: $pageNum, sort: [NAME_ASC]) {
                         pageInfo {
                             currentPage
                             totalPages
@@ -311,7 +311,11 @@ export default class WaveAPIClient {
                     }
                 }
             }
-            `
+            `,
+            variables: {
+                businessId: businessId,
+                pageNum: pageNum
+            }
         };
 
         return WaveAPIClient.#createFetchRequest(requestBody)
@@ -348,8 +352,7 @@ export default class WaveAPIClient {
     static fetchCustomer(businessId, customerId) {
         const requestBody = {
             query: `
-            query($businessId: ID!, $customerId: ID!)
-            {
+            query($businessId: ID!, $customerId: ID!) {
                 business(id: $businessId) {
                     customer(id: $customerId) {
                         id
