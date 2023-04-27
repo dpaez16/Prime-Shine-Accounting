@@ -536,6 +536,16 @@ export default class PrimeShineAPIClient {
     
     // TODO: static createScheduledCustomer(customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt)
     
+    /**
+     * Edits a scheduled customer.
+     * @param {string} scheduledCustomerId - The scheduled customer's unique ID.
+     * @param {string} customerId - The scheduled customer's unique WaveApps ID.
+     * @param {Date} serviceStartTime - The scheduled customer's service start time.
+     * @param {Date} serviceEndTime - The scheduled customer's service end time.
+     * @param {string} scheduleDayId - The schedule's unique ID.
+     * @param {string} jwt - The user's JSON web token.
+     * @returns {Promise<Object>} The promise with success returning the edited scheduled customer, otherwise an error for rejection. 
+     */
     static editScheduledCustomer(scheduledCustomerId, customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt) {
         const requestBody = {
             query: `
@@ -581,5 +591,42 @@ export default class PrimeShineAPIClient {
         });
     }
     
-    // TODO: static deleteScheduledCustomer(scheduledCustomerId, jwt)
+    /**
+     * Deletes a scheduled customer.
+     * @param {string} scheduledCustomerId - The scheduled customer's unique ID.
+     * @param {string} jwt - The user's JSON web token.
+     * @return {Promise<boolean>} The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection.
+     */
+    static deleteScheduledCustomer(scheduledCustomerId, jwt) {
+        const requestBody = {
+            query: `
+            mutation($scheduledCustomerId: ID!) {
+                deleteScheduledCustomer(scheduledCustomerID: $scheduledCustomerId)
+            }
+            `,
+            variables: {
+                scheduledCustomerId: scheduledCustomerId
+            }
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not delete scheduled customer: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not delete scheduled customer: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.deleteScheduledCustomer;
+        })
+        .catch(err => {
+            throw err;
+        });
+    }
 };
