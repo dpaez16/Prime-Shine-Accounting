@@ -5,8 +5,8 @@ const JWT_TTL = '2h';
 
 module.exports = {
     verifyToken: (req, res, next) => {
-        const token = req.headers[JWT_HEADER.toLowerCase()];
-
+        const token = req.headers[JWT_HEADER] || req.headers[JWT_HEADER.toLowerCase()] || undefined;
+        
         if (!token) {
             return res.status(403).send({ error: `A token is required for authentication (missing header in '${JWT_HEADER}' field).` });
         }

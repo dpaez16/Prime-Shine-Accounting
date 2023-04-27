@@ -20,10 +20,12 @@ describe('Auth Tests', () => {
     });
 
     test('verifyToken', async () => {
+        const authHeaderKey = JWT_HEADER;
+
         let req = {
             headers: {}
         };
-        req.headers[JWT_HEADER] = null;
+        req.headers[authHeaderKey] = null;
 
         let res = new MockResponse();
         const next = jest.fn();
@@ -34,7 +36,7 @@ describe('Auth Tests', () => {
 
         // returns error due to bad JWT secret
         process.env.JWT_TOKEN = null;
-        req.headers[JWT_HEADER] = 'token';
+        req.headers[authHeaderKey] = 'token';
         verifyToken(req, res, next);
         expect(res.statusCode).toBe(401);
 
@@ -47,7 +49,7 @@ describe('Auth Tests', () => {
         };
 
         let token = getJwtToken(user);
-        req.headers[JWT_HEADER] = token;
+        req.headers[authHeaderKey] = token;
         verifyToken(req, res, next);
         expect(next).toHaveBeenCalled();
     });
