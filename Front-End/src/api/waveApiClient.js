@@ -324,6 +324,10 @@ export default class WaveAPIClient {
             return response.json();
         })
         .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not edit invoice: ${JSON.stringify(json.errors)}`);
+            }
+
             // TODO: process raw customers into better format
             return {
                 pageInfo: json.data.business.customers.pageInfo,
@@ -467,12 +471,16 @@ export default class WaveAPIClient {
         .then(async (response) => {
             if (!response || (response.status !== 200 && response.status !== 201)) {
                 const responseText = await response.text();
-                throw new Error(`Could not fetch customers: ${responseText}`);
+                throw new Error(`Could not fetch invoices: ${responseText}`);
             }
 
             return response.json();
         })
         .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not fetch invoices: ${JSON.stringify(json.errors)}`);
+            }
+            
             // TODO: process raw invoices into better format
             return {
                 pageInfo: json.data.business.invoices.pageInfo,
