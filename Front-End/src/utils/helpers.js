@@ -1,3 +1,5 @@
+import WaveAPIClient from '../api/waveApiClient';
+
 export const deleteItemFromArray = function(arr, valObj) {
     const val = valObj._id;
     const idx = arr.findIndex(obj => obj._id === val);
@@ -47,9 +49,43 @@ export const constructTimeStr = function(dateEpochStr) {
     const dateNum = Number(dateEpochStr);
     const date = new Date(dateNum);
 
-    const hours = date.getHours();
+    let hours = date.getHours();
     const minutes = `${date.getMinutes()}`.padStart(2, '0');
-    const timePeriod = hours <= 12 ? "AM" : "PM";
+    const timePeriod = hours < 12 ? "AM" : "PM";
+
+    if (hours > 12) {
+        hours -= 12;
+    }
 
     return `${hours}:${minutes} ${timePeriod}`;
+}
+
+export const fuseDateTime = function(dateStr, timeStr) {
+    return new Date(`${dateStr} ${timeStr}`);
+}
+
+/**
+ * Fetches all customers from Wave.
+ * @param {string} businessId - The business's unique ID.
+ * @returns {Promise<Array<Object>>} The promise with success returning all customers, otherwise an error for rejection.
+ */
+export const fetchAllCustomers = async function(businessId) {
+    let pageNum = 1;
+    let allCustomers = [];
+
+    while (true) {
+        const results = await WaveAPIClient.fetchCustomers(businessId, pageNum);    
+        const { pageInfo, customers } = results;
+        const { totalPages } = pageInfo;
+
+        allCustomers = [...allCustomers, ...customers];
+
+        if (totalPages === pageNum) {
+            break;
+        }
+
+        pageNum += 1;
+    }
+
+    return allCustomers;
 }

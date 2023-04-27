@@ -4,7 +4,7 @@ import ScheduledCustomerTable from '../scheduledCustomerTable/scheduledCustomerT
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import WaveAPIClient from '../../api/waveApiClient';
 import componentWrapper from '../../utils/componentWrapper';
-import { dateToStr } from '../../utils/helpers';
+import { dateToStr, fetchAllCustomers } from '../../utils/helpers';
 //import './individualSchedulePage.css';
 
 class IndividualSchedulePage extends Component {
@@ -12,7 +12,8 @@ class IndividualSchedulePage extends Component {
         super(props);
         
         this.state = {
-            loading: true
+            loading: true,
+            allCustomers: []
         }
     }
 
@@ -72,11 +73,38 @@ class IndividualSchedulePage extends Component {
         })
         .then((completeScheduleDays) => {
             this.setState({
-                scheduleDays: completeScheduleDays,
+                scheduleDays: completeScheduleDays
+            });
+
+            return fetchAllCustomers(businessId);
+        })
+        .then((allCustomers) => {
+            this.setState({
+                allCustomers: allCustomers,
                 loading: false
             });
         })
         .catch(err => console.log);
+    }
+
+    editScheduledCustomerHandler(idx, newScheduledCustomer) {
+        const scheduleDays = this.state.scheduleDays;
+
+        const customerIdx = scheduleDays[idx].findIndex(scheduledCustomer => scheduledCustomer._id === newScheduledCustomer._id);
+        const oldScheduledCustomerEntry = scheduleDays[idx][customerIdx];
+        const newScheduledCustomerEntry = { ...oldScheduledCustomerEntry, ...newScheduledCustomer };
+
+        const newMetadata = this.state.allCustomers.find(customer => customer.id === newScheduledCustomer.customerId);
+        newScheduledCustomerEntry.metadata = newMetadata;
+
+        let newScheduledCustomers = [...scheduleDays[idx]];
+        newScheduledCustomers.splice(customerIdx, 1, newScheduledCustomerEntry);
+        const newScheduleDays = { ...scheduleDays };
+        newScheduleDays[idx] = newScheduledCustomers;
+
+        this.setState({
+            scheduleDays: newScheduleDays
+        });
     }
 
     render() {
@@ -111,6 +139,11 @@ class IndividualSchedulePage extends Component {
                                 idx={idx}
                                 key={idx}
                                 scheduledCustomers={scheduleDays[idx]}
+                                allCustomers={this.state.allCustomers}
+                                userInfo={this.props.userInfo}
+                                updateScheduledCustomer={(newScheduledCustomer) => {
+                                    this.editScheduledCustomerHandler(idx, newScheduledCustomer);
+                                }}
                             />
                         );
                     })
