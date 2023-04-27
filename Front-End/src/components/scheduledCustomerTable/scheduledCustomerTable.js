@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Table, Button} from 'semantic-ui-react';
+import {Table} from 'semantic-ui-react';
 import EditScheduledCustomerModal from '../editScheduledCustomerModal/editScheduledCustomerModal';
+import DeleteScheduleModal from '../deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import componentWrapper from '../../utils/componentWrapper';
 import { dateToStr, constructTimeStr } from '../../utils/helpers';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
@@ -33,6 +34,13 @@ class ScheduledCustomerTable extends Component {
                         scheduledCustomers.map((scheduledCustomer, customerIdx) => {
                             const serviceStartTime = constructTimeStr(scheduledCustomer.serviceStartTime);
                             const serviceEndTime = constructTimeStr(scheduledCustomer.serviceEndTime);
+                            const customerElement = (
+                                <div>
+                                    <p>Customer: {scheduledCustomer.metadata.name}</p>
+                                    <p>Service Start Time: {serviceStartTime}</p>
+                                    <p>Service End Time: {serviceEndTime}</p>
+                                </div>
+                            );
 
                             return (
                                 <Table.Row key={customerIdx}>
@@ -64,7 +72,23 @@ class ScheduledCustomerTable extends Component {
                                                 });
                                             }}
                                         />
-                                        <Button negative>Delete</Button>
+                                        <DeleteScheduleModal
+                                            customer={customerElement}
+                                            onSubmit={() => {
+                                                const scheduledCustomerId = scheduledCustomer._id;
+                                                const jwt = this.props.userInfo.token;
+                                                
+                                                PrimeShineAPIClient.deleteScheduledCustomer(scheduledCustomerId, jwt)
+                                                .then((didSucceed) => {
+                                                    if (didSucceed) {
+                                                        this.props.deleteScheduledCustomer(scheduledCustomerId);
+                                                    }
+                                                })
+                                                .catch((err) => {
+                                                    console.log(err);
+                                                });
+                                            }}
+                                        />
                                     </Table.Cell>
                                 </Table.Row>
                             );

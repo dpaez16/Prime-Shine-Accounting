@@ -107,6 +107,20 @@ class IndividualSchedulePage extends Component {
         });
     }
 
+    deleteScheduledCustomerHandler(idx, scheduledCustomerId) {
+        const scheduleDays = this.state.scheduleDays;
+        const customerIdx = scheduleDays[idx].findIndex(scheduledCustomer => scheduledCustomer._id === scheduledCustomerId);
+        let newScheduledCustomers = [...scheduleDays[idx]];
+        newScheduledCustomers.splice(customerIdx, 1);
+
+        const newScheduleDays = { ...scheduleDays };
+        newScheduleDays[idx] = newScheduledCustomers;
+
+        this.setState({
+            scheduleDays: newScheduleDays
+        });
+    }
+
     render() {
         if (this.state.loading) {
             return (
@@ -143,6 +157,9 @@ class IndividualSchedulePage extends Component {
                                 userInfo={this.props.userInfo}
                                 updateScheduledCustomer={(newScheduledCustomer) => {
                                     this.editScheduledCustomerHandler(idx, newScheduledCustomer);
+                                }}
+                                deleteScheduledCustomer={(scheduledCustomerId) => {
+                                    this.deleteScheduledCustomerHandler(idx, scheduledCustomerId);
                                 }}
                             />
                         );
