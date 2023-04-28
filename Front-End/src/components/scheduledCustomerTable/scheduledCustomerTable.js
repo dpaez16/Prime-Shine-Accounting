@@ -3,14 +3,14 @@ import {Table} from 'semantic-ui-react';
 import EditScheduledCustomerModal from '../editScheduledCustomerModal/editScheduledCustomerModal';
 import DeleteScheduleModal from '../deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import componentWrapper from '../../utils/componentWrapper';
-import { dateToStr, constructTimeStr } from '../../utils/helpers';
+import { constructTimeStr } from '../../utils/helpers';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 //import './scheduledCustomerTable.css';
 
 class ScheduledCustomerTable extends Component {
     render() {
         const { date, idx } = this.props;
-        const scheduleDayDate = dateToStr(date);
+        const scheduleDayDate = date;
         const scheduledCustomers = this.props.scheduledCustomers.sort((a, b) => Number(a.serviceStartTime) > Number(b.serviceStartTime) ? 1 : -1);
 
         return (

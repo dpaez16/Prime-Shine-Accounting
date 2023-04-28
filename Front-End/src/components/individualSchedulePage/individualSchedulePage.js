@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Dimmer, Loader, Segment} from 'semantic-ui-react';
 import ScheduledCustomerTable from '../scheduledCustomerTable/scheduledCustomerTable';
+import CreateScheduledCustomerModal from '../createScheduledCustomerModal/createScheduledCustomerModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import WaveAPIClient from '../../api/waveApiClient';
 import componentWrapper from '../../utils/componentWrapper';
@@ -52,28 +53,36 @@ class IndividualSchedulePage extends Component {
                 scheduleDays.map(async scheduleDay => {
                     const rawScheduledCustomers = await PrimeShineAPIClient.fetchScheduledCustomers(scheduleDay._id, token);
                     const scheduledCustomers = await this.fetchMetadataForScheduledCustomers(businessId, rawScheduledCustomers);
-                    return [scheduleDay.dayOffset, scheduledCustomers];
+                    return [scheduleDay.dayOffset, scheduledCustomers, scheduleDay._id];
                 })
             )
             .then((results) => {
                 let scheduleDayMap = {};
+                let scheduleDayIdMap = {};
+
                 for (let i = 0; i < 7; i++) {
                     scheduleDayMap[`${i}`] = [];
+                    scheduleDayIdMap[`${i}`] = null;
                 }
 
                 results.forEach((result) => {
                     scheduleDayMap[result[0]] = result[1];
+                    scheduleDayIdMap[result[0]] = result[2];
                 });
 
-                return scheduleDayMap;
+                return [scheduleDayMap, scheduleDayIdMap];
             })
             .catch(err => {
                 throw err;
             });
         })
-        .then((completeScheduleDays) => {
+        .then((results) => {
+            const completeScheduleDays = results[0];
+            const scheduleDayIdMap = results[1];
+
             this.setState({
-                scheduleDays: completeScheduleDays
+                scheduleDays: completeScheduleDays,
+                scheduleDayIdMap: scheduleDayIdMap
             });
 
             return fetchAllCustomers(businessId);
@@ -85,6 +94,32 @@ class IndividualSchedulePage extends Component {
             });
         })
         .catch(err => console.log);
+    }
+
+    async createScheduledCustomerHandler(dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime) {
+        let scheduleDayId = this.state.scheduleDayIdMap[dayOffset];
+
+        const businessId = this.props.businessInfo.businessId;
+        const jwt = this.props.userInfo.token;
+
+        if (!scheduleDayId) {
+            const newScheduleDay = await PrimeShineAPIClient.createScheduleDay(dayOffset, scheduleId, jwt);
+            scheduleDayId = newScheduleDay._id;
+        }
+
+        const rawScheduledCustomer = await PrimeShineAPIClient.createScheduledCustomer(customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt);
+        const newScheduledCustomer = await this.fetchMetadataForScheduledCustomer(businessId, rawScheduledCustomer);
+
+        const newScheduleDayIdMap = { ...this.state.scheduleDayIdMap };
+        newScheduleDayIdMap[dayOffset] = scheduleDayId;
+
+        const newScheduleDays = { ...this.state.scheduleDays };
+        newScheduleDays[dayOffset].push(newScheduledCustomer);
+
+        this.setState({
+            scheduleDayIdMap: newScheduleDayIdMap,
+            scheduleDays: newScheduleDays
+        });
     }
 
     editScheduledCustomerHandler(idx, newScheduledCustomer) {
@@ -138,15 +173,30 @@ class IndividualSchedulePage extends Component {
 
         const schedule = this.props.location.state.schedule;
         const scheduleDays = this.state.scheduleDays;
+        const datesOfService = [...Array(7).keys()].map(idx => {
+            const date = new Date(schedule.startDay);
+            date.setDate(date.getDate() + idx);
+            return dateToStr(date);
+        });
 
         return (
             <div className="IndividualSchedulePage">
                 <p>Schedule for Week of {dateToStr(schedule.startDay)}:</p>
+                <CreateScheduledCustomerModal
+                    datesOfService={datesOfService}
+                    allCustomers={this.state.allCustomers}
+                    onSubmit={(dateOfService, customerId, serviceStartTime, serviceEndTime) => {
+                        const dayOffset = datesOfService.findIndex((dos) => dos === dateOfService);
+                        const scheduleId = schedule._id;
+                        
+                        this.createScheduledCustomerHandler(dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime)
+                        .catch(err => {
+                            console.log(err);
+                        });
+                    }}
+                />
                 {
-                    [...Array(7).keys()].map(idx => {
-                        const date = new Date(schedule.startDay);
-                        date.setDate(date.getDate() + idx);
-
+                    datesOfService.map((date, idx) => {
                         return (
                             <ScheduledCustomerTable
                                 date={date}
