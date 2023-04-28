@@ -1,8 +1,11 @@
 import React, {Component} from 'react';
-import {Table, Button, Dimmer, Loader, Segment, Modal} from 'semantic-ui-react';
+import {Table, Dimmer, Loader, Segment} from 'semantic-ui-react';
+import CreateScheduleModal from './createScheduleModal/createScheduleModal';
+import EditScheduleModal from './editScheduleModal/editScheduleModal';
+import DeleteScheduleModal from './deleteScheduleModal/deleteScheduleModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import componentWrapper from '../../utils/componentWrapper';
-import { constructDate, dateToStr } from '../../utils/helpers';
+import { dateToStr } from '../../utils/helpers';
 //import './schedulesPage.css';
 
 class SchedulesPage extends Component {
@@ -22,16 +25,56 @@ class SchedulesPage extends Component {
         }
     }
 
-    createSchedule() {
-        const startDay = document.getElementById('createSchedule_startDay').value;
-        
-        PrimeShineAPIClient.createSchedule(constructDate(startDay), this.props.userInfo._id, this.props.userInfo.token)
+    createScheduleHandler(startDay) {
+        const userId = this.props.userInfo._id;
+        const jwt = this.props.userInfo.token;
+
+        PrimeShineAPIClient.createSchedule(startDay, userId, jwt)
         .then((schedule) => {
             this.setState({
                 schedules: [ ...this.state.schedules, schedule ]
             });
         })
         .catch((err) => {
+            console.log(err);
+        });
+    }
+
+    editScheduleHandler(startDay, scheduleId) {
+        const jwt = this.props.userInfo.token;
+
+        PrimeShineAPIClient.editSchedule(startDay, scheduleId, jwt)
+        .then((patchedSchedule) => {
+            const newSchedules = [...this.state.schedules];
+            const idx = newSchedules.findIndex((schedule) => schedule._id === scheduleId);
+            newSchedules.splice(idx, 1, patchedSchedule);
+
+            this.setState({
+                schedules: newSchedules
+            });
+        })
+        .catch((err) => {
+            console.log(err);
+        });
+    }
+
+    deleteScheduleHandler(startDay) {
+        const userId = this.props.userInfo._id;
+        const jwt = this.props.userInfo.token;
+
+        PrimeShineAPIClient.deleteSchedule(startDay, userId, jwt)
+        .then((didSucceed) => {
+            console.log(didSucceed);
+
+            const newSchedules = [...this.state.schedules];
+            const idx = newSchedules.findIndex((schedule) => schedule.startDay === startDay);
+            newSchedules.splice(idx, 1);
+
+            this.setState({
+                schedules: newSchedules
+            });
+        })
+        .catch(err => {
             console.log(err);
         });
     }
@@ -62,13 +105,20 @@ class SchedulesPage extends Component {
             );
         }
 
+        const schedules = this.state.schedules.sort((a, b) => Number(a.startDay) > Number(b.startDay) ? 1 : -1);
+
         return (
             <div className="SchedulesPage">
                 <p>Schedules:</p>
+                <CreateScheduleModal
+                    onSubmit={(startDate) => {
+                        this.createScheduleHandler(startDate);
+                    }}
+                />
                 <Table celled className="SchedulesPage_table">
                     <Table.Body>
                     {
-                        this.state.schedules.map((schedule, idx) => {
+                        schedules.map((schedule, idx) => {
                             return (
                                 <Table.Row key={`SchedulesPage_table_Schedule${idx}`}>
                                     <Table.Cell>
@@ -85,6 +135,19 @@ class SchedulesPage extends Component {
                                         >
                                             {dateToStr(schedule.startDay)}
                                         </a>
+                                        <EditScheduleModal
+                                            onSubmit={(startDay) => {
+                                                const scheduleId = schedule._id;
+                                                this.editScheduleHandler(startDay, scheduleId);
+                                            }}
+                                        />
+                                        <DeleteScheduleModal
+                                            startDay={dateToStr(schedule.startDay)}
+                                            onSubmit={() => {
+                                                const startDay = schedule.startDay;
+                                                this.deleteScheduleHandler(startDay);
+                                            }}
+                                        />
                                     </Table.Cell>
                                 </Table.Row>
                             );
@@ -92,50 +155,6 @@ class SchedulesPage extends Component {
                     }
                     </Table.Body>
                 </Table>
-                <Modal
-                    onClose={() => this.setState({
-                        modalOpen: false,
-                        isDateValid: false
-                    })}
-                    onOpen={() => this.setState({
-                        modalOpen: true,
-                        isDateValid: false
-                    })}
-                    open={this.state.modalOpen}
-                    trigger={<button>Create Schedule</button>}
-                >
-                    <Modal.Header>Create a Schedule</Modal.Header>
-                    <Modal.Content>
-                        <form>
-                            <label htmlFor="createSchedule_startDay">Start date:</label>&nbsp;&nbsp;
-                            <input  type="date"
-                                    id="createSchedule_startDay"
-                                    min="2010-01-01"
-                                    max="2023-12-31"
-                                    defaultValue=""
-                                    onChange={e => this.handleDateChange(e)}
-                            />
-                        </form>
-                    </Modal.Content>
-                    <Modal.Actions>
-                        <Button 
-                            color='black' 
-                            onClick={() => this.setState({modalOpen: false})}
-                        >
-                            Cancel
-                        </Button>
-                        <Button 
-                            onClick={() => {
-                                this.setState({modalOpen: false});
-                                this.createSchedule();
-                            }}
-                            disabled={!this.state.isDateValid}
-                            positive
-                        >
-                                Create
-                        </Button>
-                    </Modal.Actions>
-                </Modal>
             </div>
         );
     }

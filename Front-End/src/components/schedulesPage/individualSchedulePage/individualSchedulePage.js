@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {Dimmer, Loader, Segment} from 'semantic-ui-react';
-import ScheduledCustomerTable from '../scheduledCustomerTable/scheduledCustomerTable';
-import CreateScheduledCustomerModal from '../createScheduledCustomerModal/createScheduledCustomerModal';
-import PrimeShineAPIClient from '../../api/primeShineApiClient';
-import WaveAPIClient from '../../api/waveApiClient';
-import componentWrapper from '../../utils/componentWrapper';
-import { dateToStr, fetchAllCustomers } from '../../utils/helpers';
+import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
+import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
+import PrimeShineAPIClient from '../../../api/primeShineApiClient';
+import WaveAPIClient from '../../../api/waveApiClient';
+import componentWrapper from '../../../utils/componentWrapper';
+import { dateToStr, fetchAllCustomers } from '../../../utils/helpers';
 //import './individualSchedulePage.css';
 
 class IndividualSchedulePage extends Component {

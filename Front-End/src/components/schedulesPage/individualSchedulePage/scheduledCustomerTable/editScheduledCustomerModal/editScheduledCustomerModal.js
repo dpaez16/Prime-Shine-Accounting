@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Modal, Button, Dropdown, Form, Label, Input} from 'semantic-ui-react';
-import {fuseDateTime} from '../../utils/helpers';
+import {fuseDateTime} from '../../../../../utils/helpers';
 
 export default class EditScheduledCustomerModal extends Component {
     constructor(props) {

@@ -272,7 +272,7 @@ export default class PrimeShineAPIClient {
 
     /**
      * Edits a schedule.
-     * @param {string} startDay - The start day of the schedule.
+     * @param {Date} startDay - The start day of the schedule.
      * @param {scheduleId} scheduleId - The schedule's unique ID.
      * @param {string} jwt - The user's JSON web token.
      * @return {Promise<Object>} The promise with success returning the edited schedule, otherwise an error for rejection.
@@ -321,7 +321,7 @@ export default class PrimeShineAPIClient {
     
     /**
      * Deletes a schedule.
-     * @param {string} startDay - The start day for the schedule.
+     * @param {Date} startDay - The start day for the schedule.
      * @param {string} userId - The user's unique ID.
      * @param {string} jwt - The user's JSON web token.
      * @return {Promise<boolean>} The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection. 
