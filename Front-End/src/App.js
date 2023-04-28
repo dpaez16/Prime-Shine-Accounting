@@ -5,7 +5,7 @@ import LoginPage from './components/loginPage/loginPage';
 import RegisterPage from './components/registerPage/registerPage';
 import EditProfilePage from './components/editProfilePage/editProfilePage';
 import SchedulesPage from './components/schedulesPage/schedulesPage';
-import IndividualSchedulePage from './components/individualSchedulePage/individualSchedulePage';
+import IndividualSchedulePage from './components/schedulesPage/individualSchedulePage/individualSchedulePage';
 import './App.css';
 
 export default class App extends Component {

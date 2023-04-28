@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {Table} from 'semantic-ui-react';
-import EditScheduledCustomerModal from '../editScheduledCustomerModal/editScheduledCustomerModal';
-import DeleteScheduleModal from '../deleteScheduledCustomerModal/deleteScheduledCustomerModal';
-import componentWrapper from '../../utils/componentWrapper';
-import { constructTimeStr } from '../../utils/helpers';
-import PrimeShineAPIClient from '../../api/primeShineApiClient';
+import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
+import DeleteScheduleModal from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
+import componentWrapper from '../../../../utils/componentWrapper';
+import { constructTimeStr } from '../../../../utils/helpers';
+import PrimeShineAPIClient from '../../../../api/primeShineApiClient';
 //import './scheduledCustomerTable.css';
 
 class ScheduledCustomerTable extends Component {
