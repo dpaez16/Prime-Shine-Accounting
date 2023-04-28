@@ -53,8 +53,14 @@ module.exports = {
                 throw new Error("Scheduled customer already exists.");
             }
 
-            const newScheduledCustomer = new ScheduledCustomer(scheduledCustomerInput);
-            return newScheduledCustomer.save();
+            return ScheduledCustomer.findById(scheduledCustomerID);
+        })
+        .then(scheduledCustomer => {
+            scheduledCustomer.customerId = scheduledCustomerInput.customerId;
+            scheduledCustomer.serviceStartTime = scheduledCustomerInput.serviceStartTime;
+            scheduledCustomer.serviceEndTime = scheduledCustomerInput.serviceEndTime;
+
+            return scheduledCustomer.save();
         })
         .then(result => {
             return { ...result._doc };

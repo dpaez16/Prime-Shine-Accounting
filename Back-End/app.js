@@ -40,7 +40,6 @@ app.use('/ps/graphql', [verifyToken, graphqlHTTP({
             name: String!
             email: String!
             password: String!
-            token: String!
         }
 
         type Schedule {
@@ -63,7 +62,7 @@ app.use('/ps/graphql', [verifyToken, graphqlHTTP({
             scheduleDay: ID!
         }
 
-        type ScheduledCustomerInput {
+        input ScheduledCustomerInput {
             customerId: String!
             serviceStartTime: String!
             serviceEndTime: String!

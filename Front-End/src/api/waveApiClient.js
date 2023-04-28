@@ -1,4 +1,4 @@
-export class WaveAPIClient {
+export default class WaveAPIClient {
     static #createFetchRequest(body) {
         return fetch(process.env.REACT_APP_WAVE_ENDPOINT_URL, {
             method: "POST",
@@ -281,9 +281,9 @@ export class WaveAPIClient {
     static fetchCustomers(businessId, pageNum=1) {
         const requestBody = {
             query: `
-            {
-                business(id: "${businessId}") {
-                    customers(page: ${pageNum}, sort: [NAME_ASC]) {
+            query($businessId: ID!, $pageNum: Int!) {
+                business(id: $businessId) {
+                    customers(page: $pageNum, sort: [NAME_ASC]) {
                         pageInfo {
                             currentPage
                             totalPages
@@ -311,7 +311,11 @@ export class WaveAPIClient {
                     }
                 }
             }
-            `
+            `,
+            variables: {
+                businessId: businessId,
+                pageNum: pageNum
+            }
         };
 
         return WaveAPIClient.#createFetchRequest(requestBody)
@@ -324,11 +328,73 @@ export class WaveAPIClient {
             return response.json();
         })
         .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not edit invoice: ${JSON.stringify(json.errors)}`);
+            }
+
             // TODO: process raw customers into better format
             return {
                 pageInfo: json.data.business.customers.pageInfo,
                 customers: json.data.business.customers.edges.map(rawCustomer => rawCustomer.node)
             };
+        })
+        .catch((err) => {
+            throw err;
+        });
+    }
+
+    /**
+     * Fetches a customer from the business.
+     * @param {string} businessId - The business's unique ID.
+     * @param {string} customerId - The customer's unique ID.
+     * @return {Promise<Object>} The promise with success returning an object containing the requested customer's info, otherwise an error for rejection. 
+     */
+    static fetchCustomer(businessId, customerId) {
+        const requestBody = {
+            query: `
+            query($businessId: ID!, $customerId: ID!) {
+                business(id: $businessId) {
+                    customer(id: $customerId) {
+                        id
+                        name
+                        email
+                        mobile
+                        phone
+                        address {
+                            addressLine1
+                            addressLine2
+                            city
+                            province {
+                                code
+                                name
+                            }
+                            postalCode
+                        }
+                    }
+                }
+            }
+            `,
+            variables: {
+                businessId: businessId,
+                customerId: customerId
+            }
+        };
+
+        return WaveAPIClient.#createFetchRequest(requestBody)
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const responseText = await response.text();
+                throw new Error(`Could not fetch customer: ${responseText}`);
+            }
+
+            return response.json();
+        })
+        .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not fetch customer: ${JSON.stringify(json.errors)}`);
+            }
+
+            return json.data.business.customer;
         })
         .catch((err) => {
             throw err;
@@ -408,12 +474,16 @@ export class WaveAPIClient {
         .then(async (response) => {
             if (!response || (response.status !== 200 && response.status !== 201)) {
                 const responseText = await response.text();
-                throw new Error(`Could not fetch customers: ${responseText}`);
+                throw new Error(`Could not fetch invoices: ${responseText}`);
             }
 
             return response.json();
         })
         .then(json => {
+            if (json.errors !== undefined) {
+                throw new Error(`Could not fetch invoices: ${JSON.stringify(json.errors)}`);
+            }
+            
             // TODO: process raw invoices into better format
             return {
                 pageInfo: json.data.business.invoices.pageInfo,

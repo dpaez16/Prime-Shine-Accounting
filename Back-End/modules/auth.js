@@ -1,13 +1,14 @@
 const jwt = require('jsonwebtoken');
+const { JWT_HEADER } = require('./consts');
 
 const JWT_TTL = '2h';
 
 module.exports = {
     verifyToken: (req, res, next) => {
-        const token = req.headers['token'];
-
+        const token = req.headers[JWT_HEADER] || req.headers[JWT_HEADER.toLowerCase()] || undefined;
+        
         if (!token) {
-            return res.status(403).send({ error: "A token is required for authentication." });
+            return res.status(403).send({ error: `A token is required for authentication (missing header in '${JWT_HEADER}' field).` });
         }
     
         jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
