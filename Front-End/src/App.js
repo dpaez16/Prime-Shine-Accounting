@@ -6,6 +6,7 @@ import RegisterPage from './components/registerPage/registerPage';
 import EditProfilePage from './components/editProfilePage/editProfilePage';
 import SchedulesPage from './components/schedulesPage/schedulesPage';
 import IndividualSchedulePage from './components/schedulesPage/individualSchedulePage/individualSchedulePage';
+import CustomersPage from './components/customersPage/customersPage';
 import './App.css';
 
 export default class App extends Component {
@@ -63,6 +64,13 @@ export default class App extends Component {
                                     element={
                                         <IndividualSchedulePage
                                             userInfo={this.state.userInfo}
+                                            businessInfo={this.state.businessInfo}
+                                        />
+                                    }
+                            />
+                            <Route  path="/customers"
+                                    element={
+                                        <CustomersPage
                                             businessInfo={this.state.businessInfo}
                                         />
                                     }

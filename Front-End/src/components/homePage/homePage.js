@@ -82,7 +82,19 @@ class HomePage extends Component {
                                 this.props.navigation('/schedules');
                             }}
                         >
-                            Get Schedules
+                            Schedules
+                        </a>
+                        
+                    </li>
+                    <li>
+                        <a
+                            href="/customers"
+                            onClick={e => {
+                                e.preventDefault(); 
+                                this.props.navigation('/customers');
+                            }}
+                        >
+                            Customers
                         </a>
                     </li>
                 </ul>
