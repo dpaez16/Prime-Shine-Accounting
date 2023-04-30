@@ -1,4 +1,5 @@
 import WaveAPIClient from '../api/waveApiClient';
+import {DAYS_OF_WEEK} from './consts';
 
 export const deleteItemFromArray = function(arr, valObj) {
     const val = valObj._id;
@@ -62,6 +63,16 @@ export const constructTimeStr = function(dateEpochStr) {
 
 export const fuseDateTime = function(dateStr, timeStr) {
     return new Date(`${dateStr} ${timeStr}`);
+}
+
+export const getDayOfWeekStr = function(dateStr) {
+    const date = fuseDateTime(dateStr, "00:00");
+    const dayOfWeekIdx = date.getDay();
+    return DAYS_OF_WEEK[dayOfWeekIdx];
+}
+
+export const grabWorkingDays = function(dates) {
+    return dates.filter(date => getDayOfWeekStr(date) !== DAYS_OF_WEEK[0]);
 }
 
 /**

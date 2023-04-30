@@ -1,9 +1,9 @@
 import React, {Component} from 'react';
-import {Table} from 'semantic-ui-react';
+import {Table, Header} from 'semantic-ui-react';
 import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
 import DeleteScheduleModal from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import componentWrapper from '../../../../utils/componentWrapper';
-import { constructTimeStr } from '../../../../utils/helpers';
+import { constructTimeStr, getDayOfWeekStr } from '../../../../utils/helpers';
 import PrimeShineAPIClient from '../../../../api/primeShineApiClient';
 //import './scheduledCustomerTable.css';
 
@@ -15,7 +15,7 @@ class ScheduledCustomerTable extends Component {
 
         return (
             <React.Fragment>
-            <h1>{scheduleDayDate}</h1>
+            <Header as='h1'>{getDayOfWeekStr(scheduleDayDate)} {scheduleDayDate}</Header>
             <Table 
                 celled
                 className="ScheduledCustomerTable_table"
@@ -35,11 +35,11 @@ class ScheduledCustomerTable extends Component {
                             const serviceStartTime = constructTimeStr(scheduledCustomer.serviceStartTime);
                             const serviceEndTime = constructTimeStr(scheduledCustomer.serviceEndTime);
                             const customerElement = (
-                                <div>
+                                <Container>
                                     <p>Customer: {scheduledCustomer.metadata.name}</p>
                                     <p>Service Start Time: {serviceStartTime}</p>
                                     <p>Service End Time: {serviceEndTime}</p>
-                                </div>
+                                </Container>
                             );
 
                             return (

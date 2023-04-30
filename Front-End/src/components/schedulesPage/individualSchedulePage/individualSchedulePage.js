@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
-import {Dimmer, Loader, Segment} from 'semantic-ui-react';
+import {Dimmer, Loader, Segment, Button, Header, Container} from 'semantic-ui-react';
+import { BlobProvider } from '@react-pdf/renderer';
 import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
+import SchedulePDFDocument from './schedulePdfDocument/schedulePdfDocument';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
 import WaveAPIClient from '../../../api/waveApiClient';
 import componentWrapper from '../../../utils/componentWrapper';
-import { dateToStr, fetchAllCustomers } from '../../../utils/helpers';
+import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
 //import './individualSchedulePage.css';
 
 class IndividualSchedulePage extends Component {
@@ -180,8 +182,8 @@ class IndividualSchedulePage extends Component {
         });
 
         return (
-            <div className="IndividualSchedulePage">
-                <p>Schedule for Week of {dateToStr(schedule.startDay)}:</p>
+            <Container className="IndividualSchedulePage">
+                <Header as='h1'>Schedule for Week of {datesOfService[0]} - {datesOfService[datesOfService.length - 1]}:</Header>
                 <CreateScheduledCustomerModal
                     datesOfService={datesOfService}
                     allCustomers={this.state.allCustomers}
@@ -195,8 +197,28 @@ class IndividualSchedulePage extends Component {
                         });
                     }}
                 />
+                <BlobProvider
+                    document={
+                        <SchedulePDFDocument
+                            datesOfService={datesOfService}
+                            scheduleDays={scheduleDays}
+                        />
+                    }
+                >
+                    {({loading, url}) => {
+                        if (loading) {
+                            return (<React.Fragment />);
+                        } else {
+                            return (
+                                <Button onClick={() => window.open(url, '_blank')}>
+                                    Preview Schedule
+                                </Button>
+                            );
+                        }
+                    }}
+                </BlobProvider>
                 {
-                    datesOfService.map((date, idx) => {
+                    grabWorkingDays(datesOfService).map((date, idx) => {
                         return (
                             <ScheduledCustomerTable
                                 date={date}
@@ -215,7 +237,7 @@ class IndividualSchedulePage extends Component {
                         );
                     })
                 }
-            </div>
+            </Container>
         );
     }
 };
