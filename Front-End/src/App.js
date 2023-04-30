@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {Container} from 'semantic-ui-react';
 import HomePage from './components/homePage/homePage';
 import LoginPage from './components/loginPage/loginPage';
 import RegisterPage from './components/registerPage/registerPage';
@@ -7,6 +8,7 @@ import EditProfilePage from './components/editProfilePage/editProfilePage';
 import SchedulesPage from './components/schedulesPage/schedulesPage';
 import IndividualSchedulePage from './components/schedulesPage/individualSchedulePage/individualSchedulePage';
 import CustomersPage from './components/customersPage/customersPage';
+import IndividualCustomerPage from './components/customersPage/individualCustomerPage/individualCustomerPage';
 import './App.css';
 
 export default class App extends Component {
@@ -23,7 +25,7 @@ export default class App extends Component {
         return (
             <Router>
                 <React.Fragment>
-                    <div className="main-content">
+                    <Container className="main-content">
                         <Routes>
                             <Route  path="/" 
                                     element={
@@ -75,8 +77,15 @@ export default class App extends Component {
                                         />
                                     }
                             />
+                            <Route  path="/viewCustomer"
+                                    element={
+                                        <IndividualCustomerPage
+                                            businessInfo={this.state.businessInfo}
+                                        />
+                                    }
+                            />
                         </Routes>
-                    </div>
+                    </Container>
                 </React.Fragment>
             </Router>
         );

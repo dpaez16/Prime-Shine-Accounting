@@ -1,6 +1,10 @@
 import React, {Component} from 'react';
-import {Dimmer, Loader, Segment, Input, Table} from 'semantic-ui-react';
+import {Dimmer, Loader, Segment, Input, Table, Header} from 'semantic-ui-react';
+import DeleteCustomerModal from './deleteCustomerModal/deleteCustomerModal';
+import CreateCustomerModal from './createCustomerModal/createCustomerModal';
+import WaveAPIClient from '../../api/waveApiClient';
 import {fetchAllCustomers} from '../../utils/helpers';
+import {US_COUNTRY_CODE} from '../../utils/consts';
 import componentWrapper from '../../utils/componentWrapper';
 //import './customersPage.css';
 
@@ -35,6 +39,37 @@ class CustomersPage extends Component {
         });
     }
 
+    createCustomerHandler(formParams) {
+        const businessId = this.props.businessInfo.businessId;
+
+        const {
+            name, phone, mobile, email,
+            addressLine1, addressLine2, city, provinceCode, postalCode
+        } = formParams;
+
+        const customerCreateInput = {
+            businessId: businessId,
+            name: name,
+            phone: phone,
+            mobile: mobile,
+            email: email,
+            address: {
+                addressLine1: addressLine1,
+                addressLine2: addressLine2,
+                city: city,
+                provinceCode: provinceCode,
+                countryCode: US_COUNTRY_CODE,
+                postalCode: postalCode
+            }
+        };
+
+        return WaveAPIClient.createCustomer(customerCreateInput);
+    }
+
+    deleteCustomerHandler(customerId) {
+        return WaveAPIClient.deleteCustomer(customerId);
+    }
+
     render() {
         if (this.state.loading) {
             return (
@@ -55,7 +90,7 @@ class CustomersPage extends Component {
 
         return (
             <div className="CustomersPage">
-                <p>Customers:</p>
+                <Header as='h1'>Customers:</Header>
                 <Input
                     icon='search'
                     placeholder=''
@@ -64,6 +99,23 @@ class CustomersPage extends Component {
 
                         const customerName = e.target.value;
                         this.handleSearchChange(customerName);
+                    }}
+                />
+                <CreateCustomerModal
+                    onSubmit={(formParams) => {
+                        this.createCustomerHandler(formParams)
+                        .then(newCustomer => {
+                            let newCustomers = [...this.state.customers];
+                            newCustomers.push(newCustomer);
+                            newCustomers.sort((a, b) => a.name < b.name ? -1 : 1);
+
+                            this.setState({
+                                customers: newCustomers
+                            });
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
                     }}
                 />
                 <Table celled className="CustomersPage_table">
@@ -87,6 +139,25 @@ class CustomersPage extends Component {
                                             >
                                                 {customer.name}
                                             </a>
+                                            <DeleteCustomerModal
+                                                onSubmit={() => {
+                                                    this.deleteCustomerHandler(customer.id)
+                                                    .then(didSucceed => {
+                                                        console.log(didSucceed);
+
+                                                        let newCustomers = [...this.state.customers];
+                                                        const idx = newCustomers.findIndex(c => c.id === customer.id);
+                                                        newCustomers.splice(1, idx);
+                                                        
+                                                        this.setState({
+                                                            customers: newCustomers
+                                                        });
+                                                    })
+                                                    .catch(err => {
+                                                        console.log(err);
+                                                    });
+                                                }}
+                                            />
                                         </Table.Cell>
                                     </Table.Row>
                                 );
