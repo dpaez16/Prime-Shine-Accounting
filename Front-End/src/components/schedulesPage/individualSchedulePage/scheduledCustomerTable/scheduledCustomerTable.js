@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, Header} from 'semantic-ui-react';
+import {Table, Header, Container} from 'semantic-ui-react';
 import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
 import DeleteScheduleModal from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import componentWrapper from '../../../../utils/componentWrapper';
