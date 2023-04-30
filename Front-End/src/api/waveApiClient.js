@@ -155,7 +155,7 @@ export default class WaveAPIClient {
 
     /**
      * Edits a Wave Customer.
-     * @param {Object} customerPatchInput - The customer's metadata. Must follow the CustomerEditInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#customereditinput
+     * @param {Object} customerPatchInput - The customer's metadata. Must follow the CustomerPatchInput structure: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference#customerpatchinput
      * @return {Promise<Object>} The promise with success returning the edited customer, otherwise an error for rejection. 
      */
     static editCustomer(customerPatchInput) {
