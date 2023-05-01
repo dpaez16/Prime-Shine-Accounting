@@ -9,6 +9,7 @@ import SchedulesPage from './components/schedulesPage/schedulesPage';
 import IndividualSchedulePage from './components/schedulesPage/individualSchedulePage/individualSchedulePage';
 import CustomersPage from './components/customersPage/customersPage';
 import IndividualCustomerPage from './components/customersPage/individualCustomerPage/individualCustomerPage';
+import InvoicesPage from './components/invoicesPage/invoicesPage';
 import './App.css';
 
 export default class App extends Component {
@@ -80,6 +81,13 @@ export default class App extends Component {
                             <Route  path="/viewCustomer"
                                     element={
                                         <IndividualCustomerPage
+                                            
+                                        />
+                                    }
+                            />
+                            <Route  path="/invoices"
+                                    element={
+                                        <InvoicesPage
                                             businessInfo={this.state.businessInfo}
                                         />
                                     }

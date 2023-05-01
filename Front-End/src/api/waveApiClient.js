@@ -413,8 +413,14 @@ export default class WaveAPIClient {
      */
     static fetchInvoices(businessId, pageNum=1, filterParameters={}) {
         const parametersStr = Object.entries({ ...filterParameters, ...{ page: pageNum } }).map(([key, value]) => {
-            return `${key}: ${JSON.stringify(value)}`;
+            if (key !== "status") {
+                return `${key}: ${JSON.stringify(value)}`;
+            } else {
+                return `${key}: ${value}`;
+            }
         }).join(', ');
+
+        // TODO: create query variables from filterParameters + pageNum
 
         const requestBody = {
             query: `
@@ -438,6 +444,7 @@ export default class WaveAPIClient {
                                 invoiceDate
                                 customer {
                                     id
+                                    name
                                 }
                                 amountDue {
                                     value
@@ -522,6 +529,7 @@ export default class WaveAPIClient {
                         invoiceDate
                         customer {
                             id
+                            name
                         }
                         amountDue {
                             value

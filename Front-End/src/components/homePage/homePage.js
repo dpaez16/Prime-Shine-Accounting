@@ -97,6 +97,17 @@ class HomePage extends Component {
                             Customers
                         </a>
                     </li>
+                    <li>
+                        <a
+                            href="/invoices"
+                            onClick={e => {
+                                e.preventDefault(); 
+                                this.props.navigation('/invoices');
+                            }}
+                        >
+                            Invoices
+                        </a>
+                    </li>
                 </ul>
             </div>
         );
