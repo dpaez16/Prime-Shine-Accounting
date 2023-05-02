@@ -19,7 +19,7 @@ class EditInvoiceModalTable extends Component {
 
     render() {
         const {invoiceId, invoiceServices} = this.props;
-
+        
         return (
             <Table 
                 celled 
@@ -63,6 +63,10 @@ class EditInvoiceModalTable extends Component {
                                         name='trash'
                                         link={true}
                                         onClick={() => {
+                                            /*
+                                                TODO: bug where delete invoice item internally works, but visually does not.
+                                                - appears to "skip" around the intended entry
+                                            */
                                             this.props.deleteInvoiceService(index);
                                         }}
                                     />
@@ -118,6 +122,7 @@ export default class EditInvoiceModal extends Component {
 
     deleteInvoiceServiceHandler(idx) {
         const newInvoiceServices = this.state.invoiceServices.filter((element, elementIdx) => idx !== elementIdx);
+        
         this.setState({
             invoiceServices: newInvoiceServices
         });

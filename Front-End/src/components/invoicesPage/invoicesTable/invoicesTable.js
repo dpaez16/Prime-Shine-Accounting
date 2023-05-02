@@ -51,8 +51,8 @@ export default class InvoicesTable extends Component {
                                                 invoice={invoice}
                                                 customers={this.props.customers}
                                                 businessInfo={this.props.businessInfo}
-                                                onSubmit={() => {
-                                                    //this.props.editInvoice(invoice.id);
+                                                onSubmit={(invoicePatchData) => {
+                                                    //this.props.editInvoice(invoicePatchData);
                                                 }}
                                             />
                                             <DeleteInvoiceModal

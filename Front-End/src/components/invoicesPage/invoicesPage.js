@@ -189,6 +189,9 @@ class InvoicesPage extends Component {
                     deleteInvoice={invoiceId => {
                         this.deleteInvoiceHandler(invoiceId);
                     }}
+                    editInvoice={invoicePatchData => {
+                        //this.editInvoiceHandler(invoicePatchData);
+                    }}
                 />
                 {this.state.pageInfo && 
                     <Pagination
