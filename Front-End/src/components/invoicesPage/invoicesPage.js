@@ -141,7 +141,6 @@ class InvoicesPage extends Component {
                     />
                     <Input
                         type="date"
-                        clearable
                         placeholder='From'
                         name="invoiceDateStart"
                         defaultValue={this.state.filterParameters.invoiceDateStart ? this.state.filterParameters.invoiceDateStart : null}
@@ -149,16 +148,15 @@ class InvoicesPage extends Component {
                     />
                     <Input
                         type="date"
-                        clearable
                         placeholder='To'
                         name="invoiceDateEnd"
                         defaultValue={this.state.filterParameters.invoiceDateEnd ? this.state.filterParameters.invoiceDateEnd : null}
                         onChange={this.handleFilterChange.bind(this)}
                     />
                     <Input
+                        type="text"
                         placeholder='Invoice #'
                         id="invoiceNumber"
-                        clearable
                         icon={{ 
                             name: 'search', 
                             circular: true, 
@@ -186,6 +184,8 @@ class InvoicesPage extends Component {
                 <InvoicesTable
                     loading={this.state.loading}
                     invoices={this.state.invoices}
+                    customers={this.state.customers}
+                    businessInfo={this.props.businessInfo}
                     deleteInvoice={invoiceId => {
                         this.deleteInvoiceHandler(invoiceId);
                     }}

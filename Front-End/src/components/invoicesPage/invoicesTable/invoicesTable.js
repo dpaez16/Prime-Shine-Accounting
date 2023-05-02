@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {Dimmer, Loader, Segment, Table, Dropdown} from 'semantic-ui-react';
 import DeleteInvoiceModal from './deleteInvoiceModal/deleteInvoiceModal';
+import EditInvoiceModal from './editInvoiceModal/editInvoiceModal';
 
 export default class InvoicesTable extends Component {
     render() {
@@ -45,7 +46,15 @@ export default class InvoicesTable extends Component {
                                 <Table.Cell>
                                     <Dropdown>
                                         <Dropdown.Menu>
-                                            <Dropdown.Item text="Edit" />
+                                            <EditInvoiceModal
+                                                trigger={<Dropdown.Item text="Edit" />}
+                                                invoice={invoice}
+                                                customers={this.props.customers}
+                                                businessInfo={this.props.businessInfo}
+                                                onSubmit={() => {
+                                                    //this.props.editInvoice(invoice.id);
+                                                }}
+                                            />
                                             <DeleteInvoiceModal
                                                 trigger={<Dropdown.Item text="Delete" />}
                                                 invoice={invoice}
