@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Dimmer, Loader, Segment, Table} from 'semantic-ui-react';
+import {Dimmer, Loader, Segment, Table, Dropdown} from 'semantic-ui-react';
+import DeleteInvoiceModal from './deleteInvoiceModal/deleteInvoiceModal';
 
 export default class InvoicesTable extends Component {
     render() {
@@ -41,7 +42,34 @@ export default class InvoicesTable extends Component {
                                 <Table.Cell>{invoice.customer.name}</Table.Cell>
                                 <Table.Cell>${invoice.total.value}</Table.Cell>
                                 <Table.Cell>${invoice.amountDue.value}</Table.Cell>
-                                <Table.Cell>Options</Table.Cell>
+                                <Table.Cell>
+                                    <Dropdown>
+                                        <Dropdown.Menu>
+                                            <Dropdown.Item text="Edit" />
+                                            <DeleteInvoiceModal
+                                                trigger={<Dropdown.Item text="Delete" />}
+                                                invoice={invoice}
+                                                onSubmit={() => {
+                                                    this.props.deleteInvoice(invoice.id);
+                                                }}
+                                            />
+                                            <Dropdown.Item 
+                                                text="Download PDF"
+                                                onClick={() => {
+                                                    const url = invoice.pdfUrl;
+                                                    window.open(url, '_blank');
+                                                }}
+                                            />
+                                            <Dropdown.Item 
+                                                text="View Invoice to Print" 
+                                                onClick={() => {
+                                                    const url = invoice.viewUrl;
+                                                    window.open(url, '_blank');
+                                                }}
+                                            />
+                                        </Dropdown.Menu>
+                                    </Dropdown>
+                                </Table.Cell>
                             </Table.Row>
                         );
                     })
