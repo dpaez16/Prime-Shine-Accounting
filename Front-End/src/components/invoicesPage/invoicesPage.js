@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import {Dimmer, Loader, Segment, Container, Header, Input, Dropdown, Divider, Pagination} from 'semantic-ui-react';
+import {Container, Header, Input, Dropdown, Divider, Pagination} from 'semantic-ui-react';
 import WaveAPIClient from '../../api/waveApiClient';
 import InvoicesTable from './invoicesTable/invoicesTable';
 import {fetchAllCustomers} from '../../utils/helpers';
 import componentWrapper from '../../utils/componentWrapper';
-import {WAVE_INVOICE_STATUSES} from '../../utils/consts';
 //import './invoicesPage.css';
 
 class InvoicesPage extends Component {
@@ -84,20 +83,6 @@ class InvoicesPage extends Component {
     }
 
     render() {
-        if (this.state.loading) {
-            return (
-                <Segment className='InvoicesPage_loading'>
-                    <Dimmer active 
-                            inverted
-                    >
-                        <Loader inverted 
-                                content='Loading' 
-                        />
-                    </Dimmer>
-                </Segment>
-            );
-        }
-
         const customerOptions = this.state.customers.map(customer => {
             return {
                 key: customer.id,
@@ -106,7 +91,7 @@ class InvoicesPage extends Component {
             };
         });
 
-        const invoiceStatusOptions = WAVE_INVOICE_STATUSES.map(waveStatus => {
+        const invoiceStatusOptions = WaveAPIClient.WAVE_INVOICE_STATUSES.map(waveStatus => {
             return {
                 key: waveStatus,
                 value: waveStatus.toUpperCase(),
@@ -121,9 +106,9 @@ class InvoicesPage extends Component {
                 <Container className="InvoicesPage_filters">
                     <Dropdown
                         placeholder="All customers"
-                        fluid
                         selection
                         search
+                        clearable
                         options={customerOptions}
                         name="customerId"
                         defaultValue={this.state.filterParameters.customerId ? this.state.filterParameters.customerId : null}
@@ -131,8 +116,8 @@ class InvoicesPage extends Component {
                     />
                     <Dropdown
                         placeholder='All statuses'
-                        fluid
                         selection
+                        clearable
                         options={invoiceStatusOptions}
                         name="status"
                         defaultValue={this.state.filterParameters.status ? this.state.filterParameters.status : null}
@@ -140,6 +125,7 @@ class InvoicesPage extends Component {
                     />
                     <Input
                         type="date"
+                        clearable
                         placeholder='From'
                         name="invoiceDateStart"
                         defaultValue={this.state.filterParameters.invoiceDateStart ? this.state.filterParameters.invoiceDateStart : null}
@@ -147,6 +133,7 @@ class InvoicesPage extends Component {
                     />
                     <Input
                         type="date"
+                        clearable
                         placeholder='To'
                         name="invoiceDateEnd"
                         defaultValue={this.state.filterParameters.invoiceDateEnd ? this.state.filterParameters.invoiceDateEnd : null}
@@ -155,13 +142,14 @@ class InvoicesPage extends Component {
                     <Input
                         placeholder='Invoice #'
                         id="invoiceNumber"
+                        clearable
                         icon={{ 
                             name: 'search', 
                             circular: true, 
                             link: true, 
                             onClick: e => {
                                 const invoiceNumber = document.getElementById("invoiceNumber").value;
-                                //this.handleFilterChange(e, { name: "invoiceNumber", value: invoiceNumber });
+                                this.handleFilterChange(e, { name: "invoiceNumber", value: invoiceNumber });
                             }
                         }}
                         defaultValue={this.state.filterParameters.invoiceNumber ? this.state.filterParameters.invoiceNumber : null}
@@ -169,6 +157,7 @@ class InvoicesPage extends Component {
                 </Container>
                 <Divider hidden />
                 <InvoicesTable
+                    loading={this.state.loading}
                     invoices={this.state.invoices}
                 />
                 {this.state.pageInfo && 

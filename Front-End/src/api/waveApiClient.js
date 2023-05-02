@@ -1,4 +1,36 @@
+const WAVE_INVOICE_FILTERS = {
+    customerId: {
+        type: "ID"
+    },
+    status: {
+        type: "InvoiceStatus"
+    },
+    invoiceDateStart: {
+        type: "Date"
+    },
+    invoiceDateEnd: {
+        type: "Date"
+    },
+    invoiceNumber: {
+        type: "String"
+    },
+    page: {
+        type: "Int"
+    }
+};
+
 export default class WaveAPIClient {
+    static WAVE_INVOICE_STATUSES = [
+        "Draft",
+        "Overdue",
+        "Paid",
+        "Partial",
+        "Saved",
+        "Sent",
+        "Unpaid",
+        "Viewed"
+    ];
+
     static #createFetchRequest(body) {
         return fetch(process.env.REACT_APP_WAVE_ENDPOINT_URL, {
             method: "POST",
@@ -412,19 +444,27 @@ export default class WaveAPIClient {
      * @return {Promise<Object>} The promise with success returning an object containing the requested invoices and page info, otherwise an error for rejection. 
      */
     static fetchInvoices(businessId, pageNum=1, filterParameters={}) {
-        const parametersStr = Object.entries({ ...filterParameters, ...{ page: pageNum } }).map(([key, value]) => {
-            if (key !== "status") {
-                return `${key}: ${JSON.stringify(value)}`;
-            } else {
-                return `${key}: ${value}`;
+        const variableDefsStr = Object.keys({ ...filterParameters, ...{ page: pageNum } }).map(key => {
+            const waveInvoiceFilterMetadata = WAVE_INVOICE_FILTERS[key];
+            if (waveInvoiceFilterMetadata) {
+                return `$${key}: ${waveInvoiceFilterMetadata.type}`;
             }
-        }).join(', ');
 
-        // TODO: create query variables from filterParameters + pageNum
+            return '';
+        }).filter(e => e !== '').join(', ');
+
+        const parametersStr = Object.keys({ ...filterParameters, ...{ page: pageNum } }).map(key => {
+            const waveInvoiceFilterMetadata = WAVE_INVOICE_FILTERS[key];
+            if (waveInvoiceFilterMetadata) {
+                return `${key}: $${key}`;
+            }
+
+            return '';
+        }).filter(e => e !== '').join(', ');
 
         const requestBody = {
             query: `
-            query($businessId: ID!) {
+            query($businessId: ID!, ${variableDefsStr}) {
                 business(id: $businessId) {
                     invoices(sort: [INVOICE_DATE_DESC], ${parametersStr}) {
                         pageInfo {
@@ -473,6 +513,7 @@ export default class WaveAPIClient {
             }
             `,
             variables: {
+                ...filterParameters,
                 businessId: businessId
             }
         };
@@ -613,6 +654,7 @@ export default class WaveAPIClient {
                         invoiceDate
                         customer {
                             id
+                            name
                         }
                         amountDue {
                             value

@@ -115,14 +115,3 @@ export const DAYS_OF_WEEK = [
     "Friday",
     "Saturday"
 ];
-
-export const WAVE_INVOICE_STATUSES = [
-    "Draft",
-    "Overdue",
-    "Paid",
-    "Partial",
-    "Saved",
-    "Sent",
-    "Unpaid",
-    "Viewed"
-];
