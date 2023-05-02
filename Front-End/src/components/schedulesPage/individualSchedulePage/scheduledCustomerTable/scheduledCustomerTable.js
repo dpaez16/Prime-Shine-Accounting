@@ -5,11 +5,12 @@ import DeleteScheduleModal from './deleteScheduledCustomerModal/deleteScheduledC
 import componentWrapper from '../../../../utils/componentWrapper';
 import { constructTimeStr, getDayOfWeekStr } from '../../../../utils/helpers';
 import PrimeShineAPIClient from '../../../../api/primeShineApiClient';
+import { v4 as uuidv4 } from 'uuid';
 //import './scheduledCustomerTable.css';
 
 class ScheduledCustomerTable extends Component {
     render() {
-        const { date, idx } = this.props;
+        const { date } = this.props;
         const scheduleDayDate = date;
         const scheduledCustomers = this.props.scheduledCustomers.sort((a, b) => Number(a.serviceStartTime) > Number(b.serviceStartTime) ? 1 : -1);
 
@@ -19,7 +20,7 @@ class ScheduledCustomerTable extends Component {
             <Table 
                 celled
                 className="ScheduledCustomerTable_table"
-                key={idx}
+                key={uuidv4()}
             >
                 <Table.Header>
                     <Table.Row>
@@ -31,7 +32,7 @@ class ScheduledCustomerTable extends Component {
                 </Table.Header>
                 <Table.Body>
                     {
-                        scheduledCustomers.map((scheduledCustomer, customerIdx) => {
+                        scheduledCustomers.map(scheduledCustomer => {
                             const serviceStartTime = constructTimeStr(scheduledCustomer.serviceStartTime);
                             const serviceEndTime = constructTimeStr(scheduledCustomer.serviceEndTime);
                             const customerElement = (
@@ -43,7 +44,7 @@ class ScheduledCustomerTable extends Component {
                             );
 
                             return (
-                                <Table.Row key={customerIdx}>
+                                <Table.Row key={uuidv4()}>
                                     <Table.Cell>{scheduledCustomer.metadata.name}</Table.Cell>
                                     <Table.Cell>{serviceStartTime}</Table.Cell>
                                     <Table.Cell>{serviceEndTime}</Table.Cell>

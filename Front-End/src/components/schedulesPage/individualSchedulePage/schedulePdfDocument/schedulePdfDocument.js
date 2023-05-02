@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 import { constructTimeStr, getDayOfWeekStr, grabWorkingDays } from '../../../../utils/helpers';
+import { v4 as uuidv4 } from 'uuid';
 
 export default class SchedulePDFDocument extends Component {
     constructCustomerAddressStr(address) {
@@ -88,7 +89,7 @@ export default class SchedulePDFDocument extends Component {
                     {
                         workingDatesOfService.map((dateOfService, idx) => {
                             return (
-                                <View style={styleSheet.day} key={idx}>
+                                <View style={styleSheet.day} key={uuidv4()}>
                                     <Text style={styleSheet.dayHeader}>
                                         {getDayOfWeekStr(dateOfService)} {dateOfService}
                                     </Text>
@@ -96,7 +97,7 @@ export default class SchedulePDFDocument extends Component {
                                         {
                                             scheduleDays[idx].map((scheduledCustomer, customerIdx) => {
                                                 return (
-                                                    <Text key={customerIdx} style={styleSheet.scheduledCustomer}>
+                                                    <Text key={uuidv4()} style={styleSheet.scheduledCustomer}>
                                                         {this.constructCustomerEntry(scheduledCustomer)}
                                                     </Text>
                                                 );

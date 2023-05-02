@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {Modal, Button, Form, Label, Input, Divider, Table, Dropdown, Icon} from 'semantic-ui-react';
+import { v4 as uuidV4 } from 'uuid';
 
 class EditInvoiceModalTable extends Component {
     createNewInvoiceService() {
@@ -18,7 +19,7 @@ class EditInvoiceModalTable extends Component {
     }
 
     render() {
-        const {invoiceId, invoiceServices} = this.props;
+        const {invoiceServices} = this.props;
         
         return (
             <Table 
@@ -36,7 +37,7 @@ class EditInvoiceModalTable extends Component {
                 {
                     invoiceServices.map((invoiceService, index) => {
                         return (
-                            <Table.Row key={`${invoiceId}-${index}`}>
+                            <Table.Row key={uuidV4()}>
                                 <Table.Cell>{invoiceService.product.name}</Table.Cell>
                                 <Table.Cell>
                                     <Input
@@ -63,12 +64,6 @@ class EditInvoiceModalTable extends Component {
                                         name='trash'
                                         link={true}
                                         onClick={() => {
-                                            /*
-                                                TODO: bug where delete invoice item internally works, but visually does not.
-                                                - appears to "skip" around the intended entry
-
-                                                Try this: https://stackoverflow.com/questions/72801249/remove-row-from-table-not-working-in-react
-                                            */
                                             this.props.deleteInvoiceService(index);
                                         }}
                                     />
@@ -197,7 +192,6 @@ export default class EditInvoiceModal extends Component {
                         <Divider hidden />
                         <EditInvoiceModalTable
                             invoiceServices={this.state.invoiceServices}
-                            invoiceId={invoice.id}
                             businessInfo={this.props.businessInfo}
                             updateInvoiceService={(idx, newInvoiceService) => this.handleInvoiceServiceChange(idx, newInvoiceService)}
                             deleteInvoiceService={(idx) => this.deleteInvoiceServiceHandler(idx)}
@@ -223,6 +217,7 @@ export default class EditInvoiceModal extends Component {
                     </Button>
                     <Button 
                         onClick={() => {
+                            //grab form params, send it
                             this.props.onSubmit();
                             this.setState({modalOpen: false});
                         }}

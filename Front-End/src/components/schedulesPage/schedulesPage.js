@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {Table, Dimmer, Loader, Segment} from 'semantic-ui-react';
+import {Table, Dimmer, Loader, Segment, Container} from 'semantic-ui-react';
 import CreateScheduleModal from './createScheduleModal/createScheduleModal';
 import EditScheduleModal from './editScheduleModal/editScheduleModal';
 import DeleteScheduleModal from './deleteScheduleModal/deleteScheduleModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import componentWrapper from '../../utils/componentWrapper';
 import { dateToStr } from '../../utils/helpers';
+import { v4 as uuidV4 } from 'uuid';
 //import './schedulesPage.css';
 
 class SchedulesPage extends Component {
@@ -108,7 +109,7 @@ class SchedulesPage extends Component {
         const schedules = this.state.schedules.sort((a, b) => Number(a.startDay) > Number(b.startDay) ? 1 : -1);
 
         return (
-            <div className="SchedulesPage">
+            <Container className="SchedulesPage">
                 <p>Schedules:</p>
                 <CreateScheduleModal
                     onSubmit={(startDate) => {
@@ -120,7 +121,7 @@ class SchedulesPage extends Component {
                     {
                         schedules.map((schedule, idx) => {
                             return (
-                                <Table.Row key={`SchedulesPage_table_Schedule${idx}`}>
+                                <Table.Row key={uuidV4()}>
                                     <Table.Cell>
                                         <a
                                             href='/viewSchedule'
@@ -155,7 +156,7 @@ class SchedulesPage extends Component {
                     }
                     </Table.Body>
                 </Table>
-            </div>
+            </Container>
         );
     }
 };

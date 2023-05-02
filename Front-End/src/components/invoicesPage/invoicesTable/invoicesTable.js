@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Dimmer, Loader, Segment, Table, Dropdown} from 'semantic-ui-react';
 import DeleteInvoiceModal from './deleteInvoiceModal/deleteInvoiceModal';
 import EditInvoiceModal from './editInvoiceModal/editInvoiceModal';
+import { v4 as uuidV4 } from 'uuid';
 
 export default class InvoicesTable extends Component {
     render() {
@@ -36,7 +37,7 @@ export default class InvoicesTable extends Component {
                 {
                     this.props.invoices.map((invoice, idx) => {
                         return (
-                            <Table.Row key={idx}>
+                            <Table.Row key={uuidV4()}>
                                 <Table.Cell>{invoice.status}</Table.Cell>
                                 <Table.Cell>{invoice.invoiceDate}</Table.Cell>
                                 <Table.Cell>{invoice.invoiceNumber}</Table.Cell>

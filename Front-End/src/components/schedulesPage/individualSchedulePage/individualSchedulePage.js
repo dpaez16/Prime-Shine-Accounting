@@ -223,7 +223,6 @@ class IndividualSchedulePage extends Component {
                             <ScheduledCustomerTable
                                 date={date}
                                 idx={idx}
-                                key={idx}
                                 scheduledCustomers={scheduleDays[idx]}
                                 allCustomers={this.state.allCustomers}
                                 userInfo={this.props.userInfo}
