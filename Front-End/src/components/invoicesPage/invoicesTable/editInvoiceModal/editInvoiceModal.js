@@ -66,6 +66,8 @@ class EditInvoiceModalTable extends Component {
                                             /*
                                                 TODO: bug where delete invoice item internally works, but visually does not.
                                                 - appears to "skip" around the intended entry
+
+                                                Try this: https://stackoverflow.com/questions/72801249/remove-row-from-table-not-working-in-react
                                             */
                                             this.props.deleteInvoiceService(index);
                                         }}
