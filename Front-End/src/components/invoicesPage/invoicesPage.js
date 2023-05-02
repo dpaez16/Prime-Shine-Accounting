@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Container, Header, Input, Dropdown, Divider, Pagination} from 'semantic-ui-react';
+import {Container, Header, Input, Dropdown, Divider, Pagination, Button} from 'semantic-ui-react';
 import WaveAPIClient from '../../api/waveApiClient';
 import InvoicesTable from './invoicesTable/invoicesTable';
 import {fetchAllCustomers} from '../../utils/helpers';
@@ -61,7 +61,7 @@ class InvoicesPage extends Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevState.pageNum !== this.state.pageNum || this.state.filterParameters !== prevState.filterParameters) {
+        if (prevState.pageNum !== this.state.pageNum || (!prevState.loading && this.state.loading)) {
             this.fetchAllWaveData();
         }
     }
@@ -70,8 +70,7 @@ class InvoicesPage extends Component {
         const newFilterParameters = {...this.state.filterParameters, [name]: value};
 
         this.setState({
-            filterParameters: newFilterParameters,
-            loading: true
+            filterParameters: newFilterParameters
         });
     }
 
@@ -99,7 +98,6 @@ class InvoicesPage extends Component {
             };
         });
 
-        // TODO: make input date pickers behave nicer
         return (
             <Container className="InvoicesPage">
                 <Header as='h1'>Invoices</Header>
@@ -154,6 +152,17 @@ class InvoicesPage extends Component {
                         }}
                         defaultValue={this.state.filterParameters.invoiceNumber ? this.state.filterParameters.invoiceNumber : null}
                     />
+                    <Button 
+                        color='green'
+                        onClick={e => {
+                            e.preventDefault();
+                            this.setState({
+                                loading: true
+                            });
+                        }}
+                    >
+                        Search
+                    </Button>
                 </Container>
                 <Divider hidden />
                 <InvoicesTable
