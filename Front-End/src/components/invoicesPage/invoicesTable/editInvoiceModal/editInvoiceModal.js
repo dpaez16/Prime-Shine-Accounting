@@ -102,6 +102,34 @@ export default class EditInvoiceModal extends Component {
         };
     }
 
+    getFormParams() {
+        return Object.keys(this.state).reduce((acc, key) => {
+            if (key === "modalOpen") {
+                return acc;
+            }
+
+            acc[key] = this.state[key];
+            return acc;
+        }, {...this.props.invoice});
+    }
+
+    isFormValid() {
+        const formParams = this.getFormParams();
+        const OPTIONAL_FIELDS = ["memo"];
+
+        return Object.keys(formParams).reduce((acc, key) => {
+            if (OPTIONAL_FIELDS.includes(key)) {
+                return acc && true;
+            }
+
+            if (key === "invoiceServices") {
+                return acc && formParams[key].length > 0;
+            }
+
+            return acc && formParams[key] !== '';
+        }, true);
+    }
+
     handleFormChange(event, {name, value}) {
         this.setState({
             [name]: value
@@ -217,11 +245,11 @@ export default class EditInvoiceModal extends Component {
                     </Button>
                     <Button 
                         onClick={() => {
-                            //grab form params, send it
-                            this.props.onSubmit();
+                            const formParams = this.getFormParams();
+                            this.props.onSubmit(formParams);
                             this.setState({modalOpen: false});
                         }}
-                        disabled={false}
+                        disabled={!this.isFormValid()}
                         positive
                     >
                             Ok

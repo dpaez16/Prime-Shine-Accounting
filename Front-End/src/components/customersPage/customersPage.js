@@ -124,7 +124,7 @@ class CustomersPage extends Component {
                         {
                             filteredCustomers.map((customer, idx) => {
                                 return (
-                                    <Table.Row key={uuidv4()}>
+                                    <Table.Row key={uuidV4()}>
                                         <Table.Cell>
                                             <a
                                                 href="/viewCustomer"

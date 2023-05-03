@@ -137,6 +137,7 @@ class SchedulesPage extends Component {
                                             {dateToStr(schedule.startDay)}
                                         </a>
                                         <EditScheduleModal
+                                            schedule={schedule}
                                             onSubmit={(startDay) => {
                                                 const scheduleId = schedule._id;
                                                 this.editScheduleHandler(startDay, scheduleId);

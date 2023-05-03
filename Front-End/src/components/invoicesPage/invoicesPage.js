@@ -81,6 +81,22 @@ class InvoicesPage extends Component {
         });
     }
 
+    editInvoiceHandler(invoicePatchData) {
+        WaveAPIClient.editInvoice(invoicePatchData)
+        .then(newInvoice => {
+            let newInvoices = [...this.state.invoices];
+            const idx = newInvoices.findIndex(invoice => invoice.id === newInvoice.id);
+            newInvoices.splice(idx, 1, newInvoice);
+
+            this.setState({
+                invoices: newInvoices
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        });
+    }
+
     deleteInvoiceHandler(invoiceId) {
         WaveAPIClient.deleteInvoice(invoiceId)
         .then(didSucceed => {
@@ -190,7 +206,7 @@ class InvoicesPage extends Component {
                         this.deleteInvoiceHandler(invoiceId);
                     }}
                     editInvoice={invoicePatchData => {
-                        //this.editInvoiceHandler(invoicePatchData);
+                        this.editInvoiceHandler(invoicePatchData);
                     }}
                 />
                 {this.state.pageInfo && 

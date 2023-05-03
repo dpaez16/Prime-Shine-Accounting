@@ -28,6 +28,8 @@ export default class EditScheduleModal extends Component {
     }
 
     render() {
+        const defaultStartDay = this.props.schedule.startDay.toISOString().split('T')[0];
+
         return (
             <Modal
                 onClose={() => this.setState({
@@ -50,7 +52,7 @@ export default class EditScheduleModal extends Component {
                                 id="editSchedule_startDay"
                                 min="2010-01-01"
                                 max="2023-12-31"
-                                defaultValue=""
+                                defaultValue={defaultStartDay}
                                 onChange={e => this.handleDateChange(e)}
                             />
                         </Form.Field>

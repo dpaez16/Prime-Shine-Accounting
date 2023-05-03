@@ -8,6 +8,7 @@ import PrimeShineAPIClient from '../../../api/primeShineApiClient';
 import WaveAPIClient from '../../../api/waveApiClient';
 import componentWrapper from '../../../utils/componentWrapper';
 import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
+import { v4 as uuidV4 } from 'uuid';
 //import './individualSchedulePage.css';
 
 class IndividualSchedulePage extends Component {
@@ -221,6 +222,7 @@ class IndividualSchedulePage extends Component {
                     grabWorkingDays(datesOfService).map((date, idx) => {
                         return (
                             <ScheduledCustomerTable
+                                key={uuidV4()}
                                 date={date}
                                 idx={idx}
                                 scheduledCustomers={scheduleDays[idx]}

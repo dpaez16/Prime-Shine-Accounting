@@ -50,6 +50,7 @@ class ScheduledCustomerTable extends Component {
                                     <Table.Cell>{serviceEndTime}</Table.Cell>
                                     <Table.Cell>
                                         <EditScheduledCustomerModal
+                                            scheduledCustomer={scheduledCustomer}
                                             allCustomers={this.props.allCustomers}
                                             scheduleDayDate={scheduleDayDate}
                                             onSubmit={(newCustomerId, newServiceStartTime, newServiceEndTime) => {
