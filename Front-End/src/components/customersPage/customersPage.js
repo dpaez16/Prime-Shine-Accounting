@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {Dimmer, Loader, Segment, Input, Table, Header} from 'semantic-ui-react';
+import {Dimmer, Loader, Segment, Input, Table, Header, Container} from 'semantic-ui-react';
 import DeleteCustomerModal from './deleteCustomerModal/deleteCustomerModal';
 import CreateCustomerModal from './createCustomerModal/createCustomerModal';
 import WaveAPIClient from '../../api/waveApiClient';
 import {fetchAllCustomers} from '../../utils/helpers';
 import {US_COUNTRY_CODE} from '../../utils/consts';
 import componentWrapper from '../../utils/componentWrapper';
+import { v4 as uuidV4 } from 'uuid';
 //import './customersPage.css';
 
 class CustomersPage extends Component {
@@ -89,7 +90,7 @@ class CustomersPage extends Component {
         const filteredCustomers = this.state.customers.filter((customer) => searchBarRegex.test(customer.name.toLowerCase()));
 
         return (
-            <div className="CustomersPage">
+            <Container className="CustomersPage">
                 <Header as='h1'>Customers:</Header>
                 <Input
                     icon='search'
@@ -123,7 +124,7 @@ class CustomersPage extends Component {
                         {
                             filteredCustomers.map((customer, idx) => {
                                 return (
-                                    <Table.Row key={idx}>
+                                    <Table.Row key={uuidV4()}>
                                         <Table.Cell>
                                             <a
                                                 href="/viewCustomer"
@@ -165,7 +166,7 @@ class CustomersPage extends Component {
                         }
                     </Table.Body>
                 </Table>
-            </div>
+            </Container>
         );
     }
 };

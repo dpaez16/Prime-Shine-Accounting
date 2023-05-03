@@ -44,7 +44,7 @@ export const constructDate = function(date) {
 /**
  * Constructs a time in `hh:mm AM/PM` format.
  * @param {string} dateEpochStr - The date serialized in epoch format.
- * @return {Date} The constructed date.
+ * @return {string} The constructed date.
  */
 export const constructTimeStr = function(dateEpochStr) {
     const dateNum = Number(dateEpochStr);
@@ -59,6 +59,21 @@ export const constructTimeStr = function(dateEpochStr) {
     }
 
     return `${hours}:${minutes} ${timePeriod}`;
+}
+
+/**
+ * Constructs a time in `hh:mm` format.
+ * @param {string} dateEpochStr - The date serialized in epoch format.
+ * @return {string} The constructed date.
+ */
+export const constructMilitaryTimeStr = function(dateEpochStr) {
+    const dateNum = Number(dateEpochStr);
+    const date = new Date(dateNum);
+
+    const hours = `${date.getHours()}`.padStart(2, '0');
+    const minutes = `${date.getMinutes()}`.padStart(2, '0');
+
+    return `${hours}:${minutes}`;
 }
 
 export const fuseDateTime = function(dateStr, timeStr) {

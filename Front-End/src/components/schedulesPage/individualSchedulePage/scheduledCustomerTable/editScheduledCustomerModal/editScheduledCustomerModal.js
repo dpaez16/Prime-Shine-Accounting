@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Modal, Button, Dropdown, Form, Label, Input} from 'semantic-ui-react';
-import {fuseDateTime} from '../../../../../utils/helpers';
+import {fuseDateTime, constructMilitaryTimeStr} from '../../../../../utils/helpers';
 
 export default class EditScheduledCustomerModal extends Component {
     constructor(props) {
@@ -52,6 +52,9 @@ export default class EditScheduledCustomerModal extends Component {
     }
 
     render() {
+        const defaultServiceStartTime = constructMilitaryTimeStr(this.props.scheduledCustomer.serviceStartTime).split(' ')[0];
+        const defaultServiceEndTime = constructMilitaryTimeStr(this.props.scheduledCustomer.serviceEndTime).split(' ')[0];
+
         return (
             <Modal
                 onClose={() => this.setState({
@@ -80,6 +83,7 @@ export default class EditScheduledCustomerModal extends Component {
                                 options={this.convertToDropdownOptions(this.props.allCustomers)}
                                 className="EditScheduledCustomerModal_customerId"
                                 onChange={this.handleCustomerInputChange.bind(this)}
+                                defaultValue={this.props.scheduledCustomer.customerId}
                             />
                         </Form.Field>
                         <Form.Field>
@@ -92,6 +96,7 @@ export default class EditScheduledCustomerModal extends Component {
                                 max="24:00"
                                 required
                                 onChange={() => this.handleTimeInputChange()}
+                                defaultValue={defaultServiceStartTime}
                             />
                         </Form.Field>
                         <Form.Field>
@@ -104,6 +109,7 @@ export default class EditScheduledCustomerModal extends Component {
                                 max="24:00"
                                 required
                                 onChange={() => this.handleTimeInputChange()}
+                                defaultValue={defaultServiceEndTime}
                             />
                         </Form.Field>
                     </Form>
