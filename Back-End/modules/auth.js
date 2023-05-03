@@ -11,7 +11,7 @@ module.exports = {
             return res.status(403).send({ error: `A token is required for authentication (missing header in '${JWT_HEADER}' field).` });
         }
     
-        jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
+        jwt.verify(token, process.env.JWT_TOKEN, (err) => {
             if (err) {
                 return res.status(401).send({ error: "User is unauthorized." });
             }

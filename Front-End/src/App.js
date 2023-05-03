@@ -10,18 +10,10 @@ import IndividualSchedulePage from './components/schedulesPage/individualSchedul
 import CustomersPage from './components/customersPage/customersPage';
 import IndividualCustomerPage from './components/customersPage/individualCustomerPage/individualCustomerPage';
 import InvoicesPage from './components/invoicesPage/invoicesPage';
+import { localStorageWrapper } from './utils/useLocalStorage';
 import './App.css';
 
-export default class App extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            userInfo: null,
-            businessInfo: null
-        };
-    }
-
+class App extends Component {
     render() {
         return (
             <Router>
@@ -31,25 +23,25 @@ export default class App extends Component {
                             <Route  path="/" 
                                     element={
                                         <HomePage
-                                            userInfo={this.state.userInfo}
-                                            businessInfo={this.state.businessInfo}
-                                            updateUserInfo={newUserInfo => this.setState({userInfo: newUserInfo})}
-                                            updateBusinessInfo={newBusinessInfo => this.setState({businessInfo: newBusinessInfo})}
+                                            userInfo={this.props.userInfo}
+                                            businessInfo={this.props.businessInfo}
+                                            updateUserInfo={newUserInfo => this.props.setUserInfo(newUserInfo)}
+                                            updateBusinessInfo={newBusinessInfo => this.props.setBusinessInfo(newBusinessInfo)}
                                         />
                                     }
                             />
                             <Route  path="/login" 
                                     element={
                                         <LoginPage
-                                            updateUserInfo={newUserInfo => this.setState({userInfo: newUserInfo})}
-                                            updateBusinessInfo={newBusinessInfo => this.setState({businessInfo: newBusinessInfo})}
+                                            updateUserInfo={newUserInfo => this.props.setUserInfo(newUserInfo)}
+                                            updateBusinessInfo={newBusinessInfo => this.props.setBusinessInfo(newBusinessInfo)}
                                         />
                                     }
                             />
                             <Route  path="/editProfile" 
                                     element={
                                         <EditProfilePage 
-                                            updateUserInfo={newUserInfo => this.setState({userInfo: {...this.state.userInfo, ...newUserInfo}})} // passed here since we cannot serialize functions for navigation()
+                                            updateUserInfo={newUserInfo => this.props.setUserInfo({...this.state.userInfo, ...newUserInfo})} // passed here since we cannot serialize functions for navigation()
                                         />
                                     }
                             />
@@ -59,36 +51,34 @@ export default class App extends Component {
                             <Route  path="/schedules"
                                     element={
                                         <SchedulesPage
-                                            userInfo={this.state.userInfo}
+                                            userInfo={this.props.userInfo}
                                         />
                                     }
                             />
                             <Route  path="/viewSchedule"
                                     element={
                                         <IndividualSchedulePage
-                                            userInfo={this.state.userInfo}
-                                            businessInfo={this.state.businessInfo}
+                                            userInfo={this.props.userInfo}
+                                            businessInfo={this.props.businessInfo}
                                         />
                                     }
                             />
                             <Route  path="/customers"
                                     element={
                                         <CustomersPage
-                                            businessInfo={this.state.businessInfo}
+                                            businessInfo={this.props.businessInfo}
                                         />
                                     }
                             />
                             <Route  path="/viewCustomer"
                                     element={
-                                        <IndividualCustomerPage
-                                            
-                                        />
+                                        <IndividualCustomerPage/>
                                     }
                             />
                             <Route  path="/invoices"
                                     element={
                                         <InvoicesPage
-                                            businessInfo={this.state.businessInfo}
+                                            businessInfo={this.props.businessInfo}
                                         />
                                     }
                             />
@@ -99,3 +89,5 @@ export default class App extends Component {
         );
     }
 };
+
+export default localStorageWrapper(App);
