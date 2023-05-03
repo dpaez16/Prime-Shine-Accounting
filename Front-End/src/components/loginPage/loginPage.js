@@ -15,7 +15,9 @@ class LoginPage extends Component {
             .then((businessInfo) => {
                 this.props.updateUserInfo(user);
                 this.props.updateBusinessInfo(businessInfo);
-                this.props.navigation('/');
+                this.props.navigation('/', {
+                    replace: true
+                });
             })
             .catch(err => {
                 throw err
