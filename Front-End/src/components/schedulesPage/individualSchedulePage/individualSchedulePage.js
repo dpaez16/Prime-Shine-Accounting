@@ -174,6 +174,7 @@ class IndividualSchedulePage extends Component {
             );
         }
 
+        const {t} = this.props;
         const schedule = this.props.location.state.schedule;
         const scheduleDays = this.state.scheduleDays;
         const datesOfService = [...Array(7).keys()].map(idx => {
@@ -184,7 +185,7 @@ class IndividualSchedulePage extends Component {
 
         return (
             <Container className="IndividualSchedulePage">
-                <Header as='h1'>Schedule for Week of {datesOfService[0]} - {datesOfService[datesOfService.length - 1]}:</Header>
+                <Header as='h1'>{t('Schedule for Week of')} {datesOfService[0]} - {datesOfService[datesOfService.length - 1]}:</Header>
                 <CreateScheduledCustomerModal
                     datesOfService={datesOfService}
                     allCustomers={this.state.allCustomers}
@@ -212,7 +213,7 @@ class IndividualSchedulePage extends Component {
                         } else {
                             return (
                                 <Button onClick={() => window.open(url, '_blank')}>
-                                    Preview Schedule
+                                    {t('Preview Schedule')}
                                 </Button>
                             );
                         }

@@ -29,20 +29,21 @@ class LoginPage extends Component {
     }
 
     render() {
+        const {t} = this.props;
         return (
             <div className="LoginPage">
                 <form>
-                    <label htmlFor="LoginPage_email">Email:</label>&nbsp;&nbsp;
+                    <label htmlFor="LoginPage_email">{t('Email')}:</label>&nbsp;&nbsp;
                     <input type="text" id="LoginPage_email" />
                     <br />
-                    <label htmlFor="LoginPage_password">Password:</label>&nbsp;&nbsp;
+                    <label htmlFor="LoginPage_password">{t('Password')}:</label>&nbsp;&nbsp;
                     <input type="password" id="LoginPage_password" />
                     <br />
                     <button onClick={e => {
                         e.preventDefault();
                         this.handleUserLogin();
                     }}>
-                        Login
+                        {t('Login')}
                     </button>
                 </form>
             </div>

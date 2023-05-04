@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {Modal, Button} from 'semantic-ui-react';
+import componentWrapper from '../../../utils/componentWrapper';
 
-export default class DeleteCustomerModal extends Component {
+class DeleteCustomerModal extends Component {
     constructor(props) {
         super(props);
 
@@ -11,6 +12,7 @@ export default class DeleteCustomerModal extends Component {
     }
 
     render() {
+        const {t} = this.props;
         return (
             <Modal
                 onClose={() => this.setState({
@@ -20,18 +22,18 @@ export default class DeleteCustomerModal extends Component {
                     modalOpen: true
                 })}
                 open={this.state.modalOpen}
-                trigger={<Button negative>Delete</Button>}
+                trigger={<Button negative>{t('Delete')}</Button>}
             >
-                <Modal.Header>Delete Customer?</Modal.Header>
+                <Modal.Header>{t('Delete Customer?')}</Modal.Header>
                 <Modal.Content>
-                    Are you sure?
+                    {t('Are you sure?')}
                 </Modal.Content>
                 <Modal.Actions>
                     <Button 
                         color='black' 
                         onClick={() => this.setState({modalOpen: false})}
                     >
-                        Cancel
+                        {t('Cancel')}
                     </Button>
                     <Button 
                         onClick={() => {
@@ -40,10 +42,12 @@ export default class DeleteCustomerModal extends Component {
                         }}
                         negative
                     >
-                            Delete
+                            {t('Delete')}
                     </Button>
                 </Modal.Actions>
             </Modal>
         );
     }
-}
+};
+
+export default componentWrapper(DeleteCustomerModal);

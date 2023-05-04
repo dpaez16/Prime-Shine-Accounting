@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {Modal, Button, Form, Label, Input} from 'semantic-ui-react';
 import { constructDate } from '../../../utils/helpers';
+import componentWrapper from '../../../utils/componentWrapper';
 
-export default class EditScheduleModal extends Component {
+class EditScheduleModal extends Component {
     constructor(props) {
         super(props);
 
@@ -28,6 +29,7 @@ export default class EditScheduleModal extends Component {
     }
 
     render() {
+        const {t} = this.props;
         const defaultStartDay = this.props.schedule.startDay.toISOString().split('T')[0];
 
         return (
@@ -41,13 +43,13 @@ export default class EditScheduleModal extends Component {
                     isDateValid: false
                 })}
                 open={this.state.modalOpen}
-                trigger={<Button>Edit</Button>}
+                trigger={<Button>{t('Edit')}</Button>}
             >
-                <Modal.Header>Edit a Schedule</Modal.Header>
+                <Modal.Header>{t('Edit Schedule')}</Modal.Header>
                 <Modal.Content>
                     <Form>
                         <Form.Field>
-                            <Label>Start date:</Label>
+                            <Label>{t('Start date')}:</Label>
                             <Input  type="date"
                                 id="editSchedule_startDay"
                                 min="2010-01-01"
@@ -63,7 +65,7 @@ export default class EditScheduleModal extends Component {
                         color='black' 
                         onClick={() => this.setState({modalOpen: false})}
                     >
-                        Cancel
+                        {t('Cancel')}
                     </Button>
                     <Button 
                         onClick={() => {
@@ -81,4 +83,6 @@ export default class EditScheduleModal extends Component {
             </Modal>
         );
     }
-}
+};
+
+export default componentWrapper(EditScheduleModal);

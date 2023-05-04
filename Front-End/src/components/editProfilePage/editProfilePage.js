@@ -22,23 +22,24 @@ class EditProfilePage extends Component {
     }
 
     render() {
+        const {t} = this.props;
         return (
             <div className="EditProfilePage">
                 <form>
-                    <label htmlFor="EditProfilePage_name">Name:</label>&nbsp;&nbsp;
+                    <label htmlFor="EditProfilePage_name">{t('Name')}:</label>&nbsp;&nbsp;
                     <input type="text" id="EditProfilePage_name" />
                     <br />
-                    <label htmlFor="EditProfilePage_email">Email:</label>&nbsp;&nbsp;
+                    <label htmlFor="EditProfilePage_email">{t('Email')}:</label>&nbsp;&nbsp;
                     <input type="text" id="EditProfilePage_email" />
                     <br />
-                    <label htmlFor="EditProfilePage_password">Password:</label>&nbsp;&nbsp;
+                    <label htmlFor="EditProfilePage_password">{t('Password')}:</label>&nbsp;&nbsp;
                     <input type="password" id="EditProfilePage_password" />
                     <br />
                     <button onClick={e => {
                         e.preventDefault();
                         this.handleUserEditProfile();
                     }}>
-                        Save Changes
+                        {t('Save Changes')}
                     </button>
                 </form>
             </div>

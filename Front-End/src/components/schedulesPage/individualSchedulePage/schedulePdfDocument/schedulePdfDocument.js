@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 import { constructTimeStr, getDayOfWeekStr, grabWorkingDays } from '../../../../utils/helpers';
+import translationWrapper from '../../../../utils/translationWrapper';
 import { v4 as uuidv4 } from 'uuid';
 
-export default class SchedulePDFDocument extends Component {
+class SchedulePDFDocument extends Component {
     constructCustomerAddressStr(address) {
         if (!address) {
             return '';
@@ -74,6 +75,7 @@ export default class SchedulePDFDocument extends Component {
         const endDay = datesOfService[datesOfService.length - 1];
 
         const workingDatesOfService = grabWorkingDays(datesOfService);
+        const {t} = this.props;
 
         // TODO: test PDF printing 
         return (
@@ -83,7 +85,7 @@ export default class SchedulePDFDocument extends Component {
                     style={styleSheet.page}
                 >
                     <View style={styleSheet.header}>
-                        <Text>Week of {startDay} - {endDay}</Text>
+                        <Text>{t('Week of')} {startDay} - {endDay}</Text>
                     </View>
                     <View style={styleSheet.daysSection}>
                     {
@@ -91,7 +93,7 @@ export default class SchedulePDFDocument extends Component {
                             return (
                                 <View style={styleSheet.day} key={uuidv4()}>
                                     <Text style={styleSheet.dayHeader}>
-                                        {getDayOfWeekStr(dateOfService)} {dateOfService}
+                                        {t(getDayOfWeekStr(dateOfService))} {dateOfService}
                                     </Text>
                                     <View style={styleSheet.customersSection}>
                                         {
@@ -114,3 +116,5 @@ export default class SchedulePDFDocument extends Component {
         );
     }
 };
+
+export default translationWrapper(SchedulePDFDocument);
