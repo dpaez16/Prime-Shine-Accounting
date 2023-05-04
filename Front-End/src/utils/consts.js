@@ -115,3 +115,6 @@ export const DAYS_OF_WEEK = [
     "Friday",
     "Saturday"
 ];
+
+export const ENGLISH_LOCALE = "en";
+export const SPANISH_LOCALE = "es";

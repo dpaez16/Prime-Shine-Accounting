@@ -24,7 +24,7 @@ export default class DeleteInvoiceModal extends Component {
                 <Modal.Content>
                     <div>
                         <p>Invoice Number: {invoice.invoiceNumber}</p>
-                        <p>Invoice Date: {invoice.invoiceDate}</p>
+                        <p>Date of Service: {invoice.invoiceDate}</p>
                         <p>Customer: {invoice.customer.name}</p>
                     </div>
                 </Modal.Content>
