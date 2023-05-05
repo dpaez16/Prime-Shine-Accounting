@@ -11,8 +11,9 @@ class RegisterPage extends Component {
         
         PrimeShineAPIClient.createUser(name, email, password)
         .then((user) => {
-            alert("User is created!");
-            this.props.navigation('/');
+            this.props.navigation('/', {
+                replace: true
+            });
         })
         .catch((err) => {
             console.log(err);
@@ -20,23 +21,24 @@ class RegisterPage extends Component {
     }
 
     render() {
+        const {t} = this.props;
         return (
             <div className="RegisterPage">
                 <form>
-                    <label htmlFor="RegisterPage_name">Name:</label>&nbsp;&nbsp;
+                    <label htmlFor="RegisterPage_name">{t('Name')}:</label>&nbsp;&nbsp;
                     <input type="text" id="RegisterPage_name" />
                     <br />
-                    <label htmlFor="RegisterPage_email">Email:</label>&nbsp;&nbsp;
+                    <label htmlFor="RegisterPage_email">{t('Email')}:</label>&nbsp;&nbsp;
                     <input type="text" id="RegisterPage_email" />
                     <br />
-                    <label htmlFor="RegisterPage_password">Password:</label>&nbsp;&nbsp;
+                    <label htmlFor="RegisterPage_password">{t('Password')}:</label>&nbsp;&nbsp;
                     <input type="password" id="RegisterPage_password" />
                     <br />
                     <button onClick={e => {
                         e.preventDefault();
                         this.handleUserRegister();
                     }}>
-                        Register
+                        {t('Register')}
                     </button>
                 </form>
             </div>

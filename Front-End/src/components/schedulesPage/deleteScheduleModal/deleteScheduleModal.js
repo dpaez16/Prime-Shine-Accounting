@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {Modal, Button} from 'semantic-ui-react';
+import componentWrapper from '../../../utils/componentWrapper';
 
-export default class DeleteScheduleModal extends Component {
+class DeleteScheduleModal extends Component {
     constructor(props) {
         super(props);
 
@@ -11,17 +12,18 @@ export default class DeleteScheduleModal extends Component {
     }
 
     render() {
+        const {t} = this.props;
         return (
             <Modal
                 onClose={() => this.setState({modalOpen: false})}
                 onOpen={() => this.setState({modalOpen: true})}
                 open={this.state.modalOpen}
-                trigger={<Button negative>Delete</Button>}
+                trigger={<Button negative>{t('Delete')}</Button>}
             >
-                <Modal.Header>Delete Schedule?</Modal.Header>
+                <Modal.Header>{t('Delete Schedule?')}</Modal.Header>
                 <Modal.Content>
                     <div>
-                        <p>Start Day: {this.props.startDay}</p>
+                        <p>{t('Start Day')}: {this.props.startDay}</p>
                     </div>
                 </Modal.Content>
                 <Modal.Actions>
@@ -29,7 +31,7 @@ export default class DeleteScheduleModal extends Component {
                         color='black' 
                         onClick={() => this.setState({modalOpen: false})}
                     >
-                        Cancel
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={() => {
@@ -44,4 +46,6 @@ export default class DeleteScheduleModal extends Component {
             </Modal>
         );
     }
-}
+};
+
+export default componentWrapper(DeleteScheduleModal);

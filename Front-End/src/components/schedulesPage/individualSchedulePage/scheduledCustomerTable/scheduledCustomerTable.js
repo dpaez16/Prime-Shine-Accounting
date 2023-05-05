@@ -10,13 +10,13 @@ import { v4 as uuidv4 } from 'uuid';
 
 class ScheduledCustomerTable extends Component {
     render() {
-        const { date } = this.props;
+        const { t, date } = this.props;
         const scheduleDayDate = date;
         const scheduledCustomers = this.props.scheduledCustomers.sort((a, b) => Number(a.serviceStartTime) > Number(b.serviceStartTime) ? 1 : -1);
 
         return (
             <React.Fragment>
-            <Header as='h1'>{getDayOfWeekStr(scheduleDayDate)} {scheduleDayDate}</Header>
+            <Header as='h1'>{t(getDayOfWeekStr(scheduleDayDate))} {scheduleDayDate}</Header>
             <Table 
                 celled
                 className="ScheduledCustomerTable_table"
@@ -24,10 +24,10 @@ class ScheduledCustomerTable extends Component {
             >
                 <Table.Header>
                     <Table.Row>
-                        <Table.HeaderCell>Customer</Table.HeaderCell>
-                        <Table.HeaderCell>Service Start Time</Table.HeaderCell>
-                        <Table.HeaderCell>Service End Time</Table.HeaderCell>
-                        <Table.HeaderCell className='ScheduledCustomerTable_table_options'>Options</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Customer')}</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Service Start Time')}</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Service End Time')}</Table.HeaderCell>
+                        <Table.HeaderCell className='ScheduledCustomerTable_table_options'>{t('Options')}</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -37,9 +37,9 @@ class ScheduledCustomerTable extends Component {
                             const serviceEndTime = constructTimeStr(scheduledCustomer.serviceEndTime);
                             const customerElement = (
                                 <Container>
-                                    <p>Customer: {scheduledCustomer.metadata.name}</p>
-                                    <p>Service Start Time: {serviceStartTime}</p>
-                                    <p>Service End Time: {serviceEndTime}</p>
+                                    <p>{t('Customer')}: {scheduledCustomer.metadata.name}</p>
+                                    <p>{t('Service Start Time')}: {serviceStartTime}</p>
+                                    <p>{t('Service End Time')}: {serviceEndTime}</p>
                                 </Container>
                             );
 

@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {Modal, Button, Dropdown, Form, Label, Input} from 'semantic-ui-react';
 import {fuseDateTime} from '../../../../utils/helpers';
+import componentWrapper from '../../../../utils/componentWrapper';
 
-export default class CreateScheduledCustomerModal extends Component {
+class CreateScheduledCustomerModal extends Component {
     constructor(props) {
         super(props);
 
@@ -63,6 +64,8 @@ export default class CreateScheduledCustomerModal extends Component {
     }
 
     render() {
+        const {t} = this.props;
+
         const allCustomers = this.props.allCustomers.map((customerOption) => {
             return {
                 key: customerOption.id,
@@ -92,15 +95,15 @@ export default class CreateScheduledCustomerModal extends Component {
                     timesValid: false
                 })}
                 open={this.state.modalOpen}
-                trigger={<Button>Add Customer</Button>}
+                trigger={<Button>{t('Add Customer')}</Button>}
             >
-                <Modal.Header>Add Customer</Modal.Header>
+                <Modal.Header>{t('Add Customer')}</Modal.Header>
                 <Modal.Content>
                     <Form>
                         <Form.Field>
-                            <Label>Date of Service:</Label>
+                            <Label>{t('Date of Service')}:</Label>
                             <Dropdown
-                                placeholder='Select Date'
+                                placeholder={t('Select Date')}
                                 fluid
                                 selection
                                 options={datesOfService}
@@ -109,9 +112,9 @@ export default class CreateScheduledCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label>Customer:</Label>
+                            <Label>{t('Customer')}:</Label>
                             <Dropdown
-                                placeholder='Select Customer'
+                                placeholder={t('Select Customer')}
                                 fluid
                                 search
                                 selection
@@ -121,7 +124,7 @@ export default class CreateScheduledCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label htmlFor="CreateScheduledCustomerModal_serviceStartTime">Service Start Time:</Label>
+                            <Label htmlFor="CreateScheduledCustomerModal_serviceStartTime">{t('Service Start Time')}:</Label>
                             <Input 
                                 type="time" 
                                 id="CreateScheduledCustomerModal_serviceStartTime" 
@@ -133,7 +136,7 @@ export default class CreateScheduledCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label htmlFor="CreateScheduledCustomerModal_serviceEndTime">Service End Time:</Label>
+                            <Label htmlFor="CreateScheduledCustomerModal_serviceEndTime">{t('Service End Time')}:</Label>
                             <Input 
                                 type="time" 
                                 id="CreateScheduledCustomerModal_serviceEndTime" 
@@ -151,7 +154,7 @@ export default class CreateScheduledCustomerModal extends Component {
                         color='black' 
                         onClick={() => this.setState({modalOpen: false})}
                     >
-                        Cancel
+                        {t('Cancel')}
                     </Button>
                     <Button 
                         onClick={() => {
@@ -169,4 +172,6 @@ export default class CreateScheduledCustomerModal extends Component {
             </Modal>
         );
     }
-}
+};
+
+export default componentWrapper(CreateScheduledCustomerModal);

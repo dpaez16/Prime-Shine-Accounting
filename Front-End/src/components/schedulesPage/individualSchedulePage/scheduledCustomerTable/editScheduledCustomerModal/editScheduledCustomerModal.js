@@ -1,8 +1,9 @@
 import React, {Component} from 'react';
 import {Modal, Button, Dropdown, Form, Label, Input} from 'semantic-ui-react';
 import {fuseDateTime, constructMilitaryTimeStr} from '../../../../../utils/helpers';
+import componentWrapper from '../../../../../utils/componentWrapper';
 
-export default class EditScheduledCustomerModal extends Component {
+class EditScheduledCustomerModal extends Component {
     constructor(props) {
         super(props);
 
@@ -52,6 +53,7 @@ export default class EditScheduledCustomerModal extends Component {
     }
 
     render() {
+        const {t} = this.props;
         const defaultServiceStartTime = constructMilitaryTimeStr(this.props.scheduledCustomer.serviceStartTime).split(' ')[0];
         const defaultServiceEndTime = constructMilitaryTimeStr(this.props.scheduledCustomer.serviceEndTime).split(' ')[0];
 
@@ -68,15 +70,15 @@ export default class EditScheduledCustomerModal extends Component {
                     timesValid: false
                 })}
                 open={this.state.modalOpen}
-                trigger={<Button>Edit</Button>}
+                trigger={<Button>{t('Edit')}</Button>}
             >
-                <Modal.Header>Edit Scheduled Customer</Modal.Header>
+                <Modal.Header>{t('Edit Scheduled Customer')}</Modal.Header>
                 <Modal.Content>
                     <Form>
                         <Form.Field>
-                            <Label>Customer:</Label>
+                            <Label>{t('Customer')}:</Label>
                             <Dropdown
-                                placeholder='Select Customer'
+                                placeholder={t('Select Customer')}
                                 fluid
                                 search
                                 selection
@@ -87,7 +89,7 @@ export default class EditScheduledCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label htmlFor="EditScheduledCustomerModal_serviceStartTime">Service Start Time:</Label>
+                            <Label htmlFor="EditScheduledCustomerModal_serviceStartTime">{t('Service Start Time')}:</Label>
                             <Input 
                                 type="time" 
                                 id="EditScheduledCustomerModal_serviceStartTime" 
@@ -100,7 +102,7 @@ export default class EditScheduledCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label htmlFor="EditScheduledCustomerModal_serviceEndTime">Service End Time:</Label>
+                            <Label htmlFor="EditScheduledCustomerModal_serviceEndTime">{t('Service End Time')}:</Label>
                             <Input 
                                 type="time" 
                                 id="EditScheduledCustomerModal_serviceEndTime" 
@@ -119,7 +121,7 @@ export default class EditScheduledCustomerModal extends Component {
                         color='black' 
                         onClick={() => this.setState({modalOpen: false})}
                     >
-                        Cancel
+                        {t('Cancel')}
                     </Button>
                     <Button 
                         onClick={() => {
@@ -138,4 +140,6 @@ export default class EditScheduledCustomerModal extends Component {
             </Modal>
         );
     }
-}
+};
+
+export default componentWrapper(EditScheduledCustomerModal);

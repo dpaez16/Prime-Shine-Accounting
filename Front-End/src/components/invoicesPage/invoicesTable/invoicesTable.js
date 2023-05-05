@@ -2,9 +2,10 @@ import React, {Component} from 'react';
 import {Dimmer, Loader, Segment, Table, Dropdown} from 'semantic-ui-react';
 import DeleteInvoiceModal from './deleteInvoiceModal/deleteInvoiceModal';
 import EditInvoiceModal from './editInvoiceModal/editInvoiceModal';
+import componentWrapper from '../../../utils/componentWrapper';
 import { v4 as uuidV4 } from 'uuid';
 
-export default class InvoicesTable extends Component {
+class InvoicesTable extends Component {
     render() {
         if (this.props.loading) {
             return (
@@ -20,17 +21,18 @@ export default class InvoicesTable extends Component {
             );
         }
 
+        const {t} = this.props;
         return (
             <Table className='InvoicesPage_table'>
                 <Table.Header>
                     <Table.Row>
-                        <Table.HeaderCell>Status</Table.HeaderCell>
-                        <Table.HeaderCell>Date</Table.HeaderCell>
-                        <Table.HeaderCell>Number</Table.HeaderCell>
-                        <Table.HeaderCell>Customer</Table.HeaderCell>
-                        <Table.HeaderCell>Total</Table.HeaderCell>
-                        <Table.HeaderCell>Amount Due</Table.HeaderCell>
-                        <Table.HeaderCell>Options</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Status')}</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Date')}</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Number')}</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Customer')}</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Total')}</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Amount Due')}</Table.HeaderCell>
+                        <Table.HeaderCell>{t('Options')}</Table.HeaderCell>
                     </Table.Row>
                 </Table.Header>
                 <Table.Body>
@@ -48,7 +50,7 @@ export default class InvoicesTable extends Component {
                                     <Dropdown>
                                         <Dropdown.Menu>
                                             <EditInvoiceModal
-                                                trigger={<Dropdown.Item text="Edit" />}
+                                                trigger={<Dropdown.Item text={t("Edit")} />}
                                                 invoice={invoice}
                                                 customers={this.props.customers}
                                                 businessInfo={this.props.businessInfo}
@@ -57,21 +59,21 @@ export default class InvoicesTable extends Component {
                                                 }}
                                             />
                                             <DeleteInvoiceModal
-                                                trigger={<Dropdown.Item text="Delete" />}
+                                                trigger={<Dropdown.Item text={t("Delete")} />}
                                                 invoice={invoice}
                                                 onSubmit={() => {
                                                     this.props.deleteInvoice(invoice.id);
                                                 }}
                                             />
                                             <Dropdown.Item 
-                                                text="Download PDF"
+                                                text={t("Download PDF")}
                                                 onClick={() => {
                                                     const url = invoice.pdfUrl;
                                                     window.open(url, '_blank');
                                                 }}
                                             />
                                             <Dropdown.Item 
-                                                text="View Invoice to Print" 
+                                                text={t("View Invoice to Print")} 
                                                 onClick={() => {
                                                     const url = invoice.viewUrl;
                                                     window.open(url, '_blank');
@@ -89,3 +91,5 @@ export default class InvoicesTable extends Component {
         )
     }
 };
+
+export default componentWrapper(InvoicesTable);

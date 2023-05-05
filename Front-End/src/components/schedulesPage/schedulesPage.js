@@ -106,11 +106,12 @@ class SchedulesPage extends Component {
             );
         }
 
+        const {t} = this.props;
         const schedules = this.state.schedules.sort((a, b) => Number(a.startDay) > Number(b.startDay) ? 1 : -1);
 
         return (
             <Container className="SchedulesPage">
-                <p>Schedules:</p>
+                <p>{t('Schedules')}:</p>
                 <CreateScheduleModal
                     onSubmit={(startDate) => {
                         this.createScheduleHandler(startDate);

@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import {Modal, Button} from 'semantic-ui-react';
+import componentWrapper from '../../../../utils/componentWrapper';
 
-export default class DeleteInvoiceModal extends Component {
+class DeleteInvoiceModal extends Component {
     constructor(props) {
         super(props);
 
@@ -11,7 +12,7 @@ export default class DeleteInvoiceModal extends Component {
     }
 
     render() {
-        const invoice = this.props.invoice;
+        const {t, invoice} = this.props;
         
         return (
             <Modal
@@ -20,12 +21,12 @@ export default class DeleteInvoiceModal extends Component {
                 open={this.state.modalOpen}
                 trigger={this.props.trigger}
             >
-                <Modal.Header>Delete Invoice?</Modal.Header>
+                <Modal.Header>{t('Delete Invoice?')}</Modal.Header>
                 <Modal.Content>
                     <div>
-                        <p>Invoice Number: {invoice.invoiceNumber}</p>
-                        <p>Invoice Date: {invoice.invoiceDate}</p>
-                        <p>Customer: {invoice.customer.name}</p>
+                        <p>{t('Invoice Number')}: {invoice.invoiceNumber}</p>
+                        <p>{t('Date of Service')}: {invoice.invoiceDate}</p>
+                        <p>{t('Customer')}: {invoice.customer.name}</p>
                     </div>
                 </Modal.Content>
                 <Modal.Actions>
@@ -33,7 +34,7 @@ export default class DeleteInvoiceModal extends Component {
                         color='black' 
                         onClick={() => this.setState({modalOpen: false})}
                     >
-                        Cancel
+                        {t('Cancel')}
                     </Button>
                     <Button
                         onClick={() => {
@@ -48,4 +49,6 @@ export default class DeleteInvoiceModal extends Component {
             </Modal>
         );
     }
-}
+};
+
+export default componentWrapper(DeleteInvoiceModal);

@@ -132,12 +132,14 @@ class InvoicesPage extends Component {
             };
         });
 
+        const {t} = this.props;
+
         return (
             <Container className="InvoicesPage">
-                <Header as='h1'>Invoices</Header>
+                <Header as='h1'>{t('Invoices')}</Header>
                 <Container className="InvoicesPage_filters">
                     <Dropdown
-                        placeholder="All customers"
+                        placeholder={t('All customers')}
                         selection
                         search
                         clearable
@@ -147,7 +149,7 @@ class InvoicesPage extends Component {
                         onChange={this.handleFilterChange.bind(this)}
                     />
                     <Dropdown
-                        placeholder='All statuses'
+                        placeholder={t('All statuses')}
                         selection
                         clearable
                         options={invoiceStatusOptions}
@@ -171,7 +173,7 @@ class InvoicesPage extends Component {
                     />
                     <Input
                         type="text"
-                        placeholder='Invoice #'
+                        placeholder={t('Invoice #')}
                         id="invoiceNumber"
                         icon={{ 
                             name: 'search', 
@@ -193,7 +195,7 @@ class InvoicesPage extends Component {
                             });
                         }}
                     >
-                        Search
+                        {t('Search')}
                     </Button>
                 </Container>
                 <Divider hidden />

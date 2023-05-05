@@ -86,12 +86,13 @@ class CustomersPage extends Component {
             );
         }
 
+        const {t} = this.props;
         const searchBarRegex = new RegExp(this.state.searchBarValue.toLowerCase());
         const filteredCustomers = this.state.customers.filter((customer) => searchBarRegex.test(customer.name.toLowerCase()));
 
         return (
             <Container className="CustomersPage">
-                <Header as='h1'>Customers:</Header>
+                <Header as='h1'>{t('Customers')}:</Header>
                 <Input
                     icon='search'
                     placeholder=''

@@ -8,10 +8,11 @@ import componentWrapper from '../../../utils/componentWrapper';
 
 class IndividualCustomerPage extends Component {
     constructNameElement(name) {
+        const {t} = this.props;
         if (name) {
             return (
                 <React.Fragment>
-                    <Header as='h3'>Name:</Header>
+                    <Header as='h3'>{t('Name')}:</Header>
                     <p>{name}</p>
                 </React.Fragment>
             );
@@ -21,10 +22,11 @@ class IndividualCustomerPage extends Component {
     }
 
     constructPhoneElement(phone) {
+        const {t} = this.props;
         if (phone) {
             return (
                 <React.Fragment>
-                    <Header as='h3'>Phone Number:</Header>
+                    <Header as='h3'>{t('Phone Number')}:</Header>
                     <p>{phone}</p>
                 </React.Fragment>
             );
@@ -34,10 +36,11 @@ class IndividualCustomerPage extends Component {
     }
 
     constructMobileElement(mobile) {
+        const {t} = this.props;
         if (mobile) {
             return (
                 <React.Fragment>
-                    <Header as='h3'>Mobile:</Header>
+                    <Header as='h3'>{t('Mobile')}:</Header>
                     <p>{mobile}</p>
                 </React.Fragment>
             );
@@ -47,10 +50,11 @@ class IndividualCustomerPage extends Component {
     }
 
     constructEmailElement(email) {
+        const {t} = this.props;
         if (email) {
             return (
                 <React.Fragment>
-                    <Header as='h3'>Email:</Header>
+                    <Header as='h3'>{t('Email')}:</Header>
                     <p>{email}</p>
                 </React.Fragment>
             );
@@ -60,6 +64,7 @@ class IndividualCustomerPage extends Component {
     }
 
     constructAddressElement(address) {
+        const {t} = this.props;
         if (address) {
             const {
                 addressLine1, 
@@ -78,7 +83,7 @@ class IndividualCustomerPage extends Component {
 
             return (
                 <React.Fragment>
-                    <Header as='h3'>Address:</Header>
+                    <Header as='h3'>{t('Address')}:</Header>
                     <p>{addressLine1}</p>
                     {addressLine2 && <p>{addressLine2}</p>}
                     <p>{addressLine3}</p>

@@ -2,8 +2,9 @@ import React, {Component} from 'react';
 import {Modal, Button, Form, Label, Input, Divider, Header, Dropdown} from 'semantic-ui-react';
 import {validatePhoneNumber, validateEmail, validateAddress} from '../../../../utils/validators';
 import {US_COUNTRY_CODE, US_STATES, US_STATE_ABBRV} from '../../../../utils/consts';
+import componentWrapper from '../../../../utils/componentWrapper';
 
-export default class EditCustomerModal extends Component {
+class EditCustomerModal extends Component {
     constructor(props) {
         super(props);
 
@@ -75,6 +76,7 @@ export default class EditCustomerModal extends Component {
     }
 
     render() {
+        const {t} = this.props;
         return (
             <Modal
                 onClose={() => this.setState({
@@ -85,13 +87,13 @@ export default class EditCustomerModal extends Component {
                     ...this.getOriginalFormParams()
                 })}
                 open={this.state.modalOpen}
-                trigger={<Button>Edit</Button>}
+                trigger={<Button>{t('Edit')}</Button>}
             >
-                <Modal.Header>Edit a Customer</Modal.Header>
+                <Modal.Header>{t('Edit Customer')}</Modal.Header>
                 <Modal.Content>
                     <Form>
                         <Form.Field>
-                            <Label>Name:</Label>
+                            <Label>{t('Name')}:</Label>
                             <Input 
                                 type="text"
                                 name='name'
@@ -100,7 +102,7 @@ export default class EditCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label>Phone Number:</Label>
+                            <Label>{t('Phone Number')}:</Label>
                             <Input 
                                 type="text"
                                 name='phone'
@@ -109,7 +111,7 @@ export default class EditCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label>Mobile:</Label>
+                            <Label>{t('Mobile')}:</Label>
                             <Input 
                                 type="text"
                                 name='mobile'
@@ -118,7 +120,7 @@ export default class EditCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label>Email:</Label>
+                            <Label>{t('Email')}:</Label>
                             <Input 
                                 type="text"
                                 name='email'
@@ -127,9 +129,9 @@ export default class EditCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Divider hidden />
-                        <Header as='h3'>Address:</Header>
+                        <Header as='h3'>{t('Address')}:</Header>
                         <Form.Field>
-                            <Label>Address Line 1:</Label>
+                            <Label>{t('Address Line 1')}:</Label>
                             <Input 
                                 type="text"
                                 name='addressLine1'
@@ -138,7 +140,7 @@ export default class EditCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label>Address Line 2:</Label>
+                            <Label>{t('Address Line 2')}:</Label>
                             <Input 
                                 type="text"
                                 name='addressLine2'
@@ -147,7 +149,7 @@ export default class EditCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label>City:</Label>
+                            <Label>{t('City')}:</Label>
                             <Input 
                                 type="text"
                                 name='city'
@@ -156,7 +158,7 @@ export default class EditCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label>State:</Label>
+                            <Label>{t('State')}:</Label>
                             <Dropdown
                                 placeholder='Select State'
                                 fluid
@@ -171,7 +173,7 @@ export default class EditCustomerModal extends Component {
                             />
                         </Form.Field>
                         <Form.Field>
-                            <Label>Zip Code:</Label>
+                            <Label>{t('Zip Code')}:</Label>
                             <Input 
                                 type="text"
                                 name='postalCode'
@@ -186,7 +188,7 @@ export default class EditCustomerModal extends Component {
                         color='black' 
                         onClick={() => this.setState({modalOpen: false})}
                     >
-                        Cancel
+                        {t('Cancel')}
                     </Button>
                     <Button 
                         onClick={() => {
@@ -198,10 +200,12 @@ export default class EditCustomerModal extends Component {
                         disabled={!this.isFormValid()}
                         positive
                     >
-                            Save
+                            {t('Save')}
                     </Button>
                 </Modal.Actions>
             </Modal>
         );
     }
-}
+};
+
+export default componentWrapper(EditCustomerModal);
