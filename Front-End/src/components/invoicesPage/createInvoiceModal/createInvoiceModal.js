@@ -1,31 +1,29 @@
 import React, {Component} from 'react';
 import {Modal, Button, Form, Label, Input, Divider, Table, Dropdown, Icon} from 'semantic-ui-react';
-import componentWrapper from '../../../../utils/componentWrapper';
+import componentWrapper from '../../../utils/componentWrapper';
 import { v4 as uuidV4 } from 'uuid';
 
-class EditInvoiceModalTable extends Component {
+
+class CreateInvoiceModalTable extends Component {
     createNewInvoiceService() {
-        const {productId, productName} = this.props.businessInfo;
+        const {productId} = this.props.businessInfo;
 
         return {
-            productId: {
-                id: productId,
-                name: productName
-            },
+            productId: productId,
             description: "",
-            total: {
-                value: 0
-            }
+            quantity: 1,
+            unitPrice: 0
         };
     }
 
     render() {
         const {t, invoiceServices} = this.props;
+        const productName = this.props.businessInfo.productName;
         
         return (
             <Table 
                 celled 
-                className="EditInvoiceModal_table"
+                className="CreateInvoiceModal_table"
             >
                 <Table.Header>
                     <Table.Row>
@@ -39,7 +37,7 @@ class EditInvoiceModalTable extends Component {
                     invoiceServices.map((invoiceService, index) => {
                         return (
                             <Table.Row key={uuidV4()}>
-                                <Table.Cell>{invoiceService.product.name}</Table.Cell>
+                                <Table.Cell>{productName}</Table.Cell>
                                 <Table.Cell>
                                     <Input
                                         type="text"
@@ -54,10 +52,10 @@ class EditInvoiceModalTable extends Component {
                                 <Table.Cell>
                                     <Input
                                         type="text"
-                                        defaultValue={invoiceService.total.value}
+                                        defaultValue={invoiceService.unitPrice}
                                         onChange={e => {
                                             const totalValue = e.target.value;
-                                            const newInvoiceService = {...invoiceService, total: {value: totalValue}};
+                                            const newInvoiceService = {...invoiceService, unitPrice: totalValue};
                                             this.props.updateInvoiceService(index, newInvoiceService);
                                         }}
                                     />
@@ -93,40 +91,25 @@ class EditInvoiceModalTable extends Component {
     }
 };
 
-class EditInvoiceModal extends Component {
+class CreateInvoiceModal extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
             modalOpen: false,
-            invoiceServices: []
+            items: []
         };
     }
 
     getFormParams() {
-        const formParams = Object.keys(this.state).reduce((acc, key) => {
+        return Object.keys(this.state).reduce((acc, key) => {
             if (key === "modalOpen") {
                 return acc;
             }
 
             acc[key] = this.state[key];
             return acc;
-        }, {...this.props.invoice});
-
-        return {
-            id: formParams.id,
-            customerId: formParams.customer.id,
-            invoiceDate: formParams.invoiceDate,
-            items: formParams.invoiceServices.map(invoiceService => {
-                return {
-                    productId: invoiceService.product.id,
-                    description: invoiceService.description,
-                    quantity: 1,
-                    unitPrice: invoiceService.total.value
-                };
-            }),
-            memo: formParams.memo
-        };
+        }, {});
     }
 
     isFormValid() {
@@ -138,7 +121,7 @@ class EditInvoiceModal extends Component {
                 return acc && true;
             }
 
-            if (key === "invoiceServices") {
+            if (key === "items") {
                 return acc && formParams[key].length > 0;
             }
 
@@ -153,53 +136,46 @@ class EditInvoiceModal extends Component {
     }
 
     handleInvoiceServiceChange(idx, newInvoiceService) {
-        let newInvoiceServices = [...this.state.invoiceServices];
+        let newInvoiceServices = [...this.state.items];
         newInvoiceServices.splice(idx, 1, newInvoiceService);
 
         this.setState({
-            invoiceServices: newInvoiceServices
+            items: newInvoiceServices
         });
     }
 
     deleteInvoiceServiceHandler(idx) {
-        const newInvoiceServices = this.state.invoiceServices.filter((element, elementIdx) => idx !== elementIdx);
+        const newInvoiceServices = this.state.items.filter((element, elementIdx) => idx !== elementIdx);
         
         this.setState({
-            invoiceServices: newInvoiceServices
+            items: newInvoiceServices
         });
     }
 
     addInvoiceServiceHandler(newInvoiceService) {
-        const newInvoiceServices = [...this.state.invoiceServices, newInvoiceService];
+        const newInvoiceServices = [...this.state.items, newInvoiceService];
         this.setState({
-            invoiceServices: newInvoiceServices
+            items: newInvoiceServices
         });
     }
 
     render() {
-        const {t, invoice} = this.props;
-        const customerOptions = this.props.customers.map(customer => {
-            return {
-                key: customer.id,
-                value: customer.id,
-                text: customer.name
-            };
-        });
+        const {t, customerOptions} = this.props;
 
         return (
             <Modal
                 onClose={() => this.setState({
                     modalOpen: false,
-                    invoiceServices: [...this.props.invoice.items]
+                    items: []
                 })}
                 onOpen={() => this.setState({
                     modalOpen: true,
-                    invoiceServices: [...this.props.invoice.items]
+                    items: []
                 })}
                 open={this.state.modalOpen}
                 trigger={this.props.trigger}
             >
-                <Modal.Header>{t('Edit Invoice')}</Modal.Header>
+                <Modal.Header>{t('Create Invoice')}</Modal.Header>
                 <Modal.Content>
                     <Form>
                         <Form.Field>
@@ -207,7 +183,6 @@ class EditInvoiceModal extends Component {
                             <Input
                                 type="text"
                                 name="invoiceNumber"
-                                defaultValue={invoice.invoiceNumber}
                                 onChange={this.handleFormChange.bind(this)}
                             />
                         </Form.Field>
@@ -220,7 +195,6 @@ class EditInvoiceModal extends Component {
                                 selection
                                 options={customerOptions}
                                 name="customerId"
-                                defaultValue={invoice.customer.id}
                                 onChange={this.handleFormChange.bind(this)}
                             />
                         </Form.Field>
@@ -229,14 +203,13 @@ class EditInvoiceModal extends Component {
                             <Input
                                 type="date"
                                 name="invoiceDate"
-                                defaultValue={invoice.invoiceDate}
                                 onChange={this.handleFormChange.bind(this)}
                             />
                         </Form.Field>
                         <Divider hidden />
-                        <EditInvoiceModalTable
+                        <CreateInvoiceModalTable
                             t={t}
-                            invoiceServices={this.state.invoiceServices}
+                            invoiceServices={this.state.items}
                             businessInfo={this.props.businessInfo}
                             updateInvoiceService={(idx, newInvoiceService) => this.handleInvoiceServiceChange(idx, newInvoiceService)}
                             deleteInvoiceService={(idx) => this.deleteInvoiceServiceHandler(idx)}
@@ -246,7 +219,6 @@ class EditInvoiceModal extends Component {
                             <Label>{t('Memo')}:</Label>
                             <Input
                                 type="text"
-                                defaultValue={invoice.memo}
                                 name="memo"
                                 onChange={this.handleFormChange.bind(this)}
                             />
@@ -277,4 +249,4 @@ class EditInvoiceModal extends Component {
     }
 };
 
-export default componentWrapper(EditInvoiceModal);
+export default componentWrapper(CreateInvoiceModal);
