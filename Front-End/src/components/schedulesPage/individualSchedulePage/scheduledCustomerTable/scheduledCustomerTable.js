@@ -82,6 +82,9 @@ class ScheduledCustomerTable extends Component {
                                                 )
                                                 .then((newScheduledCustomer) => {
                                                     this.props.updateScheduledCustomer(newScheduledCustomer);
+                                                    this.setState({
+                                                        error: null
+                                                    });
                                                 })
                                                 .catch((err) => {
                                                     this.setState({
@@ -100,6 +103,9 @@ class ScheduledCustomerTable extends Component {
                                                 .then((didSucceed) => {
                                                     if (didSucceed) {
                                                         this.props.deleteScheduledCustomer(scheduledCustomerId);
+                                                        this.setState({
+                                                            error: null
+                                                        });
                                                     }
                                                 })
                                                 .catch((err) => {

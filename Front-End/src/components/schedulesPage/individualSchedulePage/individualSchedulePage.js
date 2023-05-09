@@ -128,7 +128,8 @@ class IndividualSchedulePage extends Component {
 
         this.setState({
             scheduleDayIdMap: newScheduleDayIdMap,
-            scheduleDays: newScheduleDays
+            scheduleDays: newScheduleDays,
+            error: null
         });
     }
 
