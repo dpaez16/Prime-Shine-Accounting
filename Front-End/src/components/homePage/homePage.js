@@ -1,4 +1,7 @@
 import React, {Component} from 'react';
+import LoginModal from '../loginModal/loginModal';
+import RegisterModal from '../registerModal/registerModal';
+import { Button } from 'semantic-ui-react';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import componentWrapper from '../../utils/componentWrapper';
 //import './homePage.css';
@@ -14,12 +17,26 @@ class HomePage extends Component {
     }
 
     render() {
+        const {t} = this.props;
+
         if (!this.props.userInfo) {
             return (
                 <div className="HomePage">
                 <ul>
-                    <li><a href="/login">Login</a></li>
-                    <li><a href="/register">Register</a></li>
+                    <li>
+                        <LoginModal
+                            trigger={<Button>{t('Login')}</Button>}
+                            updateUserInfo={this.props.updateUserInfo}
+                            updateBusinessInfo={this.props.updateBusinessInfo}
+                        />
+                    </li>
+                    <li>
+                        <RegisterModal
+                            trigger={<Button>{t('Register')}</Button>}
+                            updateUserInfo={this.props.updateUserInfo}
+                            updateBusinessInfo={this.props.updateBusinessInfo}
+                        />
+                    </li>
                 </ul>
                 </div>      
             );

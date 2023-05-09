@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Container, Header, Input, Dropdown, Divider, Pagination, Button} from 'semantic-ui-react';
+import {Container, Header, Input, Dropdown, Divider, Pagination, Button, Message} from 'semantic-ui-react';
 import WaveAPIClient from '../../api/waveApiClient';
 import InvoicesTable from './invoicesTable/invoicesTable';
 import {fetchAllCustomers} from '../../utils/helpers';
@@ -16,7 +16,8 @@ class InvoicesPage extends Component {
             filterParameters: {},
             customers: [],
             invoices: [],
-            pageInfo: null
+            pageInfo: null,
+            error: null
         };
     }
 
@@ -49,10 +50,14 @@ class InvoicesPage extends Component {
                 customers: customers,
                 invoices: invoices,
                 pageInfo: pageInfo,
+                error: null
             });
         })
         .catch(err => {
-            console.log(err);
+            this.setState({
+                loading: false,
+                error: err.message
+            });
         });
     }
 
@@ -60,24 +65,41 @@ class InvoicesPage extends Component {
         this.fetchAllWaveData();
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        if (prevState.pageNum !== this.state.pageNum || (!prevState.loading && this.state.loading)) {
-            this.fetchAllWaveData();
-        }
-    }
-
     handleFilterChange(event, {name, value}) {
-        const newFilterParameters = {...this.state.filterParameters, [name]: value};
+        const filterValue = value && value.length > 0 ? value : null;
+        const newFilterParameters = {...this.state.filterParameters, [name]: filterValue};
 
         this.setState({
             filterParameters: newFilterParameters
         });
     }
 
+    searchHandler() {
+        const businessId = this.props.businessInfo.businessId;
+        const pageNum = 1;
+
+        WaveAPIClient.fetchInvoices(businessId, pageNum, this.state.filterParameters)
+        .then(({invoices, pageInfo}) => {
+            this.setState({
+                invoices: invoices,
+                pageInfo: pageInfo,
+                loading: false,
+                error: null
+            });
+        })
+        .catch(err => {
+            this.setState({
+                loading: false,
+                error: err.message
+            });
+        });
+    }
+
     handlePageChange(event, { activePage }) {
         this.setState({
             pageNum: activePage,
-            loading: true
+            loading: true,
+            error: null
         });
     }
 
@@ -89,11 +111,14 @@ class InvoicesPage extends Component {
             newInvoices.splice(idx, 1, newInvoice);
 
             this.setState({
-                invoices: newInvoices
+                invoices: newInvoices,
+                error: null
             });
         })
         .catch(err => {
-            console.log(err);
+            this.setState({
+                error: err.message
+            });
         });
     }
 
@@ -107,11 +132,14 @@ class InvoicesPage extends Component {
             newInvoices.splice(idx, 1);
 
             this.setState({
-                invoices: newInvoices
+                invoices: newInvoices,
+                error: null
             });
         })
         .catch(err => {
-            console.log(err);
+            this.setState({
+                error: err.message
+            });
         });
     }
 
@@ -145,7 +173,6 @@ class InvoicesPage extends Component {
                         clearable
                         options={customerOptions}
                         name="customerId"
-                        defaultValue={this.state.filterParameters.customerId ? this.state.filterParameters.customerId : null}
                         onChange={this.handleFilterChange.bind(this)}
                     />
                     <Dropdown
@@ -154,63 +181,61 @@ class InvoicesPage extends Component {
                         clearable
                         options={invoiceStatusOptions}
                         name="status"
-                        defaultValue={this.state.filterParameters.status ? this.state.filterParameters.status : null}
                         onChange={this.handleFilterChange.bind(this)}
                     />
                     <Input
                         type="date"
                         placeholder='From'
                         name="invoiceDateStart"
-                        defaultValue={this.state.filterParameters.invoiceDateStart ? this.state.filterParameters.invoiceDateStart : null}
                         onChange={this.handleFilterChange.bind(this)}
                     />
                     <Input
                         type="date"
                         placeholder='To'
                         name="invoiceDateEnd"
-                        defaultValue={this.state.filterParameters.invoiceDateEnd ? this.state.filterParameters.invoiceDateEnd : null}
                         onChange={this.handleFilterChange.bind(this)}
                     />
                     <Input
                         type="text"
                         placeholder={t('Invoice #')}
-                        id="invoiceNumber"
-                        icon={{ 
-                            name: 'search', 
-                            circular: true, 
-                            link: true, 
-                            onClick: e => {
-                                const invoiceNumber = document.getElementById("invoiceNumber").value;
-                                this.handleFilterChange(e, { name: "invoiceNumber", value: invoiceNumber });
-                            }
-                        }}
-                        defaultValue={this.state.filterParameters.invoiceNumber ? this.state.filterParameters.invoiceNumber : null}
+                        name="invoiceNumber"
+                        onChange={this.handleFilterChange.bind(this)}
                     />
                     <Button 
                         color='green'
                         onClick={e => {
                             e.preventDefault();
+                            
                             this.setState({
                                 loading: true
                             });
+                            this.searchHandler();
                         }}
                     >
                         {t('Search')}
                     </Button>
                 </Container>
                 <Divider hidden />
-                <InvoicesTable
-                    loading={this.state.loading}
-                    invoices={this.state.invoices}
-                    customers={this.state.customers}
-                    businessInfo={this.props.businessInfo}
-                    deleteInvoice={invoiceId => {
-                        this.deleteInvoiceHandler(invoiceId);
-                    }}
-                    editInvoice={invoicePatchData => {
-                        this.editInvoiceHandler(invoicePatchData);
-                    }}
-                />
+                {this.state.error && 
+                    <Message
+                        negative
+                        content={this.state.error}
+                    />
+                }
+                {!this.state.error &&
+                    <InvoicesTable
+                        loading={this.state.loading}
+                        invoices={this.state.invoices}
+                        customers={this.state.customers}
+                        businessInfo={this.props.businessInfo}
+                        deleteInvoice={invoiceId => {
+                            this.deleteInvoiceHandler(invoiceId);
+                        }}
+                        editInvoice={invoicePatchData => {
+                            this.editInvoiceHandler(invoicePatchData);
+                        }}
+                    />
+                }
                 {this.state.pageInfo && 
                     <Pagination
                         boundaryRange={0}

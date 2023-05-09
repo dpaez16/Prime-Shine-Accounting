@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Table, Header, Container} from 'semantic-ui-react';
+import {Table, Header, Container, Message} from 'semantic-ui-react';
 import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
 import DeleteScheduleModal from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import componentWrapper from '../../../../utils/componentWrapper';
@@ -9,6 +9,14 @@ import { v4 as uuidv4 } from 'uuid';
 //import './scheduledCustomerTable.css';
 
 class ScheduledCustomerTable extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            error: null
+        };
+    }
+
     render() {
         const { t, date } = this.props;
         const scheduleDayDate = date;
@@ -17,6 +25,12 @@ class ScheduledCustomerTable extends Component {
         return (
             <React.Fragment>
             <Header as='h1'>{t(getDayOfWeekStr(scheduleDayDate))} {scheduleDayDate}</Header>
+            {this.state.error && 
+                <Message
+                    negative
+                    content={this.state.error}
+                />
+            }
             <Table 
                 celled
                 className="ScheduledCustomerTable_table"
@@ -68,9 +82,14 @@ class ScheduledCustomerTable extends Component {
                                                 )
                                                 .then((newScheduledCustomer) => {
                                                     this.props.updateScheduledCustomer(newScheduledCustomer);
+                                                    this.setState({
+                                                        error: null
+                                                    });
                                                 })
                                                 .catch((err) => {
-                                                    console.log(err);
+                                                    this.setState({
+                                                        error: err.message
+                                                    });
                                                 });
                                             }}
                                         />
@@ -84,10 +103,15 @@ class ScheduledCustomerTable extends Component {
                                                 .then((didSucceed) => {
                                                     if (didSucceed) {
                                                         this.props.deleteScheduledCustomer(scheduledCustomerId);
+                                                        this.setState({
+                                                            error: null
+                                                        });
                                                     }
                                                 })
                                                 .catch((err) => {
-                                                    console.log(err);
+                                                    this.setState({
+                                                        error: err.message
+                                                    });
                                                 });
                                             }}
                                         />

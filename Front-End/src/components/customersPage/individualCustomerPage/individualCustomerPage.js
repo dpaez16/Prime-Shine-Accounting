@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Container, Header, Divider} from 'semantic-ui-react';
+import {Container, Header, Divider, Message} from 'semantic-ui-react';
 import EditCustomerModal from './editCustomerModal/editCustomerModal';
 import WaveAPIClient from '../../../api/waveApiClient';
 import {US_COUNTRY_CODE} from '../../../utils/consts';
@@ -7,6 +7,14 @@ import componentWrapper from '../../../utils/componentWrapper';
 //import './individualCustomerPage.js';
 
 class IndividualCustomerPage extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            error: null
+        };
+    }
+
     constructNameElement(name) {
         const {t} = this.props;
         if (name) {
@@ -149,6 +157,12 @@ class IndividualCustomerPage extends Component {
             <Container className='IndividualCustomerPage'>
                 <Container className='IndividualCustomerPage_header'>
                     <Header as='h1'>{customer.name}</Header>
+                    {this.state.error &&
+                        <Message 
+                            negative
+                            content={this.state.error}
+                        />
+                    }
                     <EditCustomerModal
                         customer={customer}
                         onSubmit={(formParams) => {
@@ -162,7 +176,9 @@ class IndividualCustomerPage extends Component {
                                 });
                             })
                             .catch(err => {
-                                console.log(err);
+                                this.setState({
+                                    error: err.message
+                                });
                             });
                         }}
                     />

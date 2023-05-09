@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {Table, Dimmer, Loader, Segment, Container} from 'semantic-ui-react';
+import {Table, Container, Header, Message} from 'semantic-ui-react';
 import CreateScheduleModal from './createScheduleModal/createScheduleModal';
 import EditScheduleModal from './editScheduleModal/editScheduleModal';
 import DeleteScheduleModal from './deleteScheduleModal/deleteScheduleModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import componentWrapper from '../../utils/componentWrapper';
+import LoadingSegment from '../../utils/loadingSegment';
 import { dateToStr } from '../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
 //import './schedulesPage.css';
@@ -15,7 +16,8 @@ class SchedulesPage extends Component {
         this.state = {
             schedules: [],
             loading: true,
-            isDateValid: false
+            isDateValid: false,
+            error: null
         }
     }
 
@@ -33,11 +35,14 @@ class SchedulesPage extends Component {
         PrimeShineAPIClient.createSchedule(startDay, userId, jwt)
         .then((schedule) => {
             this.setState({
-                schedules: [ ...this.state.schedules, schedule ]
+                schedules: [ ...this.state.schedules, schedule ],
+                error: null
             });
         })
         .catch((err) => {
-            console.log(err);
+            this.setState({
+                error: err.message
+            });
         });
     }
 
@@ -51,11 +56,14 @@ class SchedulesPage extends Component {
             newSchedules.splice(idx, 1, patchedSchedule);
 
             this.setState({
-                schedules: newSchedules
+                schedules: newSchedules,
+                error: null
             });
         })
         .catch((err) => {
-            console.log(err);
+            this.setState({
+                error: err.message
+            });
         });
     }
 
@@ -72,11 +80,14 @@ class SchedulesPage extends Component {
             newSchedules.splice(idx, 1);
 
             this.setState({
-                schedules: newSchedules
+                schedules: newSchedules,
+                error: null
             });
         })
         .catch(err => {
-            console.log(err);
+            this.setState({
+                error: err.message
+            });
         });
     }
 
@@ -85,38 +96,36 @@ class SchedulesPage extends Component {
         .then((schedules) => {
             this.setState({
                 schedules: schedules,
-                loading: false
+                loading: false,
+                error: null
             });
         })
-        .catch(err => console.log);
+        .catch(err => {
+            this.setState({
+                error: err.message
+            });
+        });
     }
 
     render() {
-        if (this.state.loading) {
-            return (
-                <Segment className='SchedulesPage_loading'>
-                    <Dimmer active 
-                            inverted
-                    >
-                        <Loader inverted 
-                                content='Loading' 
-                        />
-                    </Dimmer>
-                </Segment>
-            );
-        }
-
         const {t} = this.props;
         const schedules = this.state.schedules.sort((a, b) => Number(a.startDay) > Number(b.startDay) ? 1 : -1);
 
         return (
             <Container className="SchedulesPage">
-                <p>{t('Schedules')}:</p>
+                <Header as='h1'>{t('Schedules')}:</Header>
+                {this.state.loading && <LoadingSegment className="SchedulesPage_loading" />}
                 <CreateScheduleModal
                     onSubmit={(startDate) => {
                         this.createScheduleHandler(startDate);
                     }}
                 />
+                {this.state.error &&
+                    <Message
+                        negative
+                        content={this.state.error}
+                    />
+                }
                 <Table celled className="SchedulesPage_table">
                     <Table.Body>
                     {
