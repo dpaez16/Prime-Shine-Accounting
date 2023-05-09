@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import {Dimmer, Loader, Segment, Input, Table, Header, Container} from 'semantic-ui-react';
+import {Input, Table, Header, Container, Message} from 'semantic-ui-react';
 import DeleteCustomerModal from './deleteCustomerModal/deleteCustomerModal';
 import CreateCustomerModal from './createCustomerModal/createCustomerModal';
 import WaveAPIClient from '../../api/waveApiClient';
 import {fetchAllCustomers} from '../../utils/helpers';
 import {US_COUNTRY_CODE} from '../../utils/consts';
 import componentWrapper from '../../utils/componentWrapper';
+import LoadingSegment from '../../utils/loadingSegment';
 import { v4 as uuidV4 } from 'uuid';
 //import './customersPage.css';
 
@@ -15,8 +16,9 @@ class CustomersPage extends Component {
         this.state = {
             customers: [],
             searchBarValue: '',
-            loading: true
-        }
+            loading: true,
+            error: null
+        };
     }
 
     componentDidMount() {
@@ -26,11 +28,14 @@ class CustomersPage extends Component {
         .then((customers) => {
             this.setState({
                 customers: customers,
-                loading: false
+                loading: false,
+                error: null
             });
         })
         .catch((err) => {
-            console.log(err);
+            this.setState({
+                error: err.message
+            });
         });
     }
 
@@ -74,15 +79,7 @@ class CustomersPage extends Component {
     render() {
         if (this.state.loading) {
             return (
-                <Segment className='CustomersPage_loading'>
-                    <Dimmer active 
-                            inverted
-                    >
-                        <Loader inverted 
-                                content='Loading' 
-                        />
-                    </Dimmer>
-                </Segment>
+                <LoadingSegment className='CustomersPage_loading' />
             );
         }
 
@@ -93,6 +90,12 @@ class CustomersPage extends Component {
         return (
             <Container className="CustomersPage">
                 <Header as='h1'>{t('Customers')}:</Header>
+                {this.state.error && 
+                    <Message
+                        negative
+                        content={this.state.error}
+                    />
+                }
                 <Input
                     icon='search'
                     placeholder=''
@@ -112,11 +115,14 @@ class CustomersPage extends Component {
                             newCustomers.sort((a, b) => a.name < b.name ? -1 : 1);
 
                             this.setState({
-                                customers: newCustomers
+                                customers: newCustomers,
+                                error: null
                             });
                         })
                         .catch(err => {
-                            console.log(err);
+                            this.setState({
+                                error: err.message
+                            });
                         });
                     }}
                 />
@@ -152,11 +158,14 @@ class CustomersPage extends Component {
                                                         newCustomers.splice(1, idx);
                                                         
                                                         this.setState({
-                                                            customers: newCustomers
+                                                            customers: newCustomers,
+                                                            error: null
                                                         });
                                                     })
                                                     .catch(err => {
-                                                        console.log(err);
+                                                        this.setState({
+                                                            error: err.message
+                                                        });
                                                     });
                                                 }}
                                             />
