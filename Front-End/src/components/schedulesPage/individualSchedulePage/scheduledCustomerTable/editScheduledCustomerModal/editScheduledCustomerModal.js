@@ -9,36 +9,33 @@ class EditScheduledCustomerModal extends Component {
 
         this.state = {
             modalOpen: false,
-            customerValid: false,
-            timesValid: false,
-            customerId: ''
+            customerId: this.props.customerId ?? null,
+            serviceStartTime: this.props.serviceStartTime ?? null,
+            serviceEndTime: this.props.serviceEndTime ?? null
         };
     }
 
     getFormParams() {
-        const customerId = this.state.customerId;
-        const startTime = document.getElementById("EditScheduledCustomerModal_serviceStartTime").value;
-        const endTime = document.getElementById("EditScheduledCustomerModal_serviceEndTime").value;
-
         return {
-            customerId: customerId,
-            startTime: startTime,
-            endTime: endTime
+            customerId: this.state.customerId,
+            serviceStartTime: this.state.serviceStartTime,
+            serviceEndTime: this.state.serviceEndTime
         };
     }
 
-    handleCustomerInputChange(event, {value}) {
-        this.setState({
-            customerId: value,
-            customerValid: value !== ''
-        });
+    isFormValid() {
+        const {customerId, serviceStartTime, serviceEndTime} = this.getFormParams();
+
+        return (
+            customerId && customerId !== null && customerId.length > 0 && 
+            serviceStartTime !== null &&
+            serviceEndTime !== null
+        );
     }
 
-    handleTimeInputChange() {
-        const { startTime, endTime } = this.getFormParams();
-
+    handleFormChange(event, {name, value}) {
         this.setState({
-            timesValid: startTime && endTime
+            [name]: value
         });
     }
 
@@ -83,8 +80,8 @@ class EditScheduledCustomerModal extends Component {
                                 search
                                 selection
                                 options={this.convertToDropdownOptions(this.props.allCustomers)}
-                                className="EditScheduledCustomerModal_customerId"
-                                onChange={this.handleCustomerInputChange.bind(this)}
+                                name="customerId"
+                                onChange={this.handleFormChange.bind(this)}
                                 defaultValue={this.props.scheduledCustomer.customerId}
                             />
                         </Form.Field>
@@ -93,11 +90,11 @@ class EditScheduledCustomerModal extends Component {
                             <Input 
                                 type="time" 
                                 id="EditScheduledCustomerModal_serviceStartTime" 
-                                name="EditScheduledCustomerModal_serviceStartTime" 
                                 min="00:00"
                                 max="24:00"
                                 required
-                                onChange={() => this.handleTimeInputChange()}
+                                name="serviceStartTime"
+                                onChange={this.handleFormChange.bind(this)}
                                 defaultValue={defaultServiceStartTime}
                             />
                         </Form.Field>
@@ -106,11 +103,11 @@ class EditScheduledCustomerModal extends Component {
                             <Input 
                                 type="time" 
                                 id="EditScheduledCustomerModal_serviceEndTime" 
-                                name="EditScheduledCustomerModal_serviceEndTime" 
                                 min="00:00"
                                 max="24:00"
                                 required
-                                onChange={() => this.handleTimeInputChange()}
+                                name="serviceEndTime"
+                                onChange={this.handleFormChange.bind(this)}
                                 defaultValue={defaultServiceEndTime}
                             />
                         </Form.Field>
@@ -132,7 +129,7 @@ class EditScheduledCustomerModal extends Component {
                             this.setState({modalOpen: false});
                         }}
                         positive
-                        disabled={!(this.state.customerValid && this.state.timesValid)}
+                        disabled={!this.isFormValid()}
                     >
                             Ok
                     </Button>

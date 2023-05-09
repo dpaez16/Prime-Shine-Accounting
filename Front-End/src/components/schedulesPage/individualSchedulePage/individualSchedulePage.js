@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Dimmer, Loader, Segment, Button, Header, Container} from 'semantic-ui-react';
+import {Button, Header, Container, Message} from 'semantic-ui-react';
 import { BlobProvider } from '@react-pdf/renderer';
 import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
@@ -7,6 +7,7 @@ import SchedulePDFDocument from './schedulePdfDocument/schedulePdfDocument';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
 import WaveAPIClient from '../../../api/waveApiClient';
 import componentWrapper from '../../../utils/componentWrapper';
+import LoadingSegment from '../../../utils/loadingSegment';
 import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
 //import './individualSchedulePage.css';
@@ -17,7 +18,8 @@ class IndividualSchedulePage extends Component {
         
         this.state = {
             loading: true,
-            allCustomers: []
+            allCustomers: [],
+            error: null
         }
     }
 
@@ -93,10 +95,15 @@ class IndividualSchedulePage extends Component {
         .then((allCustomers) => {
             this.setState({
                 allCustomers: allCustomers,
-                loading: false
+                loading: false,
+                error: null
             });
         })
-        .catch(err => console.log);
+        .catch(err => {
+            this.setState({
+                error: err.message
+            });
+        });
     }
 
     async createScheduledCustomerHandler(dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime) {
@@ -162,15 +169,7 @@ class IndividualSchedulePage extends Component {
     render() {
         if (this.state.loading) {
             return (
-                <Segment className='IndividualSchedulePage_loading'>
-                    <Dimmer active 
-                            inverted
-                    >
-                        <Loader inverted 
-                                content='Loading' 
-                        />
-                    </Dimmer>
-                </Segment>
+                <LoadingSegment className='IndividualSchedulePage_loading' />
             );
         }
 
@@ -195,7 +194,9 @@ class IndividualSchedulePage extends Component {
                         
                         this.createScheduledCustomerHandler(dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime)
                         .catch(err => {
-                            console.log(err);
+                            this.setState({
+                                error: err.message
+                            });
                         });
                     }}
                 />
@@ -219,6 +220,12 @@ class IndividualSchedulePage extends Component {
                         }
                     }}
                 </BlobProvider>
+                {this.state.error && 
+                    <Message
+                        negative
+                        content={this.state.error}
+                    />
+                }
                 {
                     grabWorkingDays(datesOfService).map((date, idx) => {
                         return (
