@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {Container, Header, Input, Dropdown, Divider, Pagination, Button, Message} from 'semantic-ui-react';
 import WaveAPIClient from '../../api/waveApiClient';
 import InvoicesTable from './invoicesTable/invoicesTable';
+import CreateInvoiceModal from './createInvoiceModal/createInvoiceModal';
 import {fetchAllCustomers} from '../../utils/helpers';
 import componentWrapper from '../../utils/componentWrapper';
 //import './invoicesPage.css';
@@ -74,9 +75,8 @@ class InvoicesPage extends Component {
         });
     }
 
-    searchHandler() {
+    searchHandler(pageNum=1) {
         const businessId = this.props.businessInfo.businessId;
-        const pageNum = 1;
 
         WaveAPIClient.fetchInvoices(businessId, pageNum, this.state.filterParameters)
         .then(({invoices, pageInfo}) => {
@@ -100,6 +100,22 @@ class InvoicesPage extends Component {
             pageNum: activePage,
             loading: true,
             error: null
+        });
+    }
+
+    createInvoiceHandler(invoiceCreateData) {
+        const businessId = this.props.businessInfo.businessId;
+        WaveAPIClient.createInvoice({...invoiceCreateData, businessId: businessId})
+        .then(invoice => {
+            this.setState({
+                loading: true
+            });
+            this.searchHandler(this.state.pageNum);
+        })
+        .catch(err => {
+            this.setState({
+                error: err.message
+            })
         });
     }
 
@@ -165,6 +181,14 @@ class InvoicesPage extends Component {
         return (
             <Container className="InvoicesPage">
                 <Header as='h1'>{t('Invoices')}</Header>
+                <CreateInvoiceModal
+                    customerOptions={customerOptions}
+                    businessInfo={this.props.businessInfo}
+                    trigger={<Button>{t('Create Invoice')}</Button>}
+                    onSubmit={formParams => {
+                        this.createInvoiceHandler(formParams);
+                    }}
+                />
                 <Container className="InvoicesPage_filters">
                     <Dropdown
                         placeholder={t('All customers')}
