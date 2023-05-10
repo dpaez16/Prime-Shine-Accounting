@@ -1,35 +1,34 @@
 import React, {Component} from 'react';
-import {Container} from 'semantic-ui-react';
+import {Container, Header} from 'semantic-ui-react';
 import componentWrapper from '../../utils/componentWrapper';
-//import './homePage.css';
+import './homePage.css';
 
 class HomePage extends Component {
-    render() {
+    getWelcomeElement() {
         const {t} = this.props;
 
         if (!this.props.userInfo) {
-            return (
-                <Container className="HomePage">
-                </Container>
-            );
+            return (<React.Fragment />);
         }
 
+        const {name} = this.props.userInfo;
+
         return (
-            <Container className="HomePage">
-                <p>Prime Shine Accounting:</p>
-                <ul>
-                    <li>ID: {this.props.userInfo._id}</li>
-                    <li>Name: {this.props.userInfo.name}</li>
-                    <li>Email: {this.props.userInfo.email}</li>
-                    <li>JWT: {this.props.userInfo.token}</li>
-                </ul>
-                <p>Wave Apps:</p>
-                <ul>
-                    <li>Business ID: {this.props.businessInfo.businessId}</li>
-                    <li>Business Name: {this.props.businessInfo.businessName}</li>
-                    <li>Product ID: {this.props.businessInfo.productId}</li>
-                    <li>Product Name: {this.props.businessInfo.productName}</li>
-                </ul>
+            <p>{t('Welcome')}, {name}</p>
+        );
+    }
+
+    render() {
+        const welcomeElement = this.getWelcomeElement();
+
+        return (
+            <Container 
+                className="HomePage" 
+                textAlign='center'
+                fluid 
+            >
+                <Header as='h1'>Prime Shine Accounting</Header>
+                {welcomeElement}
             </Container>
         );
     }

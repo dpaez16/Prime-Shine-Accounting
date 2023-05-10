@@ -29,8 +29,6 @@ class App extends Component {
                                         <HomePage
                                             userInfo={this.props.userInfo}
                                             businessInfo={this.props.businessInfo}
-                                            updateUserInfo={newUserInfo => this.props.setUserInfo(newUserInfo)}
-                                            updateBusinessInfo={newBusinessInfo => this.props.setBusinessInfo(newBusinessInfo)}
                                         />
                                     }
                             />
