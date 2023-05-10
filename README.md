@@ -19,3 +19,5 @@ TODOs:
     - Verifies user session
   - Deployment
     - Serverless (Azure Functions, AWS Lambda)
+- Integration tests
+- CI/CD
