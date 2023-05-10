@@ -4,6 +4,13 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ## Available Scripts
 
+Note: Before running any script, do make sure the following environement variables are defined (via `.env.local` file or shell environment variables):
+- `REACT_APP_WAVE_TOKEN`
+- `REACT_APP_WAVE_ENDPOINT_URL`
+- `REACT_APP_WAVE_CLEANING_PRODUCT_NAME`
+- `REACT_APP_WAVE_BUSINESS_NAME`
+- `REACT_APP_SCHEDULE_API_ENDPOINT_URL`
+
 In the project directory, you can run:
 
 ### `npm start`
