@@ -1,0 +1,9 @@
+.IndividualSchedulePage {
+    display: flex;
+    flex-direction: column;
+}
+
+.IndividualSchedulePage_buttons {
+    display: flex;
+    flex-direction: row;
+}

@@ -5,10 +5,10 @@ import EditScheduleModal from './editScheduleModal/editScheduleModal';
 import DeleteScheduleModal from './deleteScheduleModal/deleteScheduleModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import componentWrapper from '../../utils/componentWrapper';
-import LoadingSegment from '../../utils/loadingSegment';
+import LoadingSegment from '../../utils/loadingSegment/loadingSegment';
 import { dateToStr } from '../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
-//import './schedulesPage.css';
+import './schedulesPage.css';
 
 class SchedulesPage extends Component {
     constructor(props) {
@@ -112,7 +112,7 @@ class SchedulesPage extends Component {
         const schedules = this.state.schedules.sort((a, b) => Number(a.startDay) > Number(b.startDay) ? 1 : -1);
 
         return (
-            <Container className="SchedulesPage">
+            <Container fluid className="SchedulesPage">
                 <Header as='h1'>{t('Schedules')}:</Header>
                 {this.state.loading && <LoadingSegment className="SchedulesPage_loading" />}
                 <CreateScheduleModal
@@ -132,7 +132,7 @@ class SchedulesPage extends Component {
                         schedules.map((schedule, idx) => {
                             return (
                                 <Table.Row key={uuidV4()}>
-                                    <Table.Cell>
+                                    <Table.Cell className='SchedulesPage_table_row_cell'>
                                         <a
                                             href='/viewSchedule'
                                             onClick={e => {
@@ -146,20 +146,22 @@ class SchedulesPage extends Component {
                                         >
                                             {dateToStr(schedule.startDay)}
                                         </a>
-                                        <EditScheduleModal
-                                            schedule={schedule}
-                                            onSubmit={(startDay) => {
-                                                const scheduleId = schedule._id;
-                                                this.editScheduleHandler(startDay, scheduleId);
-                                            }}
-                                        />
-                                        <DeleteScheduleModal
-                                            startDay={dateToStr(schedule.startDay)}
-                                            onSubmit={() => {
-                                                const startDay = schedule.startDay;
-                                                this.deleteScheduleHandler(startDay);
-                                            }}
-                                        />
+                                        <div>
+                                            <EditScheduleModal
+                                                schedule={schedule}
+                                                onSubmit={(startDay) => {
+                                                    const scheduleId = schedule._id;
+                                                    this.editScheduleHandler(startDay, scheduleId);
+                                                }}
+                                            />
+                                            <DeleteScheduleModal
+                                                startDay={dateToStr(schedule.startDay)}
+                                                onSubmit={() => {
+                                                    const startDay = schedule.startDay;
+                                                    this.deleteScheduleHandler(startDay);
+                                                }}
+                                            />
+                                        </div>
                                     </Table.Cell>
                                 </Table.Row>
                             );

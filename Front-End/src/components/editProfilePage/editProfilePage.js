@@ -1,48 +1,131 @@
 import React, {Component} from 'react';
+import {Container, Header, Form, Label, Input, Button, Message, Divider} from 'semantic-ui-react';
+import DeleteAccountModal from './deleteAccountModal/deleteAccountModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import componentWrapper from '../../utils/componentWrapper';
-//import './editProfilePage.css';
+import './editProfilePage.css';
 
 class EditProfilePage extends Component {
+    constructor(props) {
+        super(props);
+
+        const userInfo = this.props.userInfo;
+        this.state = {
+            error: null,
+            name: userInfo.name,
+            email: userInfo.email,
+            password: null
+        };
+    }
+
     handleUserEditProfile() {
-        const name = document.getElementById('EditProfilePage_name').value;
-        const email = document.getElementById('EditProfilePage_email').value;
-        const password = document.getElementById('EditProfilePage_password').value;
-        const { userId, token } = this.props.location.state;
+        const { name, email, password } = this.state;
+        const userId = this.props.userInfo._id;
+        const token = this.props.userInfo.token;
 
         PrimeShineAPIClient.editUser(name, email, password, userId, token)
         .then((user) => {
-            alert("User changes are saved!");
             this.props.updateUserInfo(user);
-            this.props.navigation('/');
+            this.props.navigation(-1);
         })
-        .catch((err) => {
-            console.log(err);
+        .catch(err => {
+            this.setState({
+                error: err.message
+            });
         });
     }
 
-    render() {
-        const {t} = this.props;
+    handleDeleteAccount() {
+        PrimeShineAPIClient.deleteUser(this.props.userInfo._id, this.props.userInfo.token)
+        .then(didSucceed => {
+            this.props.updateUserInfo(null);
+            this.props.updateBusinessInfo(null);
+            this.props.navigation("/", {
+                replace: true
+            });
+        })
+        .catch(err => {
+            this.setState({
+                error: err.message
+            });
+        });
+    }
+
+    handleFormChange(event, {name, value}) {
+        this.setState({
+            [name]: value
+        });
+    }
+
+    isFormValid() {
+        const { name, email, password } = this.state;
+
         return (
-            <div className="EditProfilePage">
-                <form>
-                    <label htmlFor="EditProfilePage_name">{t('Name')}:</label>&nbsp;&nbsp;
-                    <input type="text" id="EditProfilePage_name" />
-                    <br />
-                    <label htmlFor="EditProfilePage_email">{t('Email')}:</label>&nbsp;&nbsp;
-                    <input type="text" id="EditProfilePage_email" />
-                    <br />
-                    <label htmlFor="EditProfilePage_password">{t('Password')}:</label>&nbsp;&nbsp;
-                    <input type="password" id="EditProfilePage_password" />
-                    <br />
-                    <button onClick={e => {
-                        e.preventDefault();
-                        this.handleUserEditProfile();
-                    }}>
+            name && name.length > 0 &&
+            email && email.length > 0 &&
+            password && password.length > 0
+        );
+    }
+    
+    render() {
+        const {t, userInfo} = this.props;
+
+        return (
+            <Container className="EditProfilePage">
+                <Header as='h1'>{t('Edit Profile')}</Header>
+                {
+                    this.state.error &&
+                    <Message
+                        negative
+                        content={this.state.error}
+                    />
+                }
+                <Container className="EditProfilePage_currentProfile">
+                    <Header as='h3'>{t('Name')}: {userInfo.name}</Header>
+                    <Header as='h3'>{t('Email')}: {userInfo.email}</Header>
+                </Container>
+                <Divider hidden />
+                <Form>
+                    <Form.Field>
+                        <Label>{t('Name')}:</Label>
+                        <Input
+                            type="text"
+                            name="name"
+                            defaultValue={userInfo.name}
+                            onChange={this.handleFormChange.bind(this)}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <Label>{t('Email')}:</Label>
+                        <Input
+                            type="text"
+                            name="email"
+                            defaultValue={userInfo.email}
+                            onChange={this.handleFormChange.bind(this)}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <Label>{t('Password')}:</Label>
+                        <Input
+                            type="password"
+                            name="password"
+                            onChange={this.handleFormChange.bind(this)}
+                        />
+                    </Form.Field>
+                </Form>
+                <Container fluid className="EditProfilePage_buttons">
+                    <Button
+                        disabled={!this.isFormValid()}
+                        onClick={() => this.handleUserEditProfile()}
+                    >
                         {t('Save Changes')}
-                    </button>
-                </form>
-            </div>
+                    </Button>
+                    <DeleteAccountModal
+                        trigger={<Button negative>{t('Delete Account')}</Button>}
+                        onSubmit={() => this.handleDeleteAccount()}
+                    />
+                </Container>
+            </Container>
         );
     }
 };

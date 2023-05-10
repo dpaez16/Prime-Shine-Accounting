@@ -1,0 +1,15 @@
+.EditProfilePage {
+    display: flex;
+    flex-direction: column;
+    align-content: left;
+}
+
+.EditProfilePage_currentProfile {
+    margin-top: 2rem;
+}
+
+.EditProfilePage_buttons {
+    display: flex;
+    flex-direction: row;
+    margin-top: 1rem;
+}

@@ -1,0 +1,6 @@
+.SchedulesPage_table_row_cell {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}

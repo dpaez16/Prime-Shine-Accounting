@@ -7,10 +7,10 @@ import SchedulePDFDocument from './schedulePdfDocument/schedulePdfDocument';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
 import WaveAPIClient from '../../../api/waveApiClient';
 import componentWrapper from '../../../utils/componentWrapper';
-import LoadingSegment from '../../../utils/loadingSegment';
+import LoadingSegment from '../../../utils/loadingSegment/loadingSegment';
 import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
-//import './individualSchedulePage.css';
+import './individualSchedulePage.css';
 
 class IndividualSchedulePage extends Component {
     constructor(props) {
@@ -184,43 +184,45 @@ class IndividualSchedulePage extends Component {
         });
 
         return (
-            <Container className="IndividualSchedulePage">
+            <Container fluid className="IndividualSchedulePage">
                 <Header as='h1'>{t('Schedule for Week of')} {datesOfService[0]} - {datesOfService[datesOfService.length - 1]}:</Header>
-                <CreateScheduledCustomerModal
-                    datesOfService={datesOfService}
-                    allCustomers={this.state.allCustomers}
-                    onSubmit={(dateOfService, customerId, serviceStartTime, serviceEndTime) => {
-                        const dayOffset = datesOfService.findIndex((dos) => dos === dateOfService);
-                        const scheduleId = schedule._id;
-                        
-                        this.createScheduledCustomerHandler(dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime)
-                        .catch(err => {
-                            this.setState({
-                                error: err.message
+                <Container fluid className='IndividualSchedulePage_buttons'>
+                    <CreateScheduledCustomerModal
+                        datesOfService={datesOfService}
+                        allCustomers={this.state.allCustomers}
+                        onSubmit={(dateOfService, customerId, serviceStartTime, serviceEndTime) => {
+                            const dayOffset = datesOfService.findIndex((dos) => dos === dateOfService);
+                            const scheduleId = schedule._id;
+                            
+                            this.createScheduledCustomerHandler(dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime)
+                            .catch(err => {
+                                this.setState({
+                                    error: err.message
+                                });
                             });
-                        });
-                    }}
-                />
-                <BlobProvider
-                    document={
-                        <SchedulePDFDocument
-                            datesOfService={datesOfService}
-                            scheduleDays={scheduleDays}
-                        />
-                    }
-                >
-                    {({loading, url}) => {
-                        if (loading) {
-                            return (<React.Fragment />);
-                        } else {
-                            return (
-                                <Button onClick={() => window.open(url, '_blank')}>
-                                    {t('Preview Schedule')}
-                                </Button>
-                            );
+                        }}
+                    />
+                    <BlobProvider
+                        document={
+                            <SchedulePDFDocument
+                                datesOfService={datesOfService}
+                                scheduleDays={scheduleDays}
+                            />
                         }
-                    }}
-                </BlobProvider>
+                    >
+                        {({loading, url}) => {
+                            if (loading) {
+                                return (<React.Fragment />);
+                            } else {
+                                return (
+                                    <Button onClick={() => window.open(url, '_blank')}>
+                                        {t('Preview Schedule')}
+                                    </Button>
+                                );
+                            }
+                        }}
+                    </BlobProvider>
+                </Container>
                 {this.state.error && 
                     <Message
                         negative

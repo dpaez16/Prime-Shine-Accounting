@@ -5,7 +5,7 @@ import InvoicesTable from './invoicesTable/invoicesTable';
 import CreateInvoiceModal from './createInvoiceModal/createInvoiceModal';
 import {fetchAllCustomers} from '../../utils/helpers';
 import componentWrapper from '../../utils/componentWrapper';
-//import './invoicesPage.css';
+import './invoicesPage.css';
 
 class InvoicesPage extends Component {
     constructor(props) {
@@ -101,6 +101,8 @@ class InvoicesPage extends Component {
             loading: true,
             error: null
         });
+
+        this.searchHandler(activePage);
     }
 
     createInvoiceHandler(invoiceCreateData) {
@@ -179,7 +181,7 @@ class InvoicesPage extends Component {
         const {t} = this.props;
 
         return (
-            <Container className="InvoicesPage">
+            <Container fluid className="InvoicesPage">
                 <Header as='h1'>{t('Invoices')}</Header>
                 <CreateInvoiceModal
                     customerOptions={customerOptions}
@@ -189,7 +191,11 @@ class InvoicesPage extends Component {
                         this.createInvoiceHandler(formParams);
                     }}
                 />
-                <Container className="InvoicesPage_filters">
+                <Container
+                    className="InvoicesPage_filters"
+                    fluid 
+                    textAlign='center' 
+                >
                     <Dropdown
                         placeholder={t('All customers')}
                         selection
