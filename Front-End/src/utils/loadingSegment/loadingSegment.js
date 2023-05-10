@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Dimmer, Loader, Segment} from 'semantic-ui-react';
-//import './schedulesPage.css';
+import './loadingSegment.css';
 
 export default class LoadingSegment extends Component {
     render() {
@@ -9,9 +9,7 @@ export default class LoadingSegment extends Component {
                 <Dimmer active 
                         inverted
                 >
-                    <Loader inverted 
-                            content='Loading' 
-                    />
+                    <Loader inverted content='Loading' />
                 </Dimmer>
             </Segment>
         );

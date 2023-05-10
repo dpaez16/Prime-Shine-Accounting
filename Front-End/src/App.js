@@ -8,6 +8,7 @@ import IndividualSchedulePage from './components/schedulesPage/individualSchedul
 import CustomersPage from './components/customersPage/customersPage';
 import IndividualCustomerPage from './components/customersPage/individualCustomerPage/individualCustomerPage';
 import InvoicesPage from './components/invoicesPage/invoicesPage';
+import SideNavbar from './components/sideNavbar/sideNavbar';
 import { localStorageWrapper } from './utils/useLocalStorage';
 import './App.css';
 
@@ -16,22 +17,26 @@ class App extends Component {
         return (
             <Router>
                 <React.Fragment>
-                    <Container className="main-content">
+                    <SideNavbar 
+                        isLoggedIn={this.props.userInfo !== null}
+                        updateUserInfo={newUserInfo => this.props.setUserInfo(newUserInfo)}
+                        updateBusinessInfo={newBusinessInfo => this.props.setBusinessInfo(newBusinessInfo)}
+                    />
+                    <Container fluid className="main-content">
                         <Routes>
                             <Route  path="/" 
                                     element={
                                         <HomePage
                                             userInfo={this.props.userInfo}
                                             businessInfo={this.props.businessInfo}
-                                            updateUserInfo={newUserInfo => this.props.setUserInfo(newUserInfo)}
-                                            updateBusinessInfo={newBusinessInfo => this.props.setBusinessInfo(newBusinessInfo)}
                                         />
                                     }
                             />
                             <Route  path="/editProfile" 
                                     element={
-                                        <EditProfilePage 
-                                            updateUserInfo={newUserInfo => this.props.setUserInfo({...this.state.userInfo, ...newUserInfo})} // passed here since we cannot serialize functions for navigation()
+                                        <EditProfilePage
+                                            userInfo={this.props.userInfo}
+                                            updateUserInfo={newUserInfo => this.props.setUserInfo({...this.props.userInfo, ...newUserInfo})}
                                         />
                                     }
                             />

@@ -1,23 +1,18 @@
 import React, {Component} from 'react';
-import {Dimmer, Loader, Segment, Table, Dropdown} from 'semantic-ui-react';
+import {Table, Dropdown} from 'semantic-ui-react';
 import DeleteInvoiceModal from './deleteInvoiceModal/deleteInvoiceModal';
 import EditInvoiceModal from './editInvoiceModal/editInvoiceModal';
 import componentWrapper from '../../../utils/componentWrapper';
+import LoadingSegment from '../../../utils/loadingSegment/loadingSegment';
 import { v4 as uuidV4 } from 'uuid';
 
 class InvoicesTable extends Component {
     render() {
         if (this.props.loading) {
             return (
-                <Segment className='InvoicesPage_table_loading'>
-                    <Dimmer active 
-                            inverted
-                    >
-                        <Loader inverted 
-                                content='Loading' 
-                        />
-                    </Dimmer>
-                </Segment>
+                <LoadingSegment
+                    className='InvoicesPage_table_loading'
+                />
             );
         }
 

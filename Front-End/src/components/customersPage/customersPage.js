@@ -6,9 +6,9 @@ import WaveAPIClient from '../../api/waveApiClient';
 import {fetchAllCustomers} from '../../utils/helpers';
 import {US_COUNTRY_CODE} from '../../utils/consts';
 import componentWrapper from '../../utils/componentWrapper';
-import LoadingSegment from '../../utils/loadingSegment';
+import LoadingSegment from '../../utils/loadingSegment/loadingSegment';
 import { v4 as uuidV4 } from 'uuid';
-//import './customersPage.css';
+import './customersPage.css';
 
 class CustomersPage extends Component {
     constructor(props) {
@@ -88,7 +88,7 @@ class CustomersPage extends Component {
         const filteredCustomers = this.state.customers.filter((customer) => searchBarRegex.test(customer.name.toLowerCase()));
 
         return (
-            <Container className="CustomersPage">
+            <Container fluid className="CustomersPage">
                 <Header as='h1'>{t('Customers')}:</Header>
                 {this.state.error && 
                     <Message
@@ -96,43 +96,45 @@ class CustomersPage extends Component {
                         content={this.state.error}
                     />
                 }
-                <Input
-                    icon='search'
-                    placeholder=''
-                    onChange={(e) => {
-                        e.preventDefault();
+                <Container fluid className='CustomersPage_searchArea'>
+                    <Input
+                        icon='search'
+                        placeholder=''
+                        onChange={(e) => {
+                            e.preventDefault();
 
-                        const customerName = e.target.value;
-                        this.handleSearchChange(customerName);
-                    }}
-                />
-                <CreateCustomerModal
-                    onSubmit={(formParams) => {
-                        this.createCustomerHandler(formParams)
-                        .then(newCustomer => {
-                            let newCustomers = [...this.state.customers];
-                            newCustomers.push(newCustomer);
-                            newCustomers.sort((a, b) => a.name < b.name ? -1 : 1);
+                            const customerName = e.target.value;
+                            this.handleSearchChange(customerName);
+                        }}
+                    />
+                    <CreateCustomerModal
+                        onSubmit={(formParams) => {
+                            this.createCustomerHandler(formParams)
+                            .then(newCustomer => {
+                                let newCustomers = [...this.state.customers];
+                                newCustomers.push(newCustomer);
+                                newCustomers.sort((a, b) => a.name < b.name ? -1 : 1);
 
-                            this.setState({
-                                customers: newCustomers,
-                                error: null
+                                this.setState({
+                                    customers: newCustomers,
+                                    error: null
+                                });
+                            })
+                            .catch(err => {
+                                this.setState({
+                                    error: err.message
+                                });
                             });
-                        })
-                        .catch(err => {
-                            this.setState({
-                                error: err.message
-                            });
-                        });
-                    }}
-                />
+                        }}
+                    />
+                </Container>
                 <Table celled className="CustomersPage_table">
                     <Table.Body>
                         {
                             filteredCustomers.map((customer, idx) => {
                                 return (
                                     <Table.Row key={uuidV4()}>
-                                        <Table.Cell>
+                                        <Table.Cell className="CustomersPage_table_row_cell">
                                             <a
                                                 href="/viewCustomer"
                                                 onClick={e => {

@@ -4,7 +4,7 @@ import EditCustomerModal from './editCustomerModal/editCustomerModal';
 import WaveAPIClient from '../../../api/waveApiClient';
 import {US_COUNTRY_CODE} from '../../../utils/consts';
 import componentWrapper from '../../../utils/componentWrapper';
-//import './individualCustomerPage.js';
+import './individualCustomerPage.css';
 
 class IndividualCustomerPage extends Component {
     constructor(props) {
@@ -154,8 +154,8 @@ class IndividualCustomerPage extends Component {
         const customerPropElements = this.constructCustomerPropElements(customer);
 
         return (
-            <Container className='IndividualCustomerPage'>
-                <Container className='IndividualCustomerPage_header'>
+            <Container fluid className='IndividualCustomerPage'>
+                <Container fluid className='IndividualCustomerPage_header'>
                     <Header as='h1'>{customer.name}</Header>
                     {this.state.error &&
                         <Message 
@@ -184,12 +184,12 @@ class IndividualCustomerPage extends Component {
                     />
                 </Container>
                 <Divider hidden />
-                <Container className="InvididualCustomerPage_props">
+                <Container fluid className="InvididualCustomerPage_props">
                     {
                         customerPropElements.map((customerElement, idx) => {
                             return (
                                 <React.Fragment>
-                                    <Container>
+                                    <Container fluid>
                                         {customerElement}
                                     </Container>
                                     <Divider hidden />
