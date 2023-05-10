@@ -31,11 +31,11 @@ class SideNavbar extends Component {
                         icon='bars'
                     >
                         <Dropdown.Menu>
-                            <Dropdown.Item>{this.createDropdownLink("/invoices", "Invoices")}</Dropdown.Item>
-                            <Dropdown.Item>{this.createDropdownLink("/customers", "Customers")}</Dropdown.Item>
-                            <Dropdown.Item>{this.createDropdownLink("/schedules", "Schedules")}</Dropdown.Item>
+                            <Dropdown.Item>{this.createDropdownLink("/invoices", t("Invoices"))}</Dropdown.Item>
+                            <Dropdown.Item>{this.createDropdownLink("/customers", t("Customers"))}</Dropdown.Item>
+                            <Dropdown.Item>{this.createDropdownLink("/schedules", t("Schedules"))}</Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item>{this.createDropdownLink("/editProfile", "Edit Profile")}</Dropdown.Item>
+                            <Dropdown.Item>{this.createDropdownLink("/editProfile", t("Edit Profile"))}</Dropdown.Item>
                             <Dropdown.Item
                                 onClick={() => {
                                     this.props.updateUserInfo(null);
@@ -43,13 +43,24 @@ class SideNavbar extends Component {
                                     this.props.navigation('/');
                                 }}
                             >
-                                Logout
+                                {t("Logout")}
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 }
 
                 <Menu.Menu position='right'>
+                    <Menu.Item>
+                        <Dropdown
+                            simple
+                            text={t('Language')}
+                        >
+                            <Dropdown.Menu>
+                                <Dropdown.Item onClick={() => this.props.changeLanguage('en')}>{t('English')}</Dropdown.Item>
+                                <Dropdown.Item onClick={() => this.props.changeLanguage('es')}>{t('Spanish')}</Dropdown.Item>
+                            </Dropdown.Menu>
+                        </Dropdown>
+                    </Menu.Item>
                     {
                         !isLoggedIn && 
                         <React.Fragment>
