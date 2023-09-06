@@ -3,6 +3,7 @@ Full-stack React app that allows for easy bookkeeping for Prime Shine Cleaning.
 
 TODOs:
 - Front-End:
+  - Migrate all class components to functional components
   - Unit tests (for components)
   - Refactoring
   - Consider loading translations via API calls
