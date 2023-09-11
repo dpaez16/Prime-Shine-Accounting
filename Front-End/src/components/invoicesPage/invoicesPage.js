@@ -81,10 +81,14 @@ export default function InvoicesPage(props) {
 
     const handleFilterChange = (event, {name, value}) => {
         const filterValue = value && value.length > 0 ? value : null;
-
-        setState({
+        const newFilterParameters = {
             ...state.filterParameters, 
             [name]: filterValue
+        };
+
+        setState({
+            ...state,
+            filterParameters: newFilterParameters
         });
     };
 
