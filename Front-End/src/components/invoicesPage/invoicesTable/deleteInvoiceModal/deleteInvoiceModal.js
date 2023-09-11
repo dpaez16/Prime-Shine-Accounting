@@ -6,7 +6,7 @@ export default function DeleteInvoiceModal(props) {
     const [modalOpen, setModalOpen] = useState(false);
     const [t] = useLocalization();
 
-    const {invoice} = this.props;
+    const {invoice} = props;
     
     return (
         <Modal
