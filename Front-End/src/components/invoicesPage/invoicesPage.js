@@ -5,6 +5,7 @@ import InvoicesTable from './invoicesTable/invoicesTable';
 import CreateInvoiceModal from './createInvoiceModal/createInvoiceModal';
 import {fetchAllCustomers} from '../../utils/helpers';
 import useLocalization from '../../hooks/useLocalization';
+import { v4 as uuidV4 } from 'uuid';
 import './invoicesPage.css';
 
 export default function InvoicesPage(props) {
@@ -41,19 +42,37 @@ export default function InvoicesPage(props) {
         };
     };
 
+    const attachInvoiceUUIDS = (invoices) => {
+        return invoices.map(invoice => {
+            const newItems = invoice.items.map(item => {
+                return {
+                    ...item,
+                    uuid: uuidV4()
+                };
+            });
+
+            return {
+                ...invoice,
+                items: newItems
+            };
+        });
+    };
+
     const fetchAllWaveData = () => {
         fetchAllWaveDataHelper()
         .then(({customers, invoices, pageInfo}) => {
             setState({
+                ...state,
                 loading: false,
                 customers: customers,
-                invoices: invoices,
+                invoices: attachInvoiceUUIDS(invoices),
                 pageInfo: pageInfo,
                 error: null
             });
         })
         .catch(err => {
             setState({
+                ...state,
                 loading: false,
                 error: err.message
             });
@@ -75,6 +94,7 @@ export default function InvoicesPage(props) {
         WaveAPIClient.fetchInvoices(businessId, pageNum, state.filterParameters)
         .then(({invoices, pageInfo}) => {
             setState({
+                ...state,
                 invoices: invoices,
                 pageInfo: pageInfo,
                 loading: false,
@@ -83,6 +103,7 @@ export default function InvoicesPage(props) {
         })
         .catch(err => {
             setState({
+                ...state,
                 loading: false,
                 error: err.message
             });
@@ -91,6 +112,7 @@ export default function InvoicesPage(props) {
 
     const handlePageChange = (event, { activePage }) => {
         setState({
+            ...state,
             pageNum: activePage,
             loading: true,
             error: null
@@ -104,14 +126,16 @@ export default function InvoicesPage(props) {
         WaveAPIClient.createInvoice({...invoiceCreateData, businessId: businessId})
         .then(invoice => {
             setState({
+                ...state,
                 loading: true
             });
             searchHandler(state.pageNum);
         })
         .catch(err => {
             setState({
+                ...state,
                 error: err.message
-            })
+            });
         });
     };
 
@@ -123,12 +147,14 @@ export default function InvoicesPage(props) {
             newInvoices.splice(idx, 1, newInvoice);
 
             setState({
+                ...state,
                 invoices: newInvoices,
                 error: null
             });
         })
         .catch(err => {
             setState({
+                ...state,
                 error: err.message
             });
         });
@@ -144,12 +170,14 @@ export default function InvoicesPage(props) {
             newInvoices.splice(idx, 1);
 
             setState({
+                ...state,
                 invoices: newInvoices,
                 error: null
             });
         })
         .catch(err => {
             setState({
+                ...state,
                 error: err.message
             });
         });
@@ -232,6 +260,7 @@ export default function InvoicesPage(props) {
                         e.preventDefault();
                         
                         setState({
+                            ...state,
                             loading: true
                         });
                         searchHandler();

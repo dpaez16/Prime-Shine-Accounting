@@ -15,7 +15,8 @@ function EditInvoiceModalTable(props) {
             description: "",
             total: {
                 value: 0
-            }
+            },
+            uuid: uuidV4()
         };
     };
 
@@ -37,7 +38,7 @@ function EditInvoiceModalTable(props) {
             {
                 invoiceServices.map((invoiceService, index) => {
                     return (
-                        <Table.Row key={uuidV4()}>
+                        <Table.Row key={invoiceService.uuid}>
                             <Table.Cell>{invoiceService.product.name}</Table.Cell>
                             <Table.Cell>
                                 <Input
