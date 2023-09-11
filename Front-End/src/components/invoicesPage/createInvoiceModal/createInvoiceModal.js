@@ -12,7 +12,8 @@ function CreateInvoiceModalTable(props) {
             productId: productId,
             description: "",
             quantity: 1,
-            unitPrice: 0
+            unitPrice: 0,
+            uuid: uuidV4()
         };
     };
 
@@ -35,7 +36,7 @@ function CreateInvoiceModalTable(props) {
             {
                 invoiceServices.map((invoiceService, index) => {
                     return (
-                        <Table.Row key={uuidV4()}>
+                        <Table.Row key={invoiceService.uuid}>
                             <Table.Cell>{productName}</Table.Cell>
                             <Table.Cell>
                                 <Input
