@@ -77,6 +77,7 @@ export default function SchedulesPage(props) {
             setError(null);
         })
         .catch(err => {
+            setLoading(false);
             setError(err.message);
         });
     }, []);

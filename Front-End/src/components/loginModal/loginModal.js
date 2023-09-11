@@ -12,6 +12,7 @@ export default function LoginModal(props) {
 
     const handleUserLogin = () => {
         const { email, password } = userParams;
+        setError(null);
         
         return PrimeShineAPIClient.loginUser(email, password)
         .then((user) => {

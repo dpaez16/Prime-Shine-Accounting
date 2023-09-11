@@ -168,7 +168,7 @@ export default function EditCustomerModal(props) {
             <Modal.Actions>
                 <Button 
                     color='black' 
-                    onClick={() => this.setState({modalOpen: false})}
+                    onClick={() => setModalOpen(false)}
                 >
                     {t('Cancel')}
                 </Button>

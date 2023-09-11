@@ -38,7 +38,7 @@ export default function IndividualSchedulePage(props) {
 
     const fetchMetadataForScheduledCustomers = (businessId, rawScheduledCustomers) => {
         return Promise.all(
-            rawScheduledCustomers.map(async rawScheduledCustomer => await this.fetchMetadataForScheduledCustomer(businessId, rawScheduledCustomer))
+            rawScheduledCustomers.map(async rawScheduledCustomer => await fetchMetadataForScheduledCustomer(businessId, rawScheduledCustomer))
         )
         .then((result) => {
             return result;
@@ -98,6 +98,7 @@ export default function IndividualSchedulePage(props) {
             setError(null);
         })
         .catch(err => {
+            setLoading(false);
             setError(err.message);
         });
     }, []);
@@ -210,7 +211,9 @@ export default function IndividualSchedulePage(props) {
                             return (<React.Fragment />);
                         } else {
                             return (
-                                <Button onClick={() => window.open(url, '_blank')}>
+                                <Button onClick={() => window.open(url, '_blank')}
+                                        disabled={scheduleDays === undefined}
+                                >
                                     {t('Preview Schedule')}
                                 </Button>
                             );
