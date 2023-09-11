@@ -1,50 +1,39 @@
-import React, {Component} from 'react';
+import {useState} from 'react';
 import {Modal, Button} from 'semantic-ui-react';
-import componentWrapper from '../../../utils/componentWrapper';
+import useLocalization from '../../../hooks/useLocalization';
 
-class DeleteAccountModal extends Component {
-    constructor(props) {
-        super(props);
+export default function DeleteAccountModal(props) {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [t] = useLocalization();
 
-        this.state = {
-            modalOpen: false
-        };
-    }
-
-    render() {
-        const {t} = this.props;
-        
-        return (
-            <Modal
-                onClose={() => this.setState({modalOpen: false})}
-                onOpen={() => this.setState({modalOpen: true})}
-                open={this.state.modalOpen}
-                trigger={this.props.trigger}
-            >
-                <Modal.Header>{t('Delete Account')}</Modal.Header>
-                <Modal.Content>
-                    {t('Are you sure?')}
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button 
-                        color='black' 
-                        onClick={() => this.setState({modalOpen: false})}
-                    >
-                        {t('Cancel')}
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            this.props.onSubmit();
-                            this.setState({modalOpen: false});
-                        }}
-                        negative
-                    >
-                            Ok
-                    </Button>
-                </Modal.Actions>
-            </Modal>
-        );
-    }
+    return (
+        <Modal
+            onClose={() => setModalOpen(false)}
+            onOpen={() => setModalOpen(true)}
+            open={modalOpen}
+            trigger={props.trigger}
+        >
+            <Modal.Header>{t('Delete Account')}</Modal.Header>
+            <Modal.Content>
+                {t('Are you sure?')}
+            </Modal.Content>
+            <Modal.Actions>
+                <Button 
+                    color='black' 
+                    onClick={() => setModalOpen(false)}
+                >
+                    {t('Cancel')}
+                </Button>
+                <Button
+                    onClick={() => {
+                        props.onSubmit();
+                        setModalOpen(false);
+                    }}
+                    negative
+                >
+                        {t('Ok')}
+                </Button>
+            </Modal.Actions>
+        </Modal>
+    );
 };
-
-export default componentWrapper(DeleteAccountModal);

@@ -1,22 +1,17 @@
-import React, {Component} from 'react';
+import {useState} from 'react';
 import {Modal, Button, Form, Label, Input, Message} from 'semantic-ui-react';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import WaveAPIClient from '../../api/waveApiClient';
-import componentWrapper from '../../utils/componentWrapper';
-//import './loginModal.css';
+import useLocalization from '../../hooks/useLocalization';
 
-class LoginModal extends Component {
-    constructor(props) {
-        super(props);
-        
-        this.state = {
-            modalOpen: false,
-            error: null
-        };
-    }
+export default function LoginModal(props) {
+    const [userParams, setUserParams] = useState({});
+    const [modalOpen, setModalOpen] = useState(false);
+    const [error, setError] = useState(null);
+    const [t] = useLocalization();
 
-    handleUserLogin() {
-        const { email, password } = this.state;
+    const handleUserLogin = () => {
+        const { email, password } = userParams;
         
         return PrimeShineAPIClient.loginUser(email, password)
         .then((user) => {
@@ -31,95 +26,89 @@ class LoginModal extends Component {
         .catch((err) => {
             throw err;
         });
-    }
+    };
 
-    handleFormChange(event, {name, value}) {
-        this.setState({
+    const handleFormChange = (event, {name, value}) => {
+        setUserParams({
+            ...userParams,
             [name]: value
         });
-    }
+    };
     
-    isFormValid() {
-        const { email, password } = this.state;
+    const isFormValid = () => {
+        const { email, password } = userParams;
         return (
             email && email.length > 0 &&
             password && password.length > 0
         );
-    }
+    };
 
-    render() {
-        const {t} = this.props;
-        return (
-            <Modal
-                onClose={() => this.setState({
-                    modalOpen: false,
-                    error: null
-                })}
-                onOpen={() => this.setState({
-                    modalOpen: true,
-                    error: null
-                })}
-                open={this.state.modalOpen}
-                trigger={this.props.trigger}
-            >
-                <Modal.Header>{t('Login')}</Modal.Header>
-                <Modal.Content>
-                    <Form>
-                        <Form.Field>
-                            <Label>{t('Email')}:</Label>
-                            <Input
-                                type="text"
-                                name="email"
-                                onChange={this.handleFormChange.bind(this)}
-                            />
-                        </Form.Field>
-                        <Form.Field>
-                            <Label>{t('Password')}:</Label>
-                            <Input
-                                type="password"
-                                name="password"
-                                onChange={this.handleFormChange.bind(this)}
-                            />
-                        </Form.Field>
-                    </Form>
-                    {
-                        this.state.error &&
-                        <Message
-                            negative
-                            content={this.state.error}
+    return (
+        <Modal
+            onClose={() => {
+                setModalOpen(false);
+                setError(null);
+            }}
+            onOpen={() => {
+                setModalOpen(true);
+                setError(null);
+            }}
+            open={modalOpen}
+            trigger={props.trigger}
+        >
+            <Modal.Header>{t('Login')}</Modal.Header>
+            <Modal.Content>
+                <Form>
+                    <Form.Field>
+                        <Label>{t('Email')}:</Label>
+                        <Input
+                            type="text"
+                            name="email"
+                            onChange={handleFormChange}
                         />
-                    }
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button 
-                        color='black' 
-                        onClick={() => this.setState({modalOpen: false})}
-                    >
-                        {t('Cancel')}
-                    </Button>
-                    <Button 
-                        onClick={() => {
-                            this.handleUserLogin()
-                            .then(({user, businessInfo}) => {
-                                this.props.updateUserInfo(user);
-                                this.props.updateBusinessInfo(businessInfo);
-                                this.setState({modalOpen: false});
-                            })
-                            .catch(err => {
-                                this.setState({
-                                    error: err.message
-                                });
-                            });
-                        }}
-                        disabled={!this.isFormValid()}
-                        positive
-                    >
-                            {t('Login')}
-                    </Button>
-                </Modal.Actions>
-            </Modal>
-        );
-    }
+                    </Form.Field>
+                    <Form.Field>
+                        <Label>{t('Password')}:</Label>
+                        <Input
+                            type="password"
+                            name="password"
+                            onChange={handleFormChange}
+                        />
+                    </Form.Field>
+                </Form>
+                {
+                    error &&
+                    <Message
+                        negative
+                        content={error}
+                    />
+                }
+            </Modal.Content>
+            <Modal.Actions>
+                <Button 
+                    color='black' 
+                    onClick={() => setModalOpen(false)}
+                >
+                    {t('Cancel')}
+                </Button>
+                <Button 
+                    onClick={() => {
+                        handleUserLogin()
+                        .then(({user, businessInfo}) => {
+                            props.updateUserInfo(user);
+                            props.updateBusinessInfo(businessInfo);
+                            setModalOpen(false);
+                        })
+                        .catch(err => {
+                            setError(err.message);
+                        });
+                    }}
+                    disabled={!isFormValid()}
+                    positive
+                >
+                        {t('Login')}
+                </Button>
+            </Modal.Actions>
+        </Modal>
+    );
 };
-
-export default componentWrapper(LoginModal);

@@ -1,37 +1,33 @@
-import React, {Component} from 'react';
+import React from 'react';
 import {Container, Header} from 'semantic-ui-react';
-import componentWrapper from '../../utils/componentWrapper';
+import useLocalization from '../../hooks/useLocalization';
 import './homePage.css';
 
-class HomePage extends Component {
-    getWelcomeElement() {
-        const {t} = this.props;
+export default function HomePage(props) {
+    const [t] = useLocalization();
 
-        if (!this.props.userInfo) {
+    const getWelcomeElement = () => {
+        if (!props.userInfo) {
             return (<React.Fragment />);
         }
 
-        const {name} = this.props.userInfo;
+        const {name} = props.userInfo;
 
         return (
             <p>{t('Welcome')}, {name}</p>
         );
-    }
+    };
 
-    render() {
-        const welcomeElement = this.getWelcomeElement();
+    const welcomeElement = getWelcomeElement();
 
-        return (
-            <Container 
-                className="HomePage" 
-                textAlign='center'
-                fluid 
-            >
-                <Header as='h1'>Prime Shine Accounting</Header>
-                {welcomeElement}
-            </Container>
-        );
-    }
+    return (
+        <Container 
+            className="HomePage" 
+            textAlign='center'
+            fluid 
+        >
+            <Header as='h1'>Prime Shine Accounting</Header>
+            {welcomeElement}
+        </Container>
+    );
 };
-
-export default componentWrapper(HomePage);

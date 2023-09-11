@@ -1,22 +1,20 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {Container, Header, Divider, Message} from 'semantic-ui-react';
 import EditCustomerModal from './editCustomerModal/editCustomerModal';
 import WaveAPIClient from '../../../api/waveApiClient';
 import {US_COUNTRY_CODE} from '../../../utils/consts';
-import componentWrapper from '../../../utils/componentWrapper';
+import useLocalization from '../../../hooks/useLocalization';
+
 import './individualCustomerPage.css';
 
-class IndividualCustomerPage extends Component {
-    constructor(props) {
-        super(props);
+export default function IndividualCustomerPage() {
+    const [error, setError] = useState(null);
+    const [t] = useLocalization();
+    const location = useLocation();
+    const navigate = useNavigate();
 
-        this.state = {
-            error: null
-        };
-    }
-
-    constructNameElement(name) {
-        const {t} = this.props;
+    const constructNameElement = (name) => {
         if (name) {
             return (
                 <React.Fragment>
@@ -27,10 +25,9 @@ class IndividualCustomerPage extends Component {
         }
 
         return null;
-    }
+    };
 
-    constructPhoneElement(phone) {
-        const {t} = this.props;
+    const constructPhoneElement = (phone) => {
         if (phone) {
             return (
                 <React.Fragment>
@@ -41,10 +38,9 @@ class IndividualCustomerPage extends Component {
         }
 
         return null;
-    }
+    };
 
-    constructMobileElement(mobile) {
-        const {t} = this.props;
+    const constructMobileElement = (mobile) => {
         if (mobile) {
             return (
                 <React.Fragment>
@@ -55,10 +51,9 @@ class IndividualCustomerPage extends Component {
         }
 
         return null;
-    }
+    };
 
-    constructEmailElement(email) {
-        const {t} = this.props;
+    const constructEmailElement = (email) => {
         if (email) {
             return (
                 <React.Fragment>
@@ -69,10 +64,9 @@ class IndividualCustomerPage extends Component {
         }
 
         return null;
-    }
+    };
 
-    constructAddressElement(address) {
-        const {t} = this.props;
+    const constructAddressElement = (address) => {
         if (address) {
             const {
                 addressLine1, 
@@ -100,9 +94,9 @@ class IndividualCustomerPage extends Component {
         }
 
         return null;
-    }
+    };
 
-    constructCustomerPropElements(customer) {
+    const constructCustomerPropElements = (customer) => {
         const {
             name,
             phone,
@@ -112,23 +106,23 @@ class IndividualCustomerPage extends Component {
         } = customer;
 
         const elements = [
-            this.constructNameElement(name),
-            this.constructPhoneElement(phone),
-            this.constructMobileElement(mobile),
-            this.constructEmailElement(email),
-            this.constructAddressElement(address),
+            constructNameElement(name),
+            constructPhoneElement(phone),
+            constructMobileElement(mobile),
+            constructEmailElement(email),
+            constructAddressElement(address),
         ];
 
         return elements.filter((element) => element !== null);
-    }
+    };
 
-    editCustomerHandler(formParams) {
+    const editCustomerHandler = (formParams) => {
         const {
             name, phone, mobile, email,
             addressLine1, addressLine2, city, provinceCode, postalCode
         } = formParams;
 
-        const customerId = this.props.location.state.customer.id;
+        const customerId = location.state.customer.id;
 
         const customerPatchInput = {
             id: customerId,
@@ -149,58 +143,52 @@ class IndividualCustomerPage extends Component {
         return WaveAPIClient.editCustomer(customerPatchInput);
     }
 
-    render() {
-        const customer = this.props.location.state.customer;
-        const customerPropElements = this.constructCustomerPropElements(customer);
+    const customer = location.state.customer;
+    const customerPropElements = constructCustomerPropElements(customer);
 
-        return (
-            <Container fluid className='IndividualCustomerPage'>
-                <Container fluid className='IndividualCustomerPage_header'>
-                    <Header as='h1'>{customer.name}</Header>
-                    {this.state.error &&
-                        <Message 
-                            negative
-                            content={this.state.error}
-                        />
-                    }
-                    <EditCustomerModal
-                        customer={customer}
-                        onSubmit={(formParams) => {
-                            this.editCustomerHandler(formParams)
-                            .then(newCustomer => {
-                                this.props.navigation("/viewCustomer", {
-                                    replace: true,
-                                    state: {
-                                        customer: newCustomer
-                                    }
-                                });
-                            })
-                            .catch(err => {
-                                this.setState({
-                                    error: err.message
-                                });
-                            });
-                        }}
+    return (
+        <Container fluid className='IndividualCustomerPage'>
+            <Container fluid className='IndividualCustomerPage_header'>
+                <Header as='h1'>{customer.name}</Header>
+                {error &&
+                    <Message 
+                        negative
+                        content={error}
                     />
-                </Container>
-                <Divider hidden />
-                <Container fluid className="InvididualCustomerPage_props">
-                    {
-                        customerPropElements.map((customerElement, idx) => {
-                            return (
-                                <React.Fragment>
-                                    <Container fluid>
-                                        {customerElement}
-                                    </Container>
-                                    <Divider hidden />
-                                </React.Fragment>
-                            );
+                }
+                <EditCustomerModal
+                    customer={customer}
+                    onSubmit={(formParams) => {
+                        editCustomerHandler(formParams)
+                        .then(newCustomer => {
+                            navigate("/viewCustomer", {
+                                replace: true,
+                                state: {
+                                    customer: newCustomer
+                                }
+                            });
                         })
-                    }
-                </Container>
+                        .catch(err => {
+                            setError(err.message);
+                        });
+                    }}
+                />
             </Container>
-        );
-    }
+            <Divider hidden />
+            <Container fluid className="InvididualCustomerPage_props">
+                {
+                    customerPropElements.map((customerElement, idx) => {
+                        return (
+                            <React.Fragment>
+                                <Container fluid>
+                                    {customerElement}
+                                </Container>
+                                <Divider hidden />
+                            </React.Fragment>
+                        );
+                    })
+                }
+            </Container>
+        </Container>
+    );
 };
-
-export default componentWrapper(IndividualCustomerPage);

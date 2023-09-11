@@ -1,25 +1,22 @@
-import React, {Component} from 'react';
+import {useState} from 'react';
 import {Modal, Button, Dropdown, Form, Label, Input} from 'semantic-ui-react';
 import {fuseDateTime} from '../../../../utils/helpers';
-import componentWrapper from '../../../../utils/componentWrapper';
+import useLocalization from '../../../../hooks/useLocalization';
 
-class CreateScheduledCustomerModal extends Component {
-    constructor(props) {
-        super(props);
+export default function CreateScheduledCustomerModal(props) {
+    const [modalOpen, setModalOpen] = useState(false);
+    const [state, setState] = useState({
+        dateOfServiceValid: false,
+        customerValid: false,
+        timesValid: false,
+        customerId: '',
+        dateOfService: ''
+    });
+    const [t] = useLocalization();
 
-        this.state = {
-            modalOpen: false,
-            dateOfServiceValid: false,
-            customerValid: false,
-            timesValid: false,
-            customerId: '',
-            dateOfService: ''
-        };
-    }
-
-    getFormParams() {
-        const dateOfService = this.state.dateOfService;
-        const customerId = this.state.customerId;
+    const getFormParams = () => {
+        const dateOfService = state.dateOfService;
+        const customerId = state.customerId;
         const startTime = document.getElementById("CreateScheduledCustomerModal_serviceStartTime").value;
         const endTime = document.getElementById("CreateScheduledCustomerModal_serviceEndTime").value;
 
@@ -29,31 +26,34 @@ class CreateScheduledCustomerModal extends Component {
             startTime: startTime,
             endTime: endTime
         };
-    }
+    };
 
-    handleDateOfServiceInputChange(event, {value}) {
-        this.setState({
+    const handleDateOfServiceInputChange = (event, {value}) => {
+        setState({
+            ...state,
             dateOfService: value,
             dateOfServiceValid: value !== ''
         });
-    }
+    };
 
-    handleCustomerInputChange(event, {value}) {
-        this.setState({
+    const handleCustomerInputChange = (event, {value}) => {
+        setState({
+            ...state,
             customerId: value,
             customerValid: value !== ''
         });
-    }
+    };
 
-    handleTimeInputChange() {
-        const { startTime, endTime } = this.getFormParams();
+    const handleTimeInputChange = () => {
+        const { startTime, endTime } = getFormParams();
 
-        this.setState({
+        setState({
+            ...state,
             timesValid: startTime && endTime
         });
-    }
+    };
 
-    convertToDropdownOptions(items) {
+    const convertToDropdownOptions = (items) => {
         return items.map(item => {
             return {
                 key: item.id,
@@ -61,117 +61,109 @@ class CreateScheduledCustomerModal extends Component {
                 text: item.name
             };
         });
-    }
+    };
 
-    render() {
-        const {t} = this.props;
+    const allCustomers = convertToDropdownOptions(props.allCustomers);
+    const datesOfService = props.datesOfService.map((dateOfService) => {
+        return {
+            key: dateOfService,
+            value: dateOfService,
+            text: dateOfService
+        };
+    });
 
-        const allCustomers = this.props.allCustomers.map((customerOption) => {
-            return {
-                key: customerOption.id,
-                value: customerOption.id,
-                text: customerOption.name
-            };
-        });
-
-        const datesOfService = this.props.datesOfService.map((dateOfService) => {
-            return {
-                key: dateOfService,
-                value: dateOfService,
-                text: dateOfService
-            };
-        });
-
-        return (
-            <Modal
-                onClose={() => this.setState({
-                    modalOpen: false,
+    return (
+        <Modal
+            onClose={() => {
+                setModalOpen(false);
+                setState({
+                    ...state,
                     customerValid: false,
                     timesValid: false
-                })}
-                onOpen={() => this.setState({
-                    modalOpen: true,
+                });
+            }}
+            onOpen={() => {
+                setModalOpen(true);
+                setState({
+                    ...state,
                     customerValid: false,
                     timesValid: false
-                })}
-                open={this.state.modalOpen}
-                trigger={<Button>{t('Add Customer')}</Button>}
-            >
-                <Modal.Header>{t('Add Customer')}</Modal.Header>
-                <Modal.Content>
-                    <Form>
-                        <Form.Field>
-                            <Label>{t('Date of Service')}:</Label>
-                            <Dropdown
-                                placeholder={t('Select Date')}
-                                fluid
-                                selection
-                                options={datesOfService}
-                                className="CreateScheduledCustomerModal_dateOfService"
-                                onChange={this.handleDateOfServiceInputChange.bind(this)}
-                            />
-                        </Form.Field>
-                        <Form.Field>
-                            <Label>{t('Customer')}:</Label>
-                            <Dropdown
-                                placeholder={t('Select Customer')}
-                                fluid
-                                search
-                                selection
-                                options={allCustomers}
-                                className="CreateScheduledCustomerModal_customerId"
-                                onChange={this.handleCustomerInputChange.bind(this)}
-                            />
-                        </Form.Field>
-                        <Form.Field>
-                            <Label htmlFor="CreateScheduledCustomerModal_serviceStartTime">{t('Service Start Time')}:</Label>
-                            <Input 
-                                type="time" 
-                                id="CreateScheduledCustomerModal_serviceStartTime" 
-                                name="CreateScheduledCustomerModal_serviceStartTime" 
-                                min="00:00"
-                                max="24:00"
-                                required
-                                onChange={() => this.handleTimeInputChange()}
-                            />
-                        </Form.Field>
-                        <Form.Field>
-                            <Label htmlFor="CreateScheduledCustomerModal_serviceEndTime">{t('Service End Time')}:</Label>
-                            <Input 
-                                type="time" 
-                                id="CreateScheduledCustomerModal_serviceEndTime" 
-                                name="CreateScheduledCustomerModal_serviceEndTime" 
-                                min="00:00"
-                                max="24:00"
-                                required
-                                onChange={() => this.handleTimeInputChange()}
-                            />
-                        </Form.Field>
-                    </Form>
-                </Modal.Content>
-                <Modal.Actions>
-                    <Button 
-                        color='black' 
-                        onClick={() => this.setState({modalOpen: false})}
-                    >
-                        {t('Cancel')}
-                    </Button>
-                    <Button 
-                        onClick={() => {
-                            const { dateOfService, customerId, startTime, endTime } = this.getFormParams();
-                            this.props.onSubmit(dateOfService, customerId, fuseDateTime(dateOfService, startTime), fuseDateTime(dateOfService, endTime));
-                            
-                            this.setState({modalOpen: false});
-                        }}
-                        positive
-                        disabled={!(this.state.dateOfServiceValid && this.state.customerValid && this.state.timesValid)}
-                    >
-                            Ok
-                    </Button>
-                </Modal.Actions>
-            </Modal>
-        );
-    }
+                });
+            }}
+            open={modalOpen}
+            trigger={<Button>{t('Add Customer')}</Button>}
+        >
+            <Modal.Header>{t('Add Customer')}</Modal.Header>
+            <Modal.Content>
+                <Form>
+                    <Form.Field>
+                        <Label>{t('Date of Service')}:</Label>
+                        <Dropdown
+                            placeholder={t('Select Date')}
+                            fluid
+                            selection
+                            options={datesOfService}
+                            className="CreateScheduledCustomerModal_dateOfService"
+                            onChange={handleDateOfServiceInputChange}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <Label>{t('Customer')}:</Label>
+                        <Dropdown
+                            placeholder={t('Select Customer')}
+                            fluid
+                            search
+                            selection
+                            options={allCustomers}
+                            className="CreateScheduledCustomerModal_customerId"
+                            onChange={handleCustomerInputChange}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <Label htmlFor="CreateScheduledCustomerModal_serviceStartTime">{t('Service Start Time')}:</Label>
+                        <Input 
+                            type="time" 
+                            id="CreateScheduledCustomerModal_serviceStartTime" 
+                            name="CreateScheduledCustomerModal_serviceStartTime" 
+                            min="00:00"
+                            max="24:00"
+                            required
+                            onChange={() => handleTimeInputChange()}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <Label htmlFor="CreateScheduledCustomerModal_serviceEndTime">{t('Service End Time')}:</Label>
+                        <Input 
+                            type="time" 
+                            id="CreateScheduledCustomerModal_serviceEndTime" 
+                            name="CreateScheduledCustomerModal_serviceEndTime" 
+                            min="00:00"
+                            max="24:00"
+                            required
+                            onChange={() => handleTimeInputChange()}
+                        />
+                    </Form.Field>
+                </Form>
+            </Modal.Content>
+            <Modal.Actions>
+                <Button 
+                    color='black' 
+                    onClick={() => setModalOpen(false)}
+                >
+                    {t('Cancel')}
+                </Button>
+                <Button 
+                    onClick={() => {
+                        const { dateOfService, customerId, startTime, endTime } = getFormParams();
+                        props.onSubmit(dateOfService, customerId, fuseDateTime(dateOfService, startTime), fuseDateTime(dateOfService, endTime));
+                        setModalOpen(false);
+                    }}
+                    positive
+                    disabled={!(state.dateOfServiceValid && state.customerValid && state.timesValid)}
+                >
+                        {t('Ok')}
+                </Button>
+            </Modal.Actions>
+        </Modal>
+    );
 };
-
-export default componentWrapper(CreateScheduledCustomerModal);

@@ -1,6 +1,6 @@
 import { useState } from "react";
   
-const useLocalStorage = (key, defaultValue) => {
+export default function useLocalStorage(key, defaultValue) {
     const [localStorageValue, setLocalStorageValue] = useState(() => {
         try {
             const value = localStorage.getItem(key)
@@ -31,19 +31,4 @@ const useLocalStorage = (key, defaultValue) => {
     };
 
     return [localStorageValue, setLocalStorageStateValue];
-};
-
-export const localStorageWrapper = (Component) => {
-    return (props) => {
-        const [userInfo, setUserInfo] = useLocalStorage("userInfo", null);
-        const [businessInfo, setBusinessInfo] = useLocalStorage("businessInfo", null);
-
-        return <Component 
-                userInfo={userInfo} 
-                setUserInfo={setUserInfo}
-                businessInfo={businessInfo}
-                setBusinessInfo={setBusinessInfo}
-                {...props}
-                />
-    }
 };
