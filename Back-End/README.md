@@ -1,7 +1,7 @@
 # Schedules API
 
 Running the Back-end API:
-- You will need a MongoDB cluster. 
+- You will need a MongoDB cluster.
 - Make sure the following environment variables are defined (via `nodemon.json` or shell environment variables):
   - `MONGO_USER`
   - `MONGO_PASSWORD`
