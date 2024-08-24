@@ -33,8 +33,7 @@ export default function EditProfilePage(props) {
     const handleDeleteAccount = () => {
         PrimeShineAPIClient.deleteUser(props.userInfo._id, props.userInfo.token)
         .then(didSucceed => {
-            props.updateUserInfo(null);
-            props.updateBusinessInfo(null);
+            props.logoutHandler();
             navigate("/", {
                 replace: true
             });

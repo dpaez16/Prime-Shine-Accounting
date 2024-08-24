@@ -122,34 +122,15 @@ export default class PrimeShineAPIClient {
      */
     static deleteUser(userId, jwt) {
         const body = {
-            query: `
-            mutation($userID: ID!) {
-                deleteUser(userID: $userID)
-            }
-            `,
-            variables: {
-                userID: userId
-            }
+            userID: userId,
         };
 
-        return PrimeShineAPIClient.#createFetchRequest(body, jwt)
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not delete user: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2("/users/delete", body, jwt)
         .then(json => {
-            if (json.errors !== undefined) {
-                throw new Error(`Could not delete user: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json.data.deleteUser;
+            return json.success;
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not delete user: ${err.message}`);
         });
     }
 
