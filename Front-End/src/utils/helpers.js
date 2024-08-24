@@ -47,8 +47,7 @@ export const constructDate = function(date) {
  * @return {string} The constructed date.
  */
 export const constructTimeStr = function(dateEpochStr) {
-    const dateNum = Number(dateEpochStr);
-    const date = new Date(dateNum);
+    const date = new Date(dateEpochStr);
 
     let hours = date.getHours();
     const minutes = `${date.getMinutes()}`.padStart(2, '0');
@@ -67,8 +66,7 @@ export const constructTimeStr = function(dateEpochStr) {
  * @return {string} The constructed date.
  */
 export const constructMilitaryTimeStr = function(dateEpochStr) {
-    const dateNum = Number(dateEpochStr);
-    const date = new Date(dateNum);
+    const date = new Date(dateEpochStr);
 
     const hours = `${date.getHours()}`.padStart(2, '0');
     const minutes = `${date.getMinutes()}`.padStart(2, '0');
@@ -100,7 +98,7 @@ export const fetchAllCustomers = async function(businessId) {
     let allCustomers = [];
 
     while (true) {
-        const results = await WaveAPIClient.fetchCustomers(businessId, pageNum);    
+        const results = await WaveAPIClient.fetchCustomers(businessId, pageNum);
         const { pageInfo, customers } = results;
         const { totalPages } = pageInfo;
 

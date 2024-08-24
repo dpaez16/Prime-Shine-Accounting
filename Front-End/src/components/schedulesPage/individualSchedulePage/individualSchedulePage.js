@@ -20,7 +20,7 @@ export default function IndividualSchedulePage(props) {
     const [scheduleMetadata, setScheduleMetadata] = useState({});
     const [t] = useLocalization();
     const location = useLocation();
-    
+
     const fetchMetadataForScheduledCustomer = (businessId, rawScheduledCustomer) => {
         const customerId = rawScheduledCustomer.customerId;
 
@@ -191,7 +191,7 @@ export default function IndividualSchedulePage(props) {
                     onSubmit={(dateOfService, customerId, serviceStartTime, serviceEndTime) => {
                         const dayOffset = datesOfService.findIndex((dos) => dos === dateOfService);
                         const scheduleId = schedule._id;
-                        
+
                         createScheduledCustomerHandler(dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime)
                         .catch(err => {
                             setError(err.message);
@@ -221,7 +221,7 @@ export default function IndividualSchedulePage(props) {
                     }}
                 </BlobProvider>
             </Container>
-            {error && 
+            {error &&
                 <Message
                     negative
                     content={error}

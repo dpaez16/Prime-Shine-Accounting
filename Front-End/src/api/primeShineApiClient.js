@@ -192,11 +192,11 @@ export default class PrimeShineAPIClient {
      * @return {Promise<Array<Object>>} The promise with success returning the requested schedules, otherwise an error for rejection.
      */
     static fetchSchedules(userId, jwt) {
-        const body = {
+        const requestBody = {
             userID: userId,
         };
 
-        return PrimeShineAPIClient.#createFetchRequest2('/schedule/query', body, jwt)
+        return PrimeShineAPIClient.#createFetchRequest2('/schedule/query', requestBody, jwt)
         .then(json => {
             return json.schedules ?? [];
         })
@@ -308,7 +308,7 @@ export default class PrimeShineAPIClient {
             throw err;
         });
     }
-    
+
     /**
      * Deletes a schedule.
      * @param {Date} startDay - The start day for the schedule.
@@ -399,42 +399,19 @@ export default class PrimeShineAPIClient {
      * Fetches schedule days for a schedule.
      * @param {string} scheduleId - The schedule's unique ID.
      * @param {string} jwt - The user's JSON web token.
-     * @return {Promise<Array<Object>>} The promise with success returning the requested schedule days, otherwise an error for rejection. 
+     * @return {Promise<Array<Object>>} The promise with success returning the requested schedule days, otherwise an error for rejection.
      */
     static fetchScheduleDays(scheduleId, jwt) {
         const requestBody = {
-            query: `
-            query($scheduleID: ID!) {
-                scheduleDays(scheduleID: $scheduleID) {
-                    _id
-                    dayOffset
-                    schedule
-                }
-            }
-            `,
-            variables: {
-                scheduleID: scheduleId
-            }
+            scheduleID: scheduleId
         };
 
-        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not get schedule days: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2("/scheduleDay/query", requestBody, jwt)
         .then(json => {
-            if (json.errors !== undefined) {
-                throw new Error(`Could not get schedule days: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json.data.scheduleDays;
+            return json.scheduleDays ?? [];
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not get schedule days: ${err.message}`);
         });
     }
 
@@ -483,47 +460,22 @@ export default class PrimeShineAPIClient {
      * Fetches scheduled customers for a schedule day.
      * @param {string} scheduleDayId - The schedule day's unique ID.
      * @param {string} jwt - The user's JSON web token.
-     * @return {Promise<Array<Object>>} The promise with success returning the requested scheduled customers, otherwise an error for rejection. 
+     * @return {Promise<Array<Object>>} The promise with success returning the requested scheduled customers, otherwise an error for rejection.
      */
     static fetchScheduledCustomers(scheduleDayId, jwt) {
         const requestBody = {
-            query: `
-            query($scheduleDayID: ID!) {
-                scheduledCustomers(scheduleDayID: $scheduleDayID) {
-                    _id
-                    customerId
-                    serviceStartTime
-                    serviceEndTime
-                    scheduleDay
-                }
-            }
-            `,
-            variables: {
-                scheduleDayID: scheduleDayId
-            }
+            scheduleDayID: scheduleDayId
         };
 
-        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not get scheduled customers: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2("/scheduledCustomer/query", requestBody, jwt)
         .then(json => {
-            if (json.errors !== undefined) {
-                throw new Error(`Could not get scheduled customers: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json.data.scheduledCustomers;
+            return json.scheduledCustomers ?? [];
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not get scheduled customers: ${err.message}`);
         });
     }
-    
+
     /**
      * Creates a scheduled customer.
      * @param {string} customerId - The scheduled customer's unique WaveApps ID.
@@ -531,7 +483,7 @@ export default class PrimeShineAPIClient {
      * @param {Date} serviceEndTime - The scheduled customer's service end time.
      * @param {string} scheduleId - The schedule's unique ID.
      * @param {string} jwt - The user's JSON web token.
-     * @return {Promise<Object>} The promise with success returning the newly created scheduled customer, otherwise an error for rejection. 
+     * @return {Promise<Object>} The promise with success returning the newly created scheduled customer, otherwise an error for rejection.
      */
     static createScheduledCustomer(customerId, serviceStartTime, serviceEndTime, scheduleDayId, jwt) {
         const requestBody = {
