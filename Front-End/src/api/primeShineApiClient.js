@@ -106,43 +106,18 @@ export default class PrimeShineAPIClient {
      */
     static editUser(name, email, password, userId, jwt) {
         const body = {
-            query: `
-            mutation($userInput: UserInput!, $userID: ID!) {
-                editUser(userInput: $userInput, userID: $userID) {
-                    _id
-                    name
-                    email
-                }
-            }
-            `,
-            variables: {
-                userInput: {
-                    name: name,
-                    email: email,
-                    password: password
-                },
-                userID: userId
-            }
+            userID: userId,
+            name: name,
+            email: email,
+            password: password,
         };
 
-        return PrimeShineAPIClient.#createFetchRequest(body, jwt)
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not edit user: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2("/users/edit", body, jwt)
         .then(json => {
-            if (json.errors !== undefined) {
-                throw new Error(`Could not edit user: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json.data.editUser;
+            return json.user;
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not edit user: ${err.message}`);
         });
     }
 

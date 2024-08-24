@@ -10,7 +10,7 @@ import (
 )
 
 type editUserBody struct {
-	ID       primitive.ObjectID `json:userID`
+	UserID   primitive.ObjectID `json:userID`
 	Name     string             `json:name`
 	Email    string             `json:email`
 	Password string             `json:password`
@@ -27,7 +27,7 @@ func (app *application) editUser(w http.ResponseWriter, r *http.Request, _ httpr
 		return
 	}
 
-	user, err := app.dbClient.EditUser(body.ID, body.Email, body.Name, body.Password)
+	user, err := app.dbClient.EditUser(body.UserID, body.Email, body.Name, body.Password)
 	if err != nil {
 		err = errors.Wrap(err, "EditUser")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())

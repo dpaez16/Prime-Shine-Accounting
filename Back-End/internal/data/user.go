@@ -117,14 +117,16 @@ func (db *MongoClient) EditUser(userID primitive.ObjectID, newEmail string, newN
 		return nil, errors.New("Unable to find user.")
 	}
 
-	filter = bson.M{"email": newEmail}
-	foundUser, err := db.FindOneUser(filter)
-	if err != nil {
-		return nil, errors.Wrap(err, "FindOneUser")
-	}
+	if user.Email != newEmail {
+		filter = bson.M{"email": newEmail}
+		foundUser, err := db.FindOneUser(filter)
+		if err != nil {
+			return nil, errors.Wrap(err, "FindOneUser")
+		}
 
-	if foundUser != nil {
-		return nil, errors.New("User with that email exists.")
+		if foundUser != nil {
+			return nil, errors.New("User with that email exists.")
+		}
 	}
 
 	user.ID = userID
