@@ -169,43 +169,20 @@ export default class PrimeShineAPIClient {
      */
     static createSchedule(startDay, userId, jwt) {
         const requestBody = {
-            query: `
-            mutation($startDay: String!, $userID: ID!) {
-                createSchedule(startDay: $startDay, userID: $userID) {
-                    _id
-                    startDay
-                    user
-                }
-            }
-            `,
-            variables: {
-                startDay: startDay,
-                userID: userId
-            }
+            startDay: startDay,
+            userID: userId,
         };
 
-        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not create schedule: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2("/schedule/create", requestBody, jwt)
         .then(json => {
-            if (json.errors !== undefined) {
-                throw new Error(`Could not create schedule: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json.data.createSchedule;
+            return json.schedule;
         })
         .then(schedule => {
-            const newStartDay = new Date(Number(schedule.startDay));
+            const newStartDay = new Date(schedule.startDay);
             return { ...schedule, ...{startDay: newStartDay} };
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not create schedule: ${err.message}`);
         });
     }
 
@@ -218,43 +195,20 @@ export default class PrimeShineAPIClient {
      */
     static editSchedule(startDay, scheduleId, jwt) {
         const requestBody = {
-            query: `
-            mutation($startDay: String!, $scheduleID: ID!) {
-                editSchedule(startDay: $startDay, scheduleID: $scheduleID) {
-                    _id
-                    startDay
-                    user
-                }
-            }
-            `,
-            variables: {
-                startDay: startDay,
-                scheduleID: scheduleId
-            }
+            startDay: startDay,
+            scheduleID: scheduleId,
         };
 
-        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not edit schedule: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2("/schedule/edit", requestBody, jwt)
         .then(json => {
-            if (json.errors !== undefined) {
-                throw new Error(`Could not edit schedule: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json.data.editSchedule;
+            return json.schedule;
         })
         .then(schedule => {
-            const newStartDay = new Date(Number(schedule.startDay));
+            const newStartDay = new Date(schedule.startDay);
             return { ...schedule, ...{startDay: newStartDay} };
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not edit schedule: ${err.message}`);
         });
     }
 
@@ -267,35 +221,16 @@ export default class PrimeShineAPIClient {
      */
     static deleteSchedule(startDay, userId, jwt) {
         const requestBody = {
-            query: `
-            mutation($startDay: String!, $userID: ID!) {
-                deleteSchedule(startDay: $startDay, userID: $userID)
-            }
-            `,
-            variables: {
-                startDay: startDay,
-                userID: userId
-            }
+            startDay: startDay,
+            userID: userId,
         };
 
-        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not delete schedule: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2("/schedule/delete", requestBody, jwt)
         .then(json => {
-            if (json.errors !== undefined) {
-                throw new Error(`Could not delete schedule: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json.data.deleteSchedule;
+            return json.success;
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not delete schedule: ${err.message}`);
         });
     }
 

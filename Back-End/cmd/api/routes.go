@@ -31,9 +31,9 @@ func (app *application) routes() http.Handler {
 
 	// schedule routes
 	router.POST("/api/schedule/query", app.authenticate(app.querySchedules))
-	//router.POST("/api/schedule/create", app.authenticate(app.queryScheduledCustomers))
-	//router.POST("/api/schedule/edit", app.authenticate(app.queryScheduledCustomers))
-	//router.POST("/api/schedule/delete", app.authenticate(app.queryScheduledCustomers))
+	router.POST("/api/schedule/create", app.authenticate(app.createSchedule))
+	router.POST("/api/schedule/edit", app.authenticate(app.editSchedule))
+	router.POST("/api/schedule/delete", app.authenticate(app.deleteSchedule))
 
 	return app.recoverPanic(app.enableCORS(router))
 }
