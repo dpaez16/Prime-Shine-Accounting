@@ -162,10 +162,36 @@ func (db *MongoClient) DeleteUser(userID primitive.ObjectID) (bool, error) {
 		return false, errors.New("User not found.")
 	}
 
-	// TODO
-	// get the user's schedules (db.QuerySchedules(user.ID))
-	// delete the schedules (db.DeleteSchedule(schedule.ID))
-	// delete user
+	schedules, err := db.QuerySchedules(userID)
+	if err != nil {
+		return false, errors.Wrap(err, "QuerySchedules")
+	}
+
+	for _, schedule := range schedules {
+		success, err := db.DeleteSchedule(schedule.StartDay, userID)
+		if err != nil {
+			return false, errors.Wrap(err, "DeleteSchedule")
+		}
+
+		if !success {
+			return false, errors.Wrapf(err, "Failed to delete schedule %s", schedule.ID)
+		}
+	}
+
+	collection := db.getUsersCollection()
+
+	deleteFilter := bson.D{{"_id", userID}}
+	result := collection.FindOneAndDelete(context.TODO(), deleteFilter)
+	err = result.Err()
+
+	if err != nil {
+		switch {
+		case errors.Is(err, mongo.ErrNoDocuments):
+			return false, nil
+		default:
+			return false, errors.Wrap(err, "users.FindOneAndDelete")
+		}
+	}
 
 	return true, nil
 }
