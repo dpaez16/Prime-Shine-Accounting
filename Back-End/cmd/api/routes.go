@@ -13,7 +13,7 @@ func (app *application) routes() http.Handler {
 
 	// user routes
 	router.POST("/api/login", app.loginUser)
-	router.POST("/api/register", app.authenticate(app.createUser))
+	router.POST("/api/register", app.createUser)
 	router.POST("/api/users/edit", app.authenticate(app.editUser))
 	router.POST("/api/users/delete", app.authenticate(app.deleteUser))
 

@@ -10,7 +10,7 @@ import (
 )
 
 type ScheduleDay struct {
-	ID        primitive.ObjectID `bson:"_id" json:"_id"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	DayOffset int                `bson:"dayOffset" json:"dayOffset"`
 	Schedule  primitive.ObjectID `bson:"schedule" json:"schedule"`
 }

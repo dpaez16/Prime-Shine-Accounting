@@ -78,20 +78,13 @@ export default class PrimeShineAPIClient {
             password: password
         };
 
-        return PrimeShineAPIClient.#createPreJWTFetchRequest(body, "register")
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not create user: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2("/register", body)
         .then(json => {
-            return json;
+            const {jwt, user} = json;
+            return {...user, token: jwt};
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not create user: ${err.message}`);
         });
     }
 

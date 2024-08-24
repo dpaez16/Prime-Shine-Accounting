@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"prime-shine-api/internal"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
@@ -32,7 +33,14 @@ func (app *application) createUser(w http.ResponseWriter, r *http.Request, _ htt
 		return
 	}
 
-	data := jsondata{"user": user}
+	jwt, err := internal.CreateToken(user.ID.String())
+	if err != nil {
+		err = errors.Wrap(err, "CreateToken")
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	data := jsondata{"user": user, "jwt": jwt}
 	err = app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {
 		err = errors.Wrap(err, "writeJSON")

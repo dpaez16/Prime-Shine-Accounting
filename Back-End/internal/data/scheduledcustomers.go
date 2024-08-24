@@ -10,7 +10,7 @@ import (
 )
 
 type ScheduledCustomer struct {
-	ID               primitive.ObjectID `bson:"_id" json:"_id"`
+	ID               primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
 	CustomerID       string             `bson:"customerId" json:"customerId"`
 	ServiceStartTime primitive.DateTime `bson:"serviceStartTime" json:"serviceStartTime"`
 	ServiceEndTime   primitive.DateTime `bson:"serviceEndTime" json:"serviceEndTime"`
