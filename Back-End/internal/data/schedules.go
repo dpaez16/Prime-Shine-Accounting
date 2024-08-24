@@ -41,7 +41,7 @@ func (db *MongoClient) FindOneSchedule(filter bson.M) (*Schedule, error) {
 
 // Gets schedules for a user.
 func (db *MongoClient) QuerySchedules(userID primitive.ObjectID) ([]Schedule, error) {
-	collection := db.getScheduleDaysCollection()
+	collection := db.getSchedulesCollection()
 
 	filter := bson.M{"user": userID}
 	cursor, err := collection.Find(context.TODO(), filter)

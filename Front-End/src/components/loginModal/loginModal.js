@@ -13,7 +13,7 @@ export default function LoginModal(props) {
     const handleUserLogin = () => {
         const { email, password } = userParams;
         setError(null);
-        
+
         return PrimeShineAPIClient.loginUser(email, password)
         .then((user) => {
             return WaveAPIClient.fetchBusinessData()
@@ -35,7 +35,7 @@ export default function LoginModal(props) {
             [name]: value
         });
     };
-    
+
     const isFormValid = () => {
         const { email, password } = userParams;
         return (
@@ -86,13 +86,13 @@ export default function LoginModal(props) {
                 }
             </Modal.Content>
             <Modal.Actions>
-                <Button 
-                    color='black' 
+                <Button
+                    color='black'
                     onClick={() => setModalOpen(false)}
                 >
                     {t('Cancel')}
                 </Button>
-                <Button 
+                <Button
                     onClick={() => {
                         handleUserLogin()
                         .then(({user, businessInfo}) => {

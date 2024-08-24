@@ -19,9 +19,9 @@ func (app *application) routes() http.Handler {
 
 	// scheduled customer routes
 	router.POST("/api/scheduledCustomer/query", app.authenticate(app.queryScheduledCustomers))
-	//router.POST("/api/scheduledCustomer/create", app.authenticate(app.queryScheduledCustomers))
-	//router.POST("/api/scheduledCustomer/edit", app.authenticate(app.queryScheduledCustomers))
-	//router.POST("/api/scheduledCustomer/delete", app.authenticate(app.queryScheduledCustomers))
+	router.POST("/api/scheduledCustomer/create", app.authenticate(app.createScheduledCustomer))
+	router.POST("/api/scheduledCustomer/edit", app.authenticate(app.editScheduledCustomer))
+	router.POST("/api/scheduledCustomer/delete", app.authenticate(app.deleteScheduledCustomer))
 
 	// schedule day routes
 	//router.POST("/api/scheduleDay/query", app.authenticate(app.queryScheduledCustomers))
@@ -30,7 +30,7 @@ func (app *application) routes() http.Handler {
 	//router.POST("/api/scheduleDay/delete", app.authenticate(app.queryScheduledCustomers))
 
 	// schedule routes
-	//router.POST("/api/schedule/query", app.authenticate(app.queryScheduledCustomers))
+	router.POST("/api/schedule/query", app.authenticate(app.querySchedules))
 	//router.POST("/api/schedule/create", app.authenticate(app.queryScheduledCustomers))
 	//router.POST("/api/schedule/edit", app.authenticate(app.queryScheduledCustomers))
 	//router.POST("/api/schedule/delete", app.authenticate(app.queryScheduledCustomers))

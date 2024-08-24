@@ -22,11 +22,31 @@ export default class PrimeShineAPIClient {
         });
     }
 
+    static #createFetchRequest2(path, body, jwt = null) {
+        const url = `${process.env.REACT_APP_SCHEDULE_API_ENDPOINT_URL}/api` + path;
+        return fetch(url, {
+            method: "POST",
+            body: JSON.stringify(body),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": jwt
+            }
+        })
+        .then(async (response) => {
+            if (!response || (response.status !== 200 && response.status !== 201)) {
+                const data = await response.json();
+                throw new Error(data.error);
+            }
+
+            return response.json();
+        });
+    }
+
     /**
      * Attempts to login the user to Prime Shine Accounting.
      * @param {string} email - The user's email associated with their account.
      * @param {string} password - The user's password associated with their account.
-     * @return {Promise<Object>} The promise with success returning the user's info + session, otherwise an error for rejection. 
+     * @return {Promise<Object>} The promise with success returning the user's info + session, otherwise an error for rejection.
      */
     static loginUser(email, password) {
         const body = {
@@ -34,20 +54,13 @@ export default class PrimeShineAPIClient {
             password: password
         };
 
-        return PrimeShineAPIClient.#createPreJWTFetchRequest(body, "login")
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not login user: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2('/login', body)
         .then(json => {
-            return json;
+            const {jwt, user} = json;
+            return {...user, token: jwt};
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not login user: ${err.message}`);
         });
     }
 
@@ -179,45 +192,22 @@ export default class PrimeShineAPIClient {
      * @return {Promise<Array<Object>>} The promise with success returning the requested schedules, otherwise an error for rejection.
      */
     static fetchSchedules(userId, jwt) {
-        const requestBody = {
-            query: `
-            query($userID: ID!) {
-                schedules(userID: $userID) {
-                    _id
-                    startDay
-                    user
-                }
-            }
-            `,
-            variables: {
-                userID: userId
-            }
+        const body = {
+            userID: userId,
         };
 
-        return PrimeShineAPIClient.#createFetchRequest(requestBody, jwt)
-        .then(async (response) => {
-            if (!response || (response.status !== 200 && response.status !== 201)) {
-                const responseText = await response.text();
-                throw new Error(`Could not fetch schedules: ${responseText}`);
-            }
-
-            return response.json();
-        })
+        return PrimeShineAPIClient.#createFetchRequest2('/schedule/query', body, jwt)
         .then(json => {
-            if (json.errors !== undefined) {
-                throw new Error(`Could not fetch schedules: ${JSON.stringify(json.errors)}`);
-            }
-
-            return json.data.schedules;
+            return json.schedules ?? [];
         })
         .then((schedules) => {
             return schedules.map((schedule) => {
-                const newStartDay = new Date(Number(schedule.startDay));
+                const newStartDay = new Date(schedule.startDay);
                 return { ...schedule, ...{startDay: newStartDay} };
             });
         })
         .catch(err => {
-            throw err;
+            throw new Error(`Could not fetch schedules: ${err.message}`);
         });
     }
 
