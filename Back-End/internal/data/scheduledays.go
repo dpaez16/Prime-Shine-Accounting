@@ -60,7 +60,7 @@ func (db *MongoClient) QueryScheduleDays(scheduleID primitive.ObjectID) ([]Sched
 
 // Creates a schedule day for a schedule.
 func (db *MongoClient) CreateScheduleDay(scheduleID primitive.ObjectID, dayOffset int) (*ScheduleDay, error) {
-	filter := bson.M{"schedule": scheduleID}
+	filter := bson.M{"_id": scheduleID}
 	schedule, err := db.FindOneSchedule(filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneSchedule")

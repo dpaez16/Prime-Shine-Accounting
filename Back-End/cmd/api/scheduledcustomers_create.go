@@ -27,14 +27,14 @@ func (app *application) createScheduledCustomer(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	scheduledCustomers, err := app.dbClient.CreateScheduledCustomer(body.CustomerID, body.ServiceStartTime, body.ServiceEndTime, body.ScheduleDayID)
+	scheduledCustomer, err := app.dbClient.CreateScheduledCustomer(body.CustomerID, body.ServiceStartTime, body.ServiceEndTime, body.ScheduleDayID)
 	if err != nil {
 		err = errors.Wrap(err, "CreateScheduledCustomer")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	data := jsondata{"scheduledCustomers": scheduledCustomers}
+	data := jsondata{"scheduledCustomer": scheduledCustomer}
 	err = app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {
 		err = errors.Wrap(err, "writeJSON")

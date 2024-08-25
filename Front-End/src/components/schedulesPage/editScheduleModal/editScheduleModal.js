@@ -55,13 +55,13 @@ export default function EditScheduleModal(props) {
                 </Form>
             </Modal.Content>
             <Modal.Actions>
-                <Button 
-                    color='black' 
+                <Button
+                    color='black'
                     onClick={() => setModalOpen(false)}
                 >
                     {t('Cancel')}
                 </Button>
-                <Button 
+                <Button
                     onClick={() => {
                         const { startDay } = getFormParams();
                         props.onSubmit(startDay);

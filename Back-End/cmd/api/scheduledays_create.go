@@ -9,13 +9,14 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type deleteScheduledCustomerBody struct {
-	ScheduledCustomerID primitive.ObjectID `json:scheduledCustomerID`
+type createScheduleDayBody struct {
+	ScheduleID primitive.ObjectID `json:scheduleID`
+	DayOffset  int                `json:dayOffset`
 }
 
-// Route for deleting a scheduled customer.
-func (app *application) deleteScheduledCustomer(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var body deleteScheduledCustomerBody
+// Route for creating schedule days.
+func (app *application) createScheduleDay(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var body createScheduleDayBody
 	err := json.NewDecoder(r.Body).Decode(&body)
 
 	if err != nil {
@@ -24,18 +25,14 @@ func (app *application) deleteScheduledCustomer(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	success, err := app.dbClient.DeleteScheduledCustomer(body.ScheduledCustomerID)
+	scheduleDay, err := app.dbClient.CreateScheduleDay(body.ScheduleID, body.DayOffset)
 	if err != nil {
-		err = errors.Wrap(err, "EditScheduledCustomer")
+		err = errors.Wrap(err, "CreateScheduleDay")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if !success {
-		app.errorResponse(w, r, http.StatusBadRequest, "Unable to delete scheduled customer.")
-	}
-
-	data := jsondata{"success": success}
+	data := jsondata{"scheduleDay": scheduleDay}
 	err = app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {
 		err = errors.Wrap(err, "writeJSON")
