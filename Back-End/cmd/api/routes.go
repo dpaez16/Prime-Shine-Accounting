@@ -34,5 +34,8 @@ func (app *application) routes() http.Handler {
 	router.POST("/api/schedule/edit", app.authenticate(app.editSchedule))
 	router.POST("/api/schedule/delete", app.authenticate(app.deleteSchedule))
 
+	// TODO: add pdf route?
+	// https://github.com/go-pdf/fpdf
+
 	return app.recoverPanic(app.enableCORS(router))
 }
