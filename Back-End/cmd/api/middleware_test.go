@@ -28,7 +28,7 @@ func TestAuthenticationNoJWT(t *testing.T) {
 
 func TestAuthenticationInvalidJWTServerError(t *testing.T) {
 	app := application{
-		logger: mocks.MockLogger(),
+		logger: mocks.Logger(),
 	}
 	rr := httptest.NewRecorder()
 
@@ -56,7 +56,7 @@ func TestAuthenticationInvalidJWTClientError(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	token, err := mocks.CreateExpiredJWT("1234")
+	token, err := mocks.ExpiredJWT("1234")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -8,12 +8,12 @@ import (
 	"github.com/pkg/errors"
 )
 
-func MockJWTSecret() []byte {
+func getMockJWTSecret() []byte {
 	return []byte(os.Getenv("JWT_TOKEN"))
 }
 
-func CreateExpiredJWT(userID string) (string, error) {
-	jwtKey := MockJWTSecret()
+func ExpiredJWT(userID string) (string, error) {
+	jwtKey := getMockJWTSecret()
 	currentTime := jwt.NewNumericDate(time.Now())
 	expirationDate := jwt.NewNumericDate(time.Now())
 

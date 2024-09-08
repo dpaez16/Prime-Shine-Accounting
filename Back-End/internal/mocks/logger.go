@@ -5,6 +5,6 @@ import (
 	"log"
 )
 
-func MockLogger() *log.Logger {
+func Logger() *log.Logger {
 	return log.New(io.Discard, "", 0)
 }
