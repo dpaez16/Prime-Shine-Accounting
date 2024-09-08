@@ -1,3 +1,5 @@
+.PHONY: tests
+
 run:
 	go run ./cmd/api
 

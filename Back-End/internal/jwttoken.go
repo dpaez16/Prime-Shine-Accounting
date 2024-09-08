@@ -48,7 +48,7 @@ func verifyHelper(token *jwt.Token) (interface{}, error) {
 
 // Verifies a JSON Web Token.
 func VerifyToken(tokenStr string) (bool, error) {
-	token, err := jwt.Parse(tokenStr, verifyHelper)
+	token, err := jwt.Parse(tokenStr, verifyHelper, jwt.WithoutClaimsValidation())
 	if err != nil {
 		return false, errors.Wrap(err, "jwt.Parse")
 	}
