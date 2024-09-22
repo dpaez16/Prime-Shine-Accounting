@@ -43,7 +43,7 @@ func waitForSignals(app *application) {
 func main() {
 	var cfg config
 
-	flag.IntVar(&cfg.port, "port", 5001, "API server port")
+	flag.IntVar(&cfg.port, "port", 5000, "API server port")
 	flag.StringVar(&cfg.env, "env", "dev", "Environment (prod|env)")
 	flag.Parse()
 
