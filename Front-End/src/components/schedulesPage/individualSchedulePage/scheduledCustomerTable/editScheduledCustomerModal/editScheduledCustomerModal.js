@@ -6,9 +6,9 @@ import useLocalization from '../../../../../hooks/useLocalization';
 export default function EditScheduledCustomerModal(props) {
     const [modalOpen, setModalOpen] = useState(false);
     const [formParams, setFormParams] = useState({
-        customerId: props.customerId ?? null,
-        serviceStartTime: props.serviceStartTime ?? null,
-        serviceEndTime: props.serviceEndTime ?? null
+        customerId: props.scheduledCustomer.customerId,
+        serviceStartTime: constructMilitaryTimeStr(props.scheduledCustomer.serviceStartTime),
+        serviceEndTime: constructMilitaryTimeStr(props.scheduledCustomer.serviceEndTime),
     });
     const [t] = useLocalization();
 
@@ -16,7 +16,7 @@ export default function EditScheduledCustomerModal(props) {
         const {customerId, serviceStartTime, serviceEndTime} = formParams;
 
         return (
-            customerId && customerId !== null && customerId.length > 0 && 
+            customerId && customerId !== null && customerId.length > 0 &&
             serviceStartTime !== null &&
             serviceEndTime !== null
         );
@@ -39,8 +39,8 @@ export default function EditScheduledCustomerModal(props) {
         });
     };
 
-    const defaultServiceStartTime = constructMilitaryTimeStr(props.scheduledCustomer.serviceStartTime).split(' ')[0];
-    const defaultServiceEndTime = constructMilitaryTimeStr(props.scheduledCustomer.serviceEndTime).split(' ')[0];
+    const defaultServiceStartTime = constructMilitaryTimeStr(props.scheduledCustomer.serviceStartTime);
+    const defaultServiceEndTime = constructMilitaryTimeStr(props.scheduledCustomer.serviceEndTime);
 
     return (
         <Modal
@@ -67,9 +67,9 @@ export default function EditScheduledCustomerModal(props) {
                     </Form.Field>
                     <Form.Field>
                         <Label htmlFor="EditScheduledCustomerModal_serviceStartTime">{t('Service Start Time')}:</Label>
-                        <Input 
-                            type="time" 
-                            id="EditScheduledCustomerModal_serviceStartTime" 
+                        <Input
+                            type="time"
+                            id="EditScheduledCustomerModal_serviceStartTime"
                             min="00:00"
                             max="24:00"
                             required
@@ -80,9 +80,9 @@ export default function EditScheduledCustomerModal(props) {
                     </Form.Field>
                     <Form.Field>
                         <Label htmlFor="EditScheduledCustomerModal_serviceEndTime">{t('Service End Time')}:</Label>
-                        <Input 
-                            type="time" 
-                            id="EditScheduledCustomerModal_serviceEndTime" 
+                        <Input
+                            type="time"
+                            id="EditScheduledCustomerModal_serviceEndTime"
                             min="00:00"
                             max="24:00"
                             required
@@ -94,17 +94,17 @@ export default function EditScheduledCustomerModal(props) {
                 </Form>
             </Modal.Content>
             <Modal.Actions>
-                <Button 
-                    color='black' 
+                <Button
+                    color='black'
                     onClick={() => setModalOpen(false)}
                 >
                     {t('Cancel')}
                 </Button>
-                <Button 
+                <Button
                     onClick={() => {
-                        const { customerId, startTime, endTime } = formParams;
+                        const { customerId, serviceStartTime, serviceEndTime } = formParams;
                         const scheduleDayDate = props.scheduleDayDate;
-                        props.onSubmit(customerId, fuseDateTime(scheduleDayDate, startTime), fuseDateTime(scheduleDayDate, endTime));
+                        props.onSubmit(customerId, fuseDateTime(scheduleDayDate, serviceStartTime), fuseDateTime(scheduleDayDate, serviceEndTime));
                         setModalOpen(false);
                     }}
                     positive

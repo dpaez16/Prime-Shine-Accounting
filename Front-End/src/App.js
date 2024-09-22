@@ -19,14 +19,14 @@ export default function App() {
     return (
         <Router>
             <React.Fragment>
-                <SideNavbar 
+                <SideNavbar
                     isLoggedIn={userInfo !== null}
                     updateUserInfo={newUserInfo => setUserInfo(newUserInfo)}
                     updateBusinessInfo={newBusinessInfo => setBusinessInfo(newBusinessInfo)}
                 />
                 <Container fluid className="main-content">
                     <Routes>
-                        <Route  path="/" 
+                        <Route  path="/"
                                 element={
                                     <HomePage
                                         userInfo={userInfo}
@@ -34,11 +34,15 @@ export default function App() {
                                     />
                                 }
                         />
-                        <Route  path="/editProfile" 
+                        <Route  path="/editProfile"
                                 element={
                                     <EditProfilePage
                                         userInfo={userInfo}
                                         updateUserInfo={newUserInfo => setUserInfo({...userInfo, ...newUserInfo})}
+                                        logoutHandler={() => {
+                                            setUserInfo(null);
+                                            setBusinessInfo(null);
+                                        }}
                                     />
                                 }
                         />

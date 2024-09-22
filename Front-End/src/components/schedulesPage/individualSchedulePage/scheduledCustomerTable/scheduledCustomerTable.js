@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 export default function ScheduledCustomerTable(props) {
     const [error, setError] = useState(null);
     const [t] = useLocalization();
-    
+
     const { date } = props;
     const scheduleDayDate = date;
     const scheduledCustomers = props.scheduledCustomers.sort((a, b) => Number(a.serviceStartTime) > Number(b.serviceStartTime) ? 1 : -1);
@@ -18,13 +18,13 @@ export default function ScheduledCustomerTable(props) {
     return (
         <React.Fragment>
         <Header as='h1'>{t(getDayOfWeekStr(scheduleDayDate))} {scheduleDayDate}</Header>
-        {error && 
+        {error &&
             <Message
                 negative
                 content={error}
             />
         }
-        <Table 
+        <Table
             celled
             className="ScheduledCustomerTable_table"
             key={uuidv4()}
@@ -67,10 +67,10 @@ export default function ScheduledCustomerTable(props) {
 
                                             PrimeShineAPIClient.editScheduledCustomer(
                                                 scheduledCustomerId,
-                                                newCustomerId, 
-                                                newServiceStartTime, 
-                                                newServiceEndTime, 
-                                                scheduleDayId, 
+                                                newCustomerId,
+                                                newServiceStartTime,
+                                                newServiceEndTime,
+                                                scheduleDayId,
                                                 jwt
                                             )
                                             .then((newScheduledCustomer) => {
@@ -87,7 +87,7 @@ export default function ScheduledCustomerTable(props) {
                                         onSubmit={() => {
                                             const scheduledCustomerId = scheduledCustomer._id;
                                             const jwt = props.userInfo.token;
-                                            
+
                                             PrimeShineAPIClient.deleteScheduledCustomer(scheduledCustomerId, jwt)
                                             .then((didSucceed) => {
                                                 if (didSucceed) {

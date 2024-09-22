@@ -13,7 +13,7 @@ export default function SideNavbar(props) {
 
     const createDropdownLink = (url, name) => {
         return (
-            <a 
+            <a
                 className="SideNavbar_menu_link"
                 href={url}
             >
@@ -27,9 +27,9 @@ export default function SideNavbar(props) {
     return (
         <Menu attached='top'>
             {
-                isLoggedIn && 
-                <Dropdown 
-                    item 
+                isLoggedIn &&
+                <Dropdown
+                    item
                     simple
                     icon='bars'
                 >

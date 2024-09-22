@@ -45,7 +45,6 @@ export default function CreateScheduleModal(props) {
                         <Input type="date"
                             id="createSchedule_startDay"
                             min="2010-01-01"
-                            max="2023-12-31"
                             defaultValue=""
                             onChange={e => handleDateChange(e)}
                         />
