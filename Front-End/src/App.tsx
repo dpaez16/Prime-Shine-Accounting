@@ -1,6 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import {Container} from 'semantic-ui-react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Container } from 'semantic-ui-react';
 import HomePage from './components/homePage/homePage';
 import EditProfilePage from './components/editProfilePage/editProfilePage';
 import SchedulesPage from './components/schedulesPage/schedulesPage';
@@ -13,8 +13,8 @@ import useLocalStorage from './hooks/useLocalStorage';
 import './App.css';
 
 export default function App() {
-    const [userInfo, setUserInfo] = useLocalStorage("userInfo", null);
-    const [businessInfo, setBusinessInfo] = useLocalStorage("businessInfo", null);
+    const [userInfo, setUserInfo] = useLocalStorage('userInfo', null);
+    const [businessInfo, setBusinessInfo] = useLocalStorage('businessInfo', null);
 
     return (
         <Router>
@@ -38,7 +38,7 @@ export default function App() {
                                 element={
                                     <EditProfilePage
                                         userInfo={userInfo}
-                                        updateUserInfo={newUserInfo => setUserInfo({...userInfo, ...newUserInfo})}
+                                        updateUserInfo={newUserInfo => setUserInfo({ ...userInfo, ...newUserInfo })}
                                         logoutHandler={() => {
                                             setUserInfo(null);
                                             setBusinessInfo(null);

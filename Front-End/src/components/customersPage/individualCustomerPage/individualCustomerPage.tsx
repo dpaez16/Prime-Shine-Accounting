@@ -1,20 +1,20 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {Container, Header, Divider, Message} from 'semantic-ui-react';
+import { Container, Header, Divider, Message } from 'semantic-ui-react';
 import EditCustomerModal from './editCustomerModal/editCustomerModal';
 import WaveAPIClient from '../../../api/waveApiClient';
-import {US_COUNTRY_CODE} from '../../../utils/consts';
+import { US_COUNTRY_CODE } from '../../../utils/consts';
 import useLocalization from '../../../hooks/useLocalization';
 
 import './individualCustomerPage.css';
 
 export default function IndividualCustomerPage() {
     const [error, setError] = useState(null);
-    const [t] = useLocalization();
+    const { t } = useLocalization();
     const location = useLocation();
     const navigate = useNavigate();
 
-    const constructNameElement = (name) => {
+    const constructNameElement = (name: string) => {
         if (name) {
             return (
                 <React.Fragment>
@@ -27,7 +27,7 @@ export default function IndividualCustomerPage() {
         return null;
     };
 
-    const constructPhoneElement = (phone) => {
+    const constructPhoneElement = (phone: string) => {
         if (phone) {
             return (
                 <React.Fragment>
@@ -40,7 +40,7 @@ export default function IndividualCustomerPage() {
         return null;
     };
 
-    const constructMobileElement = (mobile) => {
+    const constructMobileElement = (mobile: string) => {
         if (mobile) {
             return (
                 <React.Fragment>
@@ -53,7 +53,7 @@ export default function IndividualCustomerPage() {
         return null;
     };
 
-    const constructEmailElement = (email) => {
+    const constructEmailElement = (email: string) => {
         if (email) {
             return (
                 <React.Fragment>
@@ -69,7 +69,7 @@ export default function IndividualCustomerPage() {
     const constructAddressElement = (address) => {
         if (address) {
             const {
-                addressLine1, 
+                addressLine1,
                 addressLine2,
                 city,
                 postalCode,
@@ -141,7 +141,7 @@ export default function IndividualCustomerPage() {
         };
 
         return WaveAPIClient.editCustomer(customerPatchInput);
-    }
+    };
 
     const customer = location.state.customer;
     const customerPropElements = constructCustomerPropElements(customer);
@@ -151,7 +151,7 @@ export default function IndividualCustomerPage() {
             <Container fluid className='IndividualCustomerPage_header'>
                 <Header as='h1'>{customer.name}</Header>
                 {error &&
-                    <Message 
+                    <Message
                         negative
                         content={error}
                     />
@@ -161,7 +161,7 @@ export default function IndividualCustomerPage() {
                     onSubmit={(formParams) => {
                         editCustomerHandler(formParams)
                         .then(newCustomer => {
-                            navigate("/viewCustomer", {
+                            navigate('/viewCustomer', {
                                 replace: true,
                                 state: {
                                     customer: newCustomer
@@ -175,11 +175,11 @@ export default function IndividualCustomerPage() {
                 />
             </Container>
             <Divider hidden />
-            <Container fluid className="InvididualCustomerPage_props">
+            <Container fluid className='InvididualCustomerPage_props'>
                 {
                     customerPropElements.map((customerElement, idx) => {
                         return (
-                            <React.Fragment>
+                            <React.Fragment key={idx}>
                                 <Container fluid>
                                     {customerElement}
                                 </Container>

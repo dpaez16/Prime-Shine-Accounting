@@ -1,17 +1,19 @@
-import React, {Component} from 'react';
-import {Dimmer, Loader, Segment} from 'semantic-ui-react';
+import React from 'react';
+import { Dimmer, Loader, Segment } from 'semantic-ui-react';
 import './loadingSegment.css';
 
-export default class LoadingSegment extends Component {
-    render() {
-        return (
-            <Segment className={this.props.className}>
-                <Dimmer active 
-                        inverted
-                >
-                    <Loader inverted content='Loading' />
-                </Dimmer>
-            </Segment>
-        );
-    }
+type LoadingSegmentProps = {
+  className: string;
+};
+
+export default function LoadingSegment(props: LoadingSegmentProps) {
+  return (
+      <Segment className={props.className}>
+          <Dimmer active
+                  inverted
+          >
+              <Loader inverted content='Loading' />
+          </Dimmer>
+      </Segment>
+  );
 };

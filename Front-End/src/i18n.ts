@@ -24,8 +24,8 @@ i18n
                 translations: translationSpanish
             }
         },
-        ns: ["translations"],
-        defaultNS: "translations"
+        ns: ['translations'],
+        defaultNS: 'translations'
     });
 
 export default i18n;

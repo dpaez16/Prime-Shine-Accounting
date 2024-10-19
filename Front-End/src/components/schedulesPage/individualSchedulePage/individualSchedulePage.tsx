@@ -1,10 +1,10 @@
-import React, {useState, useEffect} from 'react';
-import {useLocation} from 'react-router-dom';
-import {Button, Header, Container, Message} from 'semantic-ui-react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Button, Header, Container, Message } from 'semantic-ui-react';
 import { BlobProvider } from '@react-pdf/renderer';
 import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
-import SchedulePDFDocument from './schedulePdfDocument/schedulePdfDocument';
+import SchedulePDFDocument from './scheduledCustomerTable/schedulePdfDocument/schedulePdfDocument';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
 import WaveAPIClient from '../../../api/waveApiClient';
 import LoadingSegment from '../../loadingSegment/loadingSegment';
@@ -12,77 +12,97 @@ import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/he
 import useLocalization from '../../../hooks/useLocalization';
 import { v4 as uuidV4 } from 'uuid';
 import './individualSchedulePage.css';
+import { UserInfo } from '@/types/userInfo';
+import { BusinessInfo } from '@/types/businessInfo';
+import { WaveCustomer } from '@/types/waveCustomer';
+import { ScheduledCustomer } from '@/types/scheduledCustomer';
+import { Schedule } from '@/types/schedule';
 
-export default function IndividualSchedulePage(props) {
-    const [allCustomers, setAllCustomers] = useState([]);
+type IndividualSchedulePage = {
+  userInfo: UserInfo;
+  businessInfo: BusinessInfo;
+}
+
+type ScheduleMetadata = {
+  scheduleDays: Array<ScheduledCustomer[]>;
+  scheduleDayIdMap: Array<string>;
+}
+
+export default function IndividualSchedulePage(props: IndividualSchedulePage) {
+    const [allCustomers, setAllCustomers] = useState<WaveCustomer[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [scheduleMetadata, setScheduleMetadata] = useState({});
-    const [t] = useLocalization();
+    const [scheduleMetadata, setScheduleMetadata] = useState({} as ScheduleMetadata);
+    const { t } = useLocalization();
     const location = useLocation();
 
-    const fetchMetadataForScheduledCustomer = (businessId, rawScheduledCustomer) => {
+    const fetchMetadataForScheduledCustomer = (businessId: string, rawScheduledCustomer: ScheduledCustomer) => {
         const customerId = rawScheduledCustomer.customerId;
 
         return WaveAPIClient.fetchCustomer(businessId, customerId)
         .then(customerMetadata => {
             return {
                 ...rawScheduledCustomer,
-                ...{metadata: customerMetadata}
-            };
+                ...{ metadata: customerMetadata }
+            } as ScheduledCustomer;
         })
         .catch(err => {
             throw err;
         });
     };
 
-    const fetchMetadataForScheduledCustomers = (businessId, rawScheduledCustomers) => {
+    const fetchMetadataForScheduledCustomers = (businessId: string, rawScheduledCustomers: ScheduledCustomer[]) => {
         return Promise.all(
             rawScheduledCustomers.map(async rawScheduledCustomer => await fetchMetadataForScheduledCustomer(businessId, rawScheduledCustomer))
         )
         .then((result) => {
             return result;
-        })
+        });
     };
 
     useEffect(() => {
-        const schedule = location.state.schedule;
+        const schedule: Schedule = location.state.schedule;
         const scheduleId = schedule._id;
         const token = props.userInfo.token;
         const businessId = props.businessInfo.businessId;
 
         PrimeShineAPIClient.fetchScheduleDays(scheduleId, token)
-        .then((scheduleDays) => {
+        .then(scheduleDays => {
             return Promise.all(
                 scheduleDays.map(async scheduleDay => {
                     const rawScheduledCustomers = await PrimeShineAPIClient.fetchScheduledCustomers(scheduleDay._id, token);
                     const scheduledCustomers = await fetchMetadataForScheduledCustomers(businessId, rawScheduledCustomers);
-                    return [scheduleDay.dayOffset, scheduledCustomers, scheduleDay._id];
+                    return {
+                      dayOffset: scheduleDay.dayOffset,
+                      scheduledCustomers: scheduledCustomers,
+                      _id: scheduleDay._id,
+                    };
                 })
             )
             .then((results) => {
-                let scheduleDayMap = {};
-                let scheduleDayIdMap = {};
+                const scheduleDayMap = [] as Array<ScheduledCustomer[]>;
+                const scheduleDayIdMap = [] as Array<string>;
 
                 for (let i = 0; i < 7; i++) {
-                    scheduleDayMap[`${i}`] = [];
-                    scheduleDayIdMap[`${i}`] = null;
+                    scheduleDayMap[i] = [];
+                    scheduleDayIdMap[i] = '';
                 }
 
                 results.forEach((result) => {
-                    scheduleDayMap[result[0]] = result[1];
-                    scheduleDayIdMap[result[0]] = result[2];
+                    const { dayOffset, scheduledCustomers, _id } = result;
+                    scheduleDayMap[dayOffset] = scheduledCustomers;
+                    scheduleDayIdMap[dayOffset] = _id;
                 });
 
-                return [scheduleDayMap, scheduleDayIdMap];
+              return { scheduleDayMap, scheduleDayIdMap };
             })
             .catch(err => {
                 throw err;
             });
         })
         .then((results) => {
-            const completeScheduleDays = results[0];
-            const scheduleDayIdMap = results[1];
+            const completeScheduleDays = results.scheduleDayMap;
+            const scheduleDayIdMap = results.scheduleDayIdMap;
 
             setScheduleMetadata({
                 ...scheduleMetadata,
@@ -103,7 +123,13 @@ export default function IndividualSchedulePage(props) {
         });
     }, []);
 
-    const createScheduledCustomerHandler = async (dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime) => {
+    const createScheduledCustomerHandler = async (
+      dayOffset: number,
+      scheduleId: string,
+      customerId: string,
+      serviceStartTime: Date,
+      serviceEndTime: Date
+    ) => {
         let scheduleDayId = scheduleMetadata.scheduleDayIdMap[dayOffset];
 
         const businessId = props.businessInfo.businessId;
@@ -131,7 +157,7 @@ export default function IndividualSchedulePage(props) {
         setError(null);
     };
 
-    const editScheduledCustomerHandler = (idx, newScheduledCustomer) => {
+    const editScheduledCustomerHandler = (idx: number, newScheduledCustomer: ScheduledCustomer) => {
         const scheduleDays = scheduleMetadata.scheduleDays;
 
         const customerIdx = scheduleDays[idx].findIndex(scheduledCustomer => scheduledCustomer._id === newScheduledCustomer._id);
@@ -139,9 +165,13 @@ export default function IndividualSchedulePage(props) {
         const newScheduledCustomerEntry = { ...oldScheduledCustomerEntry, ...newScheduledCustomer };
 
         const newMetadata = allCustomers.find(customer => customer.id === newScheduledCustomer.customerId);
+        if (!newMetadata) {
+          return;
+        }
+
         newScheduledCustomerEntry.metadata = newMetadata;
 
-        let newScheduledCustomers = [...scheduleDays[idx]];
+        const newScheduledCustomers = [...scheduleDays[idx]];
         newScheduledCustomers.splice(customerIdx, 1, newScheduledCustomerEntry);
         const newScheduleDays = { ...scheduleDays };
         newScheduleDays[idx] = newScheduledCustomers;
@@ -152,10 +182,10 @@ export default function IndividualSchedulePage(props) {
         });
     };
 
-    const deleteScheduledCustomerHandler = (idx, scheduledCustomerId) => {
+    const deleteScheduledCustomerHandler = (idx: number, scheduledCustomerId: string) => {
         const scheduleDays = scheduleMetadata.scheduleDays;
         const customerIdx = scheduleDays[idx].findIndex(scheduledCustomer => scheduledCustomer._id === scheduledCustomerId);
-        let newScheduledCustomers = [...scheduleDays[idx]];
+        const newScheduledCustomers = [...scheduleDays[idx]];
         newScheduledCustomers.splice(customerIdx, 1);
 
         const newScheduleDays = { ...scheduleDays };
@@ -173,7 +203,7 @@ export default function IndividualSchedulePage(props) {
         );
     }
 
-    const schedule = location.state.schedule;
+    const schedule = location.state.schedule as Schedule;
     const scheduleDays = scheduleMetadata.scheduleDays;
     const datesOfService = [...Array(7).keys()].map(idx => {
         const date = new Date(schedule.startDay);
@@ -192,7 +222,7 @@ export default function IndividualSchedulePage(props) {
                         const dayOffset = datesOfService.findIndex((dos) => dos === dateOfService);
                         const scheduleId = schedule._id;
 
-                        createScheduledCustomerHandler(dayOffset, scheduleId, dateOfService, customerId, serviceStartTime, serviceEndTime)
+                        createScheduledCustomerHandler(dayOffset, scheduleId, customerId, serviceStartTime, serviceEndTime)
                         .catch(err => {
                             setError(err.message);
                         });
@@ -206,18 +236,19 @@ export default function IndividualSchedulePage(props) {
                         />
                     }
                 >
-                    {({loadingParam, url}) => {
-                        if (loadingParam) {
+                    {(blobObj) => {
+                        const { loading, url } = blobObj;
+                        if (loading || !url) {
                             return (<React.Fragment />);
-                        } else {
-                            return (
-                                <Button onClick={() => window.open(url, '_blank')}
-                                        disabled={scheduleDays === undefined}
-                                >
-                                    {t('Preview Schedule')}
-                                </Button>
-                            );
                         }
+
+                        return (
+                            <Button onClick={() => window.open(url, '_blank')}
+                                    disabled={scheduleDays === undefined}
+                            >
+                                {t('Preview Schedule')}
+                            </Button>
+                        );
                     }}
                 </BlobProvider>
             </Container>
@@ -233,7 +264,6 @@ export default function IndividualSchedulePage(props) {
                         <ScheduledCustomerTable
                             key={uuidV4()}
                             date={date}
-                            idx={idx}
                             scheduledCustomers={scheduleDays[idx]}
                             allCustomers={allCustomers}
                             userInfo={props.userInfo}

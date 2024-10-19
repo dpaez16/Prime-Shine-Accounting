@@ -1,17 +1,24 @@
 import React from 'react';
-import {Container, Header} from 'semantic-ui-react';
+import { Container, Header } from 'semantic-ui-react';
 import useLocalization from '../../hooks/useLocalization';
 import './homePage.css';
+import { UserInfo } from '@/types/userInfo';
+import { BusinessInfo } from '@/types/businessInfo';
 
-export default function HomePage(props) {
-    const [t] = useLocalization();
+type HomePageProps = {
+  userInfo: UserInfo;
+  businessInfo: BusinessInfo;
+};
+
+export default function HomePage(props: HomePageProps) {
+    const { t } = useLocalization();
 
     const getWelcomeElement = () => {
         if (!props.userInfo) {
             return (<React.Fragment />);
         }
 
-        const {name} = props.userInfo;
+        const { name } = props.userInfo;
 
         return (
             <p>{t('Welcome')}, {name}</p>
@@ -21,10 +28,10 @@ export default function HomePage(props) {
     const welcomeElement = getWelcomeElement();
 
     return (
-        <Container 
-            className="HomePage" 
+        <Container
+            className="HomePage"
             textAlign='center'
-            fluid 
+            fluid
         >
             <Header as='h1'>Prime Shine Accounting</Header>
             {welcomeElement}
