@@ -9,80 +9,49 @@ import CustomersPage from './components/customersPage/customersPage';
 import IndividualCustomerPage from './components/customersPage/individualCustomerPage/individualCustomerPage';
 import InvoicesPage from './components/invoicesPage/invoicesPage';
 import SideNavbar from './components/sideNavbar/sideNavbar';
-import useLocalStorage from './hooks/useLocalStorage';
 import './App.css';
+import { LoginSession, LoginSessionContext } from './context/LoginSessionContext';
+import { UserInfo } from './types/userInfo';
+import { BusinessInfo } from './types/businessInfo';
+import useLocalStorage from './hooks/useLocalStorage';
 
 export default function App() {
-    const [userInfo, setUserInfo] = useLocalStorage('userInfo', null);
-    const [businessInfo, setBusinessInfo] = useLocalStorage('businessInfo', null);
+    const { localStorageValue: userInfo, setLocalStorageValue: setUserInfo } = useLocalStorage<UserInfo>('userInfo');
+    const { localStorageValue: businessInfo, setLocalStorageValue: setBusinessInfo } = useLocalStorage<BusinessInfo>('businessInfo');
+
+    const loginSession: LoginSession = {
+        userInfo,
+        businessInfo,
+        updateUserInfo: setUserInfo,
+        updateBusinessInfo: setBusinessInfo,
+        clearSession: () => {
+            setUserInfo(null);
+            setBusinessInfo(null);
+        }
+    };
 
     return (
         <Router>
+            <LoginSessionContext.Provider value={loginSession}>
             <React.Fragment>
-                <SideNavbar
-                    isLoggedIn={userInfo !== null}
-                    updateUserInfo={newUserInfo => setUserInfo(newUserInfo)}
-                    updateBusinessInfo={newBusinessInfo => setBusinessInfo(newBusinessInfo)}
-                />
+                <SideNavbar />
                 <Container fluid className="main-content">
                     <Routes>
-                        <Route  path="/"
-                                element={
-                                    <HomePage
-                                        userInfo={userInfo}
-                                        businessInfo={businessInfo}
-                                    />
-                                }
-                        />
-                        <Route  path="/editProfile"
-                                element={
-                                    <EditProfilePage
-                                        userInfo={userInfo}
-                                        updateUserInfo={newUserInfo => setUserInfo({ ...userInfo, ...newUserInfo })}
-                                        logoutHandler={() => {
-                                            setUserInfo(null);
-                                            setBusinessInfo(null);
-                                        }}
-                                    />
-                                }
-                        />
-                        <Route  path="/schedules"
-                                element={
-                                    <SchedulesPage
-                                        userInfo={userInfo}
-                                    />
-                                }
-                        />
-                        <Route  path="/viewSchedule"
-                                element={
-                                    <IndividualSchedulePage
-                                        userInfo={userInfo}
-                                        businessInfo={businessInfo}
-                                    />
-                                }
-                        />
-                        <Route  path="/customers"
-                                element={
-                                    <CustomersPage
-                                        businessInfo={businessInfo}
-                                    />
-                                }
-                        />
-                        <Route  path="/viewCustomer"
-                                element={
-                                    <IndividualCustomerPage/>
-                                }
-                        />
-                        <Route  path="/invoices"
-                                element={
-                                    <InvoicesPage
-                                        businessInfo={businessInfo}
-                                    />
-                                }
-                        />
+                        <Route path="/" element={<HomePage />} />
+                        {userInfo &&
+                            <>
+                                <Route path="/editProfile" element={<EditProfilePage />} />
+                                <Route path="/schedules" element={<SchedulesPage />} />
+                                <Route path="/viewSchedule" element={<IndividualSchedulePage />} />
+                                <Route path="/customers" element={<CustomersPage />} />
+                                <Route path="/viewCustomer" element={<IndividualCustomerPage/>} />
+                                <Route path="/invoices" element={<InvoicesPage />} />
+                            </>
+                        }
                     </Routes>
                 </Container>
             </React.Fragment>
+            </LoginSessionContext.Provider>
         </Router>
     );
 };

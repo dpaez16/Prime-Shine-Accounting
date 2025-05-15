@@ -1,24 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Container, Header } from 'semantic-ui-react';
 import useLocalization from '../../hooks/useLocalization';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
 import './homePage.css';
-import { UserInfo } from '@/types/userInfo';
-import { BusinessInfo } from '@/types/businessInfo';
 
-type HomePageProps = {
-  userInfo: UserInfo;
-  businessInfo: BusinessInfo;
-};
-
-export default function HomePage(props: HomePageProps) {
+export default function HomePage() {
+    const { userInfo } = useContext(LoginSessionContext);
     const { t } = useLocalization();
 
     const getWelcomeElement = () => {
-        if (!props.userInfo) {
-            return (<React.Fragment />);
+        if (!userInfo) {
+            return null;
         }
 
-        const { name } = props.userInfo;
+        const { name } = userInfo;
 
         return (
             <p>{t('Welcome')}, {name}</p>

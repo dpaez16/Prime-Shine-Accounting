@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, Dropdown } from 'semantic-ui-react';
 import DeleteInvoiceModal from './deleteInvoiceModal/deleteInvoiceModal';
 import EditInvoiceModal from './editInvoiceModal/editInvoiceModal';
@@ -6,20 +6,15 @@ import LoadingSegment from '../../loadingSegment/loadingSegment';
 import useLocalization from '../../../hooks/useLocalization';
 import { v4 as uuidV4 } from 'uuid';
 import { WaveInvoice } from '@/types/waveInvoice';
-import { BusinessInfo } from '@/types/businessInfo';
-import { WaveCustomer } from '@/types/waveCustomer';
-import { InvoiceParams } from '../createInvoiceModal/createInvoiceModal';
+import { constructDate, dateToStr } from '@/utils/helpers';
 
 type InvoiceTableProps = {
   loading: boolean;
   invoices: WaveInvoice[];
-  customers: WaveCustomer[];
-  businessInfo: BusinessInfo;
-  editInvoice: (data: InvoiceParams) => void;
-  deleteInvoice: (id: string) => void;
 };
 
 export default function InvoicesTable(props: InvoiceTableProps) {
+  const [editingInvoice, setEditingInvoice] = useState<WaveInvoice | null>(null);
   const { t } = useLocalization();
 
   if (props.loading) {
@@ -27,6 +22,11 @@ export default function InvoicesTable(props: InvoiceTableProps) {
   }
 
   return (
+    <>
+      {editingInvoice && <EditInvoiceModal
+        invoice={editingInvoice}
+        onClose={() => setEditingInvoice(null)}
+      />}
     <Table className="InvoicesPage_table">
       <Table.Header>
         <Table.Row>
@@ -41,10 +41,11 @@ export default function InvoicesTable(props: InvoiceTableProps) {
       </Table.Header>
       <Table.Body>
         {props.invoices.map(invoice => {
+          const invoiceDate = constructDate(invoice.invoiceDate);
           return (
             <Table.Row key={uuidV4()}>
               <Table.Cell>{invoice.status}</Table.Cell>
-              <Table.Cell>{invoice.invoiceDate}</Table.Cell>
+              <Table.Cell>{dateToStr(invoiceDate)}</Table.Cell>
               <Table.Cell>{invoice.invoiceNumber}</Table.Cell>
               <Table.Cell>{invoice.customer.name}</Table.Cell>
               <Table.Cell>${invoice.total.value}</Table.Cell>
@@ -52,21 +53,10 @@ export default function InvoicesTable(props: InvoiceTableProps) {
               <Table.Cell>
                 <Dropdown>
                   <Dropdown.Menu>
-                    <EditInvoiceModal
-                      trigger={<Dropdown.Item text={t('Edit')} />}
-                      invoice={invoice}
-                      customers={props.customers}
-                      businessInfo={props.businessInfo}
-                      onSubmit={(invoicePatchData: InvoiceParams) => {
-                        props.editInvoice(invoicePatchData);
-                      }}
-                    />
+                    <Dropdown.Item text={t('Edit')} onClick={() => setEditingInvoice(invoice)} />
                     <DeleteInvoiceModal
                       trigger={<Dropdown.Item text={t('Delete')} />}
                       invoice={invoice}
-                      onSubmit={() => {
-                        props.deleteInvoice(invoice.id);
-                      }}
                     />
                     <Dropdown.Item
                       text={t('Download PDF')}
@@ -90,5 +80,6 @@ export default function InvoicesTable(props: InvoiceTableProps) {
         })}
       </Table.Body>
     </Table>
+    </>
   );
 }

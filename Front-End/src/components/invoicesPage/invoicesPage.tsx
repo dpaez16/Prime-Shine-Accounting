@@ -1,337 +1,117 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import {
-  Container,
-  Header,
-  Input,
-  Dropdown,
-  Divider,
-  Pagination,
-  Button,
-  Message,
+    Container,
+    Header,
+    Divider,
+    Pagination,
+    Button,
+    Message,
+    PaginationProps,
 } from 'semantic-ui-react';
-import WaveAPIClient from '../../api/waveApiClient';
+import WaveAPIClient, { WaveInvoiceFilterKey, WaveInvoiceFilterObj } from '../../api/waveApiClient';
 import InvoicesTable from './invoicesTable/invoicesTable';
 import { CreateInvoiceModal } from './createInvoiceModal/createInvoiceModal';
-import { fetchAllCustomers } from '../../utils/helpers';
 import useLocalization from '../../hooks/useLocalization';
-import { v4 as uuidV4 } from 'uuid';
-import './invoicesPage.css';
-import { BusinessInfo } from '@/types/businessInfo';
 import { WaveInvoice } from '@/types/waveInvoice';
-import { WaveCustomer } from '@/types/waveCustomer';
 import { WavePageInfo } from '@/types/wavePageInfo';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
+import { InvoicesSearchToolbar } from './invoicesSearchToolbar/invoicesSearchToolbar';
+import { useInvoicesSearch } from './invoicesSearchToolbar/useInvoicesSearch';
+import './invoicesPage.css';
+import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { EventListenerNames } from '@/utils/consts';
 
-type InvoicesPageProps = {
-  businessInfo: BusinessInfo;
-};
+interface InvoicesData {
+    invoices: WaveInvoice[];
+    pageInfo: WavePageInfo;
+}
 
-type FilterParameters = { [key: string]: string | null};
+export default function InvoicesPage() {
+    const context = useContext(LoginSessionContext);
+    const businessInfo = context.businessInfo!;
 
-export default function InvoicesPage(props: InvoicesPageProps) {
-  const [state, setState] = useState({
-    loading: true,
-    pageNum: 1,
-    filterParameters: {} as FilterParameters,
-    customers: [] as WaveCustomer[],
-    invoices: [] as WaveInvoice[],
-    pageInfo: null as WavePageInfo | null,
-    error: '',
-  });
+    const { t } = useLocalization();
+    const [createInvoiceModalOpen, setCreateInvoiceModalOpen] = useState(false);
+    const { filterParameters, handleFilterChange, pageNum, setPageNum } = useInvoicesSearch();
 
-  const { t } = useLocalization();
+    const { data, loading, error, refetch } = useDataFetcher<InvoicesData>({ fetcher: () => searchHandler() });
 
-  const fetchAllWaveDataHelper = async () => {
-    const businessId = props.businessInfo.businessId;
-    const pageNum = state.pageNum;
-    const filterParameters = Object.keys(state.filterParameters).reduce(
-      (filtered, key) => {
-        if (state.filterParameters[key] !== '') {
-          filtered[key] = state.filterParameters[key];
-        }
+    const invoices = data?.invoices ?? [];
 
-        return filtered;
-      },
-      {} as FilterParameters,
-    );
+    const searchHandler = () => {
+        const businessId = businessInfo.businessId;
 
-    const customers = await fetchAllCustomers(businessId);
-    const { pageInfo, invoices } = await WaveAPIClient.fetchInvoices(
-      businessId,
-      pageNum,
-      filterParameters,
-    );
+        const filterParametersObj = Object.keys(filterParameters).reduce((filtered, key) => {
+            const k = key as WaveInvoiceFilterKey;
 
-    return {
-      customers,
-      invoices,
-      pageInfo,
+            if (filterParameters[k] !== '') {
+                filtered[k] = filterParameters[k];
+            }
+
+            return filtered;
+        }, {} as WaveInvoiceFilterObj);
+
+        return WaveAPIClient.fetchInvoices(businessId, pageNum, filterParametersObj);
     };
-  };
 
-  const attachInvoiceUUIDS = (invoices: WaveInvoice[]) => {
-    return invoices.map((invoice) => {
-      const newItems = invoice.items.map((item) => {
-        return {
-          ...item,
-          uuid: uuidV4(),
+    const handlePageChange = (
+        _: React.MouseEvent<HTMLAnchorElement>,
+        data: PaginationProps,
+    ) => {
+        const activePage = data.activePage as number;
+        setPageNum(activePage);
+    };
+
+    useEffect(() => {
+        const refetchData = () => {
+            refetch();
         };
-      });
 
-      return {
-        ...invoice,
-        items: newItems,
-      };
-    });
-  };
+        window.addEventListener(EventListenerNames.mutateInvoice, refetchData);
 
-  const fetchAllWaveData = () => {
-    fetchAllWaveDataHelper()
-      .then(({ customers, invoices, pageInfo }) => {
-        setState({
-          ...state,
-          loading: false,
-          customers: customers,
-          invoices: attachInvoiceUUIDS(invoices),
-          pageInfo: pageInfo,
-          error: '',
-        });
-      })
-      .catch((err) => {
-        setState({
-          ...state,
-          loading: false,
-          error: err.message,
-        });
-      });
-  };
+        return () => {
+            window.removeEventListener(EventListenerNames.mutateInvoice, refetchData);
+        };
+    }, []);
 
-  const handleFilterChange = (event, { name, value }) => {
-    const filterValue = value && value.length > 0 ? value : null;
-    const newFilterParameters = {
-      ...state.filterParameters,
-      [name]: filterValue,
-    };
+    useEffect(() => {
+        refetch();
+    }, [pageNum]);
 
-    setState({
-      ...state,
-      filterParameters: newFilterParameters,
-    });
-  };
-
-  const searchHandler = (pageNum = 1) => {
-    const businessId = props.businessInfo.businessId;
-
-    WaveAPIClient.fetchInvoices(businessId, pageNum, state.filterParameters)
-      .then(({ invoices, pageInfo }) => {
-        setState({
-          ...state,
-          invoices: invoices,
-          pageInfo: pageInfo,
-          loading: false,
-          error: '',
-        });
-      })
-      .catch((err) => {
-        setState({
-          ...state,
-          loading: false,
-          error: err.message,
-        });
-      });
-  };
-
-  const handlePageChange = (event, { activePage }) => {
-    setState({
-      ...state,
-      pageNum: activePage,
-      loading: true,
-      error: '',
-    });
-
-    searchHandler(activePage);
-  };
-
-  const createInvoiceHandler = (invoiceCreateData) => {
-    const businessId = props.businessInfo.businessId;
-    WaveAPIClient.createInvoice({
-      ...invoiceCreateData,
-      businessId: businessId,
-    })
-      .then(() => {
-        setState({
-          ...state,
-          loading: true,
-        });
-        searchHandler(state.pageNum);
-      })
-      .catch((err) => {
-        setState({
-          ...state,
-          error: err.message,
-        });
-      });
-  };
-
-  const editInvoiceHandler = (invoicePatchData) => {
-    WaveAPIClient.editInvoice(invoicePatchData)
-      .then((newInvoice) => {
-        const newInvoices = [...state.invoices];
-        const idx = newInvoices.findIndex(
-          (invoice) => invoice.id === newInvoice.id,
-        );
-        newInvoices.splice(idx, 1, newInvoice);
-
-        setState({
-          ...state,
-          invoices: newInvoices,
-          error: '',
-        });
-      })
-      .catch((err) => {
-        setState({
-          ...state,
-          error: err.message,
-        });
-      });
-  };
-
-  const deleteInvoiceHandler = (invoiceId) => {
-    WaveAPIClient.deleteInvoice(invoiceId)
-      .then((didSucceed) => {
-        console.log(didSucceed);
-
-        const newInvoices = [...state.invoices];
-        const idx = newInvoices.findIndex(
-          (invoice) => invoice.id === invoiceId,
-        );
-        newInvoices.splice(idx, 1);
-
-        setState({
-          ...state,
-          invoices: newInvoices,
-          error: '',
-        });
-      })
-      .catch((err) => {
-        setState({
-          ...state,
-          error: err.message,
-        });
-      });
-  };
-
-  useEffect(() => {
-    fetchAllWaveData();
-  }, []);
-
-  const customerOptions = state.customers.map((customer) => {
-    return {
-      key: customer.id,
-      value: customer.id,
-      text: customer.name,
-    };
-  });
-
-  const invoiceStatusOptions = WaveAPIClient.WAVE_INVOICE_STATUSES.map(
-    (waveStatus) => {
-      return {
-        key: waveStatus,
-        value: waveStatus.toUpperCase(),
-        text: waveStatus,
-      };
-    },
-  );
-
-  return (
-    <Container fluid className="InvoicesPage">
-      <Header as="h1">{t('Invoices')}</Header>
-      <CreateInvoiceModal
-        customerOptions={customerOptions}
-        businessInfo={props.businessInfo}
-        trigger={<Button>{t('Create Invoice')}</Button>}
-        onSubmit={(formParams) => {
-          createInvoiceHandler(formParams);
-        }}
-      />
-      <Container className="InvoicesPage_filters" fluid textAlign="center">
-        <Dropdown
-          placeholder={t('All customers')!}
-          selection
-          search
-          clearable
-          options={customerOptions}
-          name="customerId"
-          onChange={handleFilterChange}
-        />
-        <Dropdown
-          placeholder={t('All statuses')!}
-          selection
-          clearable
-          options={invoiceStatusOptions}
-          name="status"
-          onChange={handleFilterChange}
-        />
-        <Input
-          type="date"
-          placeholder="From"
-          name="invoiceDateStart"
-          onChange={handleFilterChange}
-        />
-        <Input
-          type="date"
-          placeholder="To"
-          name="invoiceDateEnd"
-          onChange={handleFilterChange}
-        />
-        <Input
-          type="text"
-          placeholder={t('Invoice #')}
-          name="invoiceNumber"
-          onChange={handleFilterChange}
-        />
-        <Button
-          color="green"
-          onClick={(e) => {
-            e.preventDefault();
-
-            setState({
-              ...state,
-              loading: true,
-            });
-            searchHandler();
-          }}
-        >
-          {t('Search')}
-        </Button>
-      </Container>
-      <Divider hidden />
-      {state.error && <Message negative content={state.error} />}
-      {!state.error && (
-        <InvoicesTable
-          loading={state.loading}
-          invoices={state.invoices}
-          customers={state.customers}
-          businessInfo={props.businessInfo}
-          deleteInvoice={(invoiceId) => {
-            deleteInvoiceHandler(invoiceId);
-          }}
-          editInvoice={(invoicePatchData) => {
-            editInvoiceHandler(invoicePatchData);
-          }}
-        />
-      )}
-      {state.pageInfo && (
-        <Pagination
-          boundaryRange={0}
-          activePage={state.pageNum}
-          ellipsisItem={null}
-          firstItem={null}
-          lastItem={null}
-          siblingRange={1}
-          totalPages={state.pageInfo.totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
-    </Container>
-  );
+    return (
+        <Container fluid className="InvoicesPage">
+            <Header as="h1">{t('Invoices')}</Header>
+            {createInvoiceModalOpen && <CreateInvoiceModal
+                onClose={() => setCreateInvoiceModalOpen(false)}
+            />}
+            <Button onClick={() => setCreateInvoiceModalOpen(true)}>{t('Create Invoice')}</Button>
+            <InvoicesSearchToolbar
+                onSubmit={refetch}
+                handleFilterChange={handleFilterChange}
+                loading={loading}
+            />
+            <Divider hidden />
+            {error && <Message negative content={error.message} />}
+            {
+                !error &&
+                <InvoicesTable
+                    loading={loading}
+                    invoices={invoices}
+                />
+            }
+            {
+                data?.pageInfo &&
+                <Pagination
+                    boundaryRange={0}
+                    activePage={pageNum}
+                    //ellipsisItem={null}
+                    //firstItem={null}
+                    //lastItem={null}
+                    siblingRange={1}
+                    totalPages={data.pageInfo.totalPages}
+                    onPageChange={handlePageChange}
+                />
+            }
+        </Container>
+    );
 }

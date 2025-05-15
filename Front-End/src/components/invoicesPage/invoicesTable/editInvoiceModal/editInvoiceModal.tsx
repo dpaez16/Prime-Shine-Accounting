@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Modal,
   Button,
@@ -16,11 +16,14 @@ import useLocalization from '../../../../hooks/useLocalization';
 import { v4 as uuidV4 } from 'uuid';
 import { WaveInvoice, WaveInvoiceItem } from '@/types/waveInvoice';
 import { WaveCustomer } from '@/types/waveCustomer';
-import { BusinessInfo } from '@/types/businessInfo';
 import { InvoiceItem, InvoiceParams } from '../../createInvoiceModal/createInvoiceModal';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
+import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { fetchAllCustomers } from '@/utils/helpers';
+import WaveAPIClient from '@/api/waveApiClient';
+import { EventListenerNames } from '@/utils/consts';
 
 type EditInvoiceModalTableProps = {
-  businessInfo: BusinessInfo;
   invoiceServices: WaveInvoiceItem[];
   updateInvoiceService: (idx: number, invoiceItem: WaveInvoiceItem) => void;
   deleteInvoiceService: (idx: number) => void;
@@ -28,8 +31,11 @@ type EditInvoiceModalTableProps = {
 };
 
 function EditInvoiceModalTable(props: EditInvoiceModalTableProps) {
+  const context = useContext(LoginSessionContext);
+  const businessInfo = context.businessInfo!;
+
   const createNewInvoiceService = () => {
-    const { productId, productName } = props.businessInfo;
+    const { productId, productName } = businessInfo;
 
     return {
       product: {
@@ -119,31 +125,34 @@ function EditInvoiceModalTable(props: EditInvoiceModalTableProps) {
 }
 
 type EditInvoiceModalProps = {
-  trigger: React.ReactElement;
   invoice: WaveInvoice;
-  customers: WaveCustomer[];
-  businessInfo: BusinessInfo;
-  onSubmit: (invoiceParams: InvoiceParams) => void;
+  onClose: () => void;
 };
 
 export default function EditInvoiceModal(props: EditInvoiceModalProps) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [invoiceServices, setInvoiceServices] = useState([] as WaveInvoiceItem[]);
-  const [invoiceParams, setInvoiceParams] = useState({} as InvoiceParams);
+  const loginSession = useContext(LoginSessionContext);
+  const businessInfo = loginSession.businessInfo!;
+
+  const [invoiceServices, setInvoiceServices] = useState(props.invoice.items);
+  const [invoiceParams, setInvoiceParams] = useState<InvoiceParams>({
+      invoiceNumber: props.invoice.invoiceNumber,
+      customerId: props.invoice.customer.id,
+      invoiceDate: props.invoice.invoiceDate,
+      items: [],
+      memo: props.invoice.memo,
+  });
+
   const { t } = useLocalization();
 
-  const getFormParams = () => {
-    const formParams = {
-      ...props.invoice,
-      ...invoiceParams,
-      invoiceServices: invoiceServices,
-    };
+  const { data, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => fetchAllCustomers(businessInfo.businessId) });
+  const customers = data ?? [];
 
+  const getFormParams = () => {
     return {
-      id: formParams.id,
-      customerId: formParams.customer.id,
-      invoiceDate: formParams.invoiceDate,
-      items: formParams.invoiceServices.map((invoiceService) => {
+      id: props.invoice.id,
+      customerId: invoiceParams.customerId,
+      invoiceDate: invoiceParams.invoiceDate,
+      items: invoiceServices.map((invoiceService) => {
         return {
           productId: invoiceService.product.id,
           description: invoiceService.description,
@@ -151,7 +160,7 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
           unitPrice: invoiceService.total.value,
         } as InvoiceItem;
       }),
-      memo: formParams.memo,
+      memo: invoiceParams.memo,
     } as InvoiceParams;
   };
 
@@ -199,8 +208,13 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
     setInvoiceServices(newInvoiceServices);
   };
 
+  const onSubmit = () => {
+    const formParams = getFormParams();
+    return WaveAPIClient.editInvoice(formParams);
+  };
+
   const { invoice } = props;
-  const customerOptions = props.customers.map((customer) => {
+  const customerOptions = customers.map((customer) => {
     return {
       key: customer.id,
       value: customer.id,
@@ -210,16 +224,8 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
 
   return (
     <Modal
-      onClose={() => {
-        setModalOpen(false);
-        setInvoiceServices([...props.invoice.items]);
-      }}
-      onOpen={() => {
-        setModalOpen(true);
-        setInvoiceServices([...props.invoice.items]);
-      }}
-      open={modalOpen}
-      trigger={props.trigger}
+      onClose={() => props.onClose()}
+      open={true}
     >
       <Modal.Header>{t('Edit Invoice')}</Modal.Header>
       <Modal.Content>
@@ -240,6 +246,7 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
               fluid
               search
               selection
+              loading={loading}
               options={customerOptions}
               name="customerId"
               defaultValue={invoice.customer.id}
@@ -258,7 +265,6 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
           <Divider hidden />
           <EditInvoiceModalTable
             invoiceServices={invoiceServices}
-            businessInfo={props.businessInfo}
             updateInvoiceService={(idx, newInvoiceService) =>
               handleInvoiceServiceChange(idx, newInvoiceService)
             }
@@ -279,16 +285,19 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
         </Form>
       </Modal.Content>
       <Modal.Actions>
-        <Button color="black" onClick={() => setModalOpen(false)}>
+        <Button color="black" onClick={() => props.onClose()}>
           {t('Cancel')}
         </Button>
         <Button
           onClick={() => {
-            const formParams = getFormParams();
-            props.onSubmit(formParams);
-            setModalOpen(false);
+            onSubmit()
+              .then(() => {
+                window.dispatchEvent(new Event(EventListenerNames.mutateInvoice));
+                props.onClose();
+              })
+              .catch(err => alert('Error editing invoice: ' + err.message)); // TODO: use translation hook
           }}
-          disabled={!isFormValid()}
+          disabled={!isFormValid() || loading}
           positive
         >
           {t('Ok')}

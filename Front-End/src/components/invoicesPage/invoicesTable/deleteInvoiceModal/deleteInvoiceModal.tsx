@@ -2,11 +2,13 @@ import React, { useState } from 'react';
 import { Modal, Button } from 'semantic-ui-react';
 import useLocalization from '../../../../hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';
+import { constructDate, dateToStr } from '@/utils/helpers';
+import WaveAPIClient from '@/api/waveApiClient';
+import { EventListenerNames } from '@/utils/consts';
 
 type DeleteInvoiceModalProps = {
   trigger: React.ReactElement;
   invoice: WaveInvoice;
-  onSubmit: () => void;
 };
 
 export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
@@ -14,6 +16,11 @@ export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
   const { t } = useLocalization();
 
   const { invoice } = props;
+  const invoiceDate = constructDate(invoice.invoiceDate);
+
+  const onSubmit = () => {
+    return WaveAPIClient.deleteInvoice(invoice.id);
+  };
 
   return (
     <Modal
@@ -29,7 +36,7 @@ export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
             {t('Invoice Number')}: {invoice.invoiceNumber}
           </p>
           <p>
-            {t('Date of Service')}: {invoice.invoiceDate}
+            {t('Date of Service')}: {dateToStr(invoiceDate)}
           </p>
           <p>
             {t('Customer')}: {invoice.customer.name}
@@ -42,8 +49,12 @@ export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
         </Button>
         <Button
           onClick={() => {
-            props.onSubmit();
-            setModalOpen(false);
+            onSubmit()
+              .then(() => {
+                window.dispatchEvent(new Event(EventListenerNames.mutateInvoice));
+                setModalOpen(false);
+              })
+              .catch(err => alert('Error deleting invoice: ' + err.message)); // TODO: use translation hook
           }}
           negative
         >

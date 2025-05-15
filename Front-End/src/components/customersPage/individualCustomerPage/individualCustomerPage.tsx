@@ -7,6 +7,8 @@ import { US_COUNTRY_CODE } from '../../../utils/consts';
 import useLocalization from '../../../hooks/useLocalization';
 
 import './individualCustomerPage.css';
+import { WaveCustomer, WaveCustomerAddress } from '@/types/waveCustomer';
+import { CreateCustomerFormParams } from '../createCustomerModal/createCustomerModal';
 
 export default function IndividualCustomerPage() {
     const [error, setError] = useState(null);
@@ -14,89 +16,91 @@ export default function IndividualCustomerPage() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const constructNameElement = (name: string) => {
-        if (name) {
-            return (
-                <React.Fragment>
-                    <Header as='h3'>{t('Name')}:</Header>
-                    <p>{name}</p>
-                </React.Fragment>
-            );
+    const customer: WaveCustomer = location.state.customer;
+
+    const constructNameElement = (name: string | null) => {
+        if (!name) {
+            return null;
         }
 
-        return null;
+        return (
+            <React.Fragment>
+                <Header as='h3'>{t('Name')}:</Header>
+                <p>{name}</p>
+            </React.Fragment>
+        );
     };
 
-    const constructPhoneElement = (phone: string) => {
-        if (phone) {
-            return (
-                <React.Fragment>
-                    <Header as='h3'>{t('Phone Number')}:</Header>
-                    <p>{phone}</p>
-                </React.Fragment>
-            );
+    const constructPhoneElement = (phone: string | null) => {
+        if (!phone) {
+            return null;
         }
 
-        return null;
+        return (
+            <React.Fragment>
+                <Header as='h3'>{t('Phone Number')}:</Header>
+                <p>{phone}</p>
+            </React.Fragment>
+        );
     };
 
-    const constructMobileElement = (mobile: string) => {
-        if (mobile) {
-            return (
-                <React.Fragment>
-                    <Header as='h3'>{t('Mobile')}:</Header>
-                    <p>{mobile}</p>
-                </React.Fragment>
-            );
+    const constructMobileElement = (mobile: string | null) => {
+        if (!mobile) {
+            return null;
         }
 
-        return null;
+        return (
+            <React.Fragment>
+                <Header as='h3'>{t('Mobile')}:</Header>
+                <p>{mobile}</p>
+            </React.Fragment>
+        );
     };
 
-    const constructEmailElement = (email: string) => {
-        if (email) {
-            return (
-                <React.Fragment>
-                    <Header as='h3'>{t('Email')}:</Header>
-                    <p>{email}</p>
-                </React.Fragment>
-            );
+    const constructEmailElement = (email: string | null) => {
+        if (!email) {
+            return null;
         }
 
-        return null;
+        return (
+            <React.Fragment>
+                <Header as='h3'>{t('Email')}:</Header>
+                <p>{email}</p>
+            </React.Fragment>
+        );
     };
 
-    const constructAddressElement = (address) => {
-        if (address) {
-            const {
-                addressLine1,
-                addressLine2,
-                city,
-                postalCode,
-                province
-            } = address;
-
-            if (!province) {
-                return null;
-            }
-
-            const provinceName = province.name;
-            const addressLine3 = `${city} ${provinceName}, ${postalCode}`;
-
-            return (
-                <React.Fragment>
-                    <Header as='h3'>{t('Address')}:</Header>
-                    <p>{addressLine1}</p>
-                    {addressLine2 && <p>{addressLine2}</p>}
-                    <p>{addressLine3}</p>
-                </React.Fragment>
-            );
+    const constructAddressElement = (address: WaveCustomerAddress | null) => {
+        if (!address) {
+            return null;
         }
 
-        return null;
+        const {
+            addressLine1,
+            addressLine2,
+            city,
+            postalCode,
+            province
+        } = address;
+
+        if (!province) {
+            return null;
+        }
+
+        const provinceName = province.name;
+        const addressLine3 = `${city} ${provinceName}, ${postalCode}`;
+
+        return (
+            <React.Fragment>
+                <Header as='h3'>{t('Address')}:</Header>
+                <p>{addressLine1}</p>
+                {addressLine2 && <p>{addressLine2}</p>}
+                <p>{addressLine3}</p>
+            </React.Fragment>
+        );
     };
 
-    const constructCustomerPropElements = (customer) => {
+    const constructCustomerPropElements = (customer: WaveCustomer) => {
         const {
             name,
             phone,
@@ -116,13 +120,13 @@ export default function IndividualCustomerPage() {
         return elements.filter((element) => element !== null);
     };
 
-    const editCustomerHandler = (formParams) => {
+    const editCustomerHandler = (formParams: CreateCustomerFormParams) => {
         const {
             name, phone, mobile, email,
             addressLine1, addressLine2, city, provinceCode, postalCode
         } = formParams;
 
-        const customerId = location.state.customer.id;
+        const customerId = customer.id;
 
         const customerPatchInput = {
             id: customerId,
@@ -140,10 +144,9 @@ export default function IndividualCustomerPage() {
             }
         };
 
-        return WaveAPIClient.editCustomer(customerPatchInput);
+        return WaveAPIClient.editCustomer(customerPatchInput) as Promise<WaveCustomer>;
     };
 
-    const customer = location.state.customer;
     const customerPropElements = constructCustomerPropElements(customer);
 
     return (
@@ -160,17 +163,17 @@ export default function IndividualCustomerPage() {
                     customer={customer}
                     onSubmit={(formParams) => {
                         editCustomerHandler(formParams)
-                        .then(newCustomer => {
-                            navigate('/viewCustomer', {
-                                replace: true,
-                                state: {
-                                    customer: newCustomer
-                                }
+                            .then(newCustomer => {
+                                navigate('/viewCustomer', {
+                                    replace: true,
+                                    state: {
+                                        customer: newCustomer
+                                    }
+                                });
+                            })
+                            .catch(err => {
+                                setError(err.message);
                             });
-                        })
-                        .catch(err => {
-                            setError(err.message);
-                        });
                     }}
                 />
             </Container>

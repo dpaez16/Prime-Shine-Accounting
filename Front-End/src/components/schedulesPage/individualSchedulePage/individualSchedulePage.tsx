@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Header, Container, Message } from 'semantic-ui-react';
 import { BlobProvider } from '@react-pdf/renderer';
@@ -12,23 +12,21 @@ import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/he
 import useLocalization from '../../../hooks/useLocalization';
 import { v4 as uuidV4 } from 'uuid';
 import './individualSchedulePage.css';
-import { UserInfo } from '@/types/userInfo';
-import { BusinessInfo } from '@/types/businessInfo';
 import { WaveCustomer } from '@/types/waveCustomer';
 import { ScheduledCustomer } from '@/types/scheduledCustomer';
 import { Schedule } from '@/types/schedule';
-
-type IndividualSchedulePage = {
-  userInfo: UserInfo;
-  businessInfo: BusinessInfo;
-}
+import { LoginSessionContext } from '@/context/LoginSessionContext';
 
 type ScheduleMetadata = {
   scheduleDays: Array<ScheduledCustomer[]>;
   scheduleDayIdMap: Array<string>;
 }
 
-export default function IndividualSchedulePage(props: IndividualSchedulePage) {
+export default function IndividualSchedulePage() {
+    const context = useContext(LoginSessionContext);
+    const userInfo = context.userInfo!;
+    const businessInfo = context.businessInfo!;
+
     const [allCustomers, setAllCustomers] = useState<WaveCustomer[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -63,8 +61,8 @@ export default function IndividualSchedulePage(props: IndividualSchedulePage) {
     useEffect(() => {
         const schedule: Schedule = location.state.schedule;
         const scheduleId = schedule._id;
-        const token = props.userInfo.token;
-        const businessId = props.businessInfo.businessId;
+        const token = userInfo.token;
+        const businessId = businessInfo.businessId;
 
         PrimeShineAPIClient.fetchScheduleDays(scheduleId, token)
         .then(scheduleDays => {
@@ -132,8 +130,8 @@ export default function IndividualSchedulePage(props: IndividualSchedulePage) {
     ) => {
         let scheduleDayId = scheduleMetadata.scheduleDayIdMap[dayOffset];
 
-        const businessId = props.businessInfo.businessId;
-        const jwt = props.userInfo.token;
+        const businessId = businessInfo.businessId;
+        const jwt = userInfo.token;
 
         if (!scheduleDayId) {
             const newScheduleDay = await PrimeShineAPIClient.createScheduleDay(dayOffset, scheduleId, jwt);
@@ -266,7 +264,6 @@ export default function IndividualSchedulePage(props: IndividualSchedulePage) {
                             date={date}
                             scheduledCustomers={scheduleDays[idx]}
                             allCustomers={allCustomers}
-                            userInfo={props.userInfo}
                             updateScheduledCustomer={(newScheduledCustomer) => {
                                 editScheduledCustomerHandler(idx, newScheduledCustomer);
                             }}

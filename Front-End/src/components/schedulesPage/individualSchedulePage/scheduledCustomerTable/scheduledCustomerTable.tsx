@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Table, Header, Container, Message } from 'semantic-ui-react';
 import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
 import DeleteScheduleModal from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
@@ -6,20 +6,22 @@ import { constructTimeStr, getDayOfWeekStr } from '../../../../utils/helpers';
 import PrimeShineAPIClient from '../../../../api/primeShineApiClient';
 import useLocalization from '../../../../hooks/useLocalization';
 import { v4 as uuidv4 } from 'uuid';
-import { UserInfo } from '@/types/userInfo';
 import { ScheduledCustomer } from '@/types/scheduledCustomer';
 import { WaveCustomer } from '@/types/waveCustomer';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
 
 type ScheduledCustomerTableProps = {
   allCustomers: WaveCustomer[];
   scheduledCustomers: ScheduledCustomer[];
   date: string;
-  userInfo: UserInfo;
   updateScheduledCustomer: (scheduledCustomer: ScheduledCustomer) => void;
   deleteScheduledCustomer: (scheduledCustomerId: string) => void;
 };
 
 export default function ScheduledCustomerTable(props: ScheduledCustomerTableProps) {
+  const context = useContext(LoginSessionContext);
+  const userInfo = context.userInfo!;
+
   const [error, setError] = useState(null);
   const { t } = useLocalization();
 
@@ -87,7 +89,7 @@ export default function ScheduledCustomerTable(props: ScheduledCustomerTableProp
                     ) => {
                       const scheduledCustomerId = scheduledCustomer._id;
                       const scheduleDayId = scheduledCustomer.scheduleDay;
-                      const jwt = props.userInfo.token;
+                      const jwt = userInfo.token;
 
                       PrimeShineAPIClient.editScheduledCustomer(
                         scheduledCustomerId,
@@ -110,7 +112,7 @@ export default function ScheduledCustomerTable(props: ScheduledCustomerTableProp
                     customer={customerElement}
                     onSubmit={() => {
                       const scheduledCustomerId = scheduledCustomer._id;
-                      const jwt = props.userInfo.token;
+                      const jwt = userInfo.token;
 
                       PrimeShineAPIClient.deleteScheduledCustomer(
                         scheduledCustomerId,

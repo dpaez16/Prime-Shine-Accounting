@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Container, Header, Message } from 'semantic-ui-react';
 import CreateScheduleModal from './createScheduleModal/createScheduleModal';
@@ -10,14 +10,13 @@ import LoadingSegment from '../loadingSegment/loadingSegment';
 import { dateToStr } from '../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
 import './schedulesPage.css';
-import { UserInfo } from '@/types/userInfo';
 import { Schedule } from '@/types/schedule';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
 
-type SchedulesPageProps = {
-  userInfo: UserInfo;
-};
+export default function SchedulesPage() {
+  const context = useContext(LoginSessionContext);
+  const userInfo = context.userInfo!;
 
-export default function SchedulesPage(props: SchedulesPageProps) {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,8 +24,8 @@ export default function SchedulesPage(props: SchedulesPageProps) {
   const navigate = useNavigate();
 
   const createScheduleHandler = (startDay: Date) => {
-    const userId = props.userInfo._id;
-    const jwt = props.userInfo.token;
+    const userId = userInfo._id;
+    const jwt = userInfo.token;
 
     PrimeShineAPIClient.createSchedule(startDay, userId, jwt)
       .then((schedule) => {
@@ -39,7 +38,7 @@ export default function SchedulesPage(props: SchedulesPageProps) {
   };
 
   const editScheduleHandler = (startDay: Date, scheduleId: string) => {
-    const jwt = props.userInfo.token;
+    const jwt = userInfo.token;
 
     PrimeShineAPIClient.editSchedule(startDay, scheduleId, jwt)
       .then((patchedSchedule) => {
@@ -58,8 +57,8 @@ export default function SchedulesPage(props: SchedulesPageProps) {
   };
 
   const deleteScheduleHandler = (startDay: Date) => {
-    const userId = props.userInfo._id;
-    const jwt = props.userInfo.token;
+    const userId = userInfo._id;
+    const jwt = userInfo.token;
 
     PrimeShineAPIClient.deleteSchedule(startDay, userId, jwt)
       .then((didSucceed) => {
@@ -80,7 +79,7 @@ export default function SchedulesPage(props: SchedulesPageProps) {
   };
 
   useEffect(() => {
-    PrimeShineAPIClient.fetchSchedules(props.userInfo._id, props.userInfo.token)
+    PrimeShineAPIClient.fetchSchedules(userInfo._id, userInfo.token)
       .then((fetchedSchedules) => {
         setSchedules(fetchedSchedules);
         setLoading(false);
@@ -92,9 +91,7 @@ export default function SchedulesPage(props: SchedulesPageProps) {
       });
   }, []);
 
-  const sortedSchedules = schedules.sort((a, b) =>
-    Number(a.startDay) > Number(b.startDay) ? 1 : -1,
-  );
+  const sortedSchedules = schedules.sort((a, b) => a.startDay.getTime() - b.startDay.getTime());
 
   return (
     <Container fluid className='SchedulesPage'>

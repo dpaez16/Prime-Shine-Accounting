@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Modal,
   Button,
@@ -14,8 +14,12 @@ import {
 } from 'semantic-ui-react';
 import useLocalization from '../../../hooks/useLocalization';
 import { v4 as uuidV4 } from 'uuid';
-import { BusinessInfo } from '@/types/businessInfo';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
+import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { fetchAllCustomers } from '@/utils/helpers';
 import { WaveCustomer } from '@/types/waveCustomer';
+import WaveAPIClient from '@/api/waveApiClient';
+import { EventListenerNames } from '@/utils/consts';
 
 export type InvoiceItem = {
   description: string;
@@ -26,7 +30,6 @@ export type InvoiceItem = {
 };
 
 type CreateInvoiceModalTableProps = {
-  businessInfo: BusinessInfo;
   invoiceServices: InvoiceItem[];
   updateInvoiceService: (idx: number, invoiceService: InvoiceItem) => void;
   deleteInvoiceService: (idx: number) => void;
@@ -34,8 +37,11 @@ type CreateInvoiceModalTableProps = {
 };
 
 function CreateInvoiceModalTable(props: CreateInvoiceModalTableProps) {
+  const context = useContext(LoginSessionContext);
+  const businessInfo = context.businessInfo!;
+
   const createNewInvoiceService = () => {
-    const { productId } = props.businessInfo;
+    const { productId } = businessInfo;
 
     return {
       productId: productId,
@@ -48,7 +54,7 @@ function CreateInvoiceModalTable(props: CreateInvoiceModalTableProps) {
 
   const { t } = useLocalization();
   const { invoiceServices } = props;
-  const productName = props.businessInfo.productName;
+  const productName = businessInfo.productName;
 
   return (
     <Table celled className="CreateInvoiceModal_table">
@@ -130,17 +136,24 @@ export type InvoiceParams = {
 };
 
 type CreateInvoiceModalProps = {
-  businessInfo: BusinessInfo;
-  customerOptions: WaveCustomer[];
-  onSubmit: (params: InvoiceParams) => void;
-  trigger: React.ReactElement;
+  onClose: () => void;
 };
 
 export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
-  const [modalOpen, setModalOpen] = useState(false);
+  const loginSession = useContext(LoginSessionContext);
+  const businessInfo = loginSession.businessInfo!;
+
   const [items, setItems] = useState([] as InvoiceItem[]);
-  const [invoiceParams, setInvoiceParams] = useState({} as InvoiceParams);
+  const [invoiceParams, setInvoiceParams] = useState<InvoiceParams>({
+      invoiceNumber: '',
+      customerId: '',
+      invoiceDate: '',
+      items: [],
+      memo: '',
+  });
   const { t } = useLocalization();
+
+  const { data: customers, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => fetchAllCustomers(businessInfo.businessId) });
 
   const getFormParams = () => {
     return {
@@ -192,20 +205,28 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
     setItems(newInvoiceServices);
   };
 
-  const { customerOptions } = props;
+  const onSubmit = () => {
+    const businessId = businessInfo.businessId;
+    const formParams = getFormParams();
+
+    return WaveAPIClient.createInvoice({
+      ...formParams,
+      businessId: businessId,
+    });
+  };
+
+  const customerOptions = customers?.map(customer => {
+    return {
+      key: customer.id,
+      value: customer.id,
+      text: customer.name,
+    };
+  }) ?? [];
 
   return (
     <Modal
-      onClose={() => {
-        setModalOpen(false);
-        setItems([]);
-      }}
-      onOpen={() => {
-        setModalOpen(true);
-        setItems([]);
-      }}
-      open={modalOpen}
-      trigger={props.trigger}
+      onClose={() => props.onClose()}
+      open={true}
     >
       <Modal.Header>{t('Create Invoice')}</Modal.Header>
       <Modal.Content>
@@ -225,6 +246,7 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
               fluid
               search
               selection
+              loading={loading}
               options={customerOptions}
               name="customerId"
               onChange={(_, data) => handleFormChange(data)}
@@ -237,7 +259,6 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
           <Divider hidden />
           <CreateInvoiceModalTable
             invoiceServices={items}
-            businessInfo={props.businessInfo}
             updateInvoiceService={(idx, newInvoiceService) =>
               handleInvoiceServiceChange(idx, newInvoiceService)
             }
@@ -253,16 +274,19 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
         </Form>
       </Modal.Content>
       <Modal.Actions>
-        <Button color="black" onClick={() => setModalOpen(false)}>
+        <Button color="black" onClick={() => props.onClose()}>
           {t('Cancel')}
         </Button>
         <Button
           onClick={() => {
-            const formParams = getFormParams();
-            props.onSubmit(formParams);
-            setModalOpen(false);
+            onSubmit()
+              .then(() => {
+                window.dispatchEvent(new Event(EventListenerNames.mutateInvoice));
+                props.onClose();
+              })
+              .catch(err => alert('Error creating invoice: ' + err.message)); // TODO: use translation hook
           }}
-          disabled={!isFormValid()}
+          disabled={!isFormValid() || loading}
           positive
         >
           {t('Ok')}

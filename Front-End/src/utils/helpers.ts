@@ -26,7 +26,10 @@ export const dateToStr = function(date: Date) {
     const day = date.getDate();
     const year = date.getFullYear();
 
-    return `${month}/${day}/${year}`;
+    const monthStr = month.toString().padStart(2, '0');
+    const dayStr = day.toString().padStart(2, '0');
+
+    return `${monthStr}/${dayStr}/${year}`;
 };
 
 /**
