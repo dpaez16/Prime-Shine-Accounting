@@ -5,11 +5,10 @@ import WaveAPIClient from '../../api/waveApiClient';
 import { fetchAllCustomers } from '../../utils/helpers';
 import { US_COUNTRY_CODE } from '../../utils/consts';
 import LoadingSegment from '../loadingSegment/loadingSegment';
-import { Input, Table, Header, Container, Message } from 'semantic-ui-react';
+import { Input, Table, Message } from 'semantic-ui-react';
 import useLocalization from '../../hooks/useLocalization';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidV4 } from 'uuid';
-import './customersPage.css';
 import { WaveCustomer } from '@/types/waveCustomer';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 
@@ -77,7 +76,7 @@ export default function CustomersPage() {
     };
 
     if (loading) {
-        return <LoadingSegment className='CustomersPage_loading' />;
+        return <LoadingSegment />;
     }
 
     const searchBarRegex = new RegExp(searchBarValue.toLowerCase());
@@ -86,10 +85,10 @@ export default function CustomersPage() {
     );
 
     return (
-        <Container fluid className='CustomersPage'>
-            <Header as='h1'>{t('Customers')}:</Header>
+        <div className='flex flex-col'>
+            <h1>{t('Customers')}:</h1>
             {error && <Message negative content={error} />}
-            <Container fluid className='CustomersPage_searchArea'>
+            <div className='flex flex-row gap-4'>
                 <Input
                     icon='search'
                     placeholder=''
@@ -115,13 +114,13 @@ export default function CustomersPage() {
                             });
                     }}
                 />
-            </Container>
-            <Table celled className='CustomersPage_table'>
+            </div>
+            <Table celled>
                 <Table.Body>
                 {filteredCustomers.map((customer) => {
                     return (
                         <Table.Row key={uuidV4()}>
-                            <Table.Cell className='CustomersPage_table_row_cell'>
+                            <Table.Cell className='flex flex-row justify-between items-center'>
                                 <a
                                     href='/viewCustomer'
                                     onClick={(e) => {
@@ -163,6 +162,6 @@ export default function CustomersPage() {
                 })}
                 </Table.Body>
             </Table>
-        </Container>
+        </div>
     );
 }
