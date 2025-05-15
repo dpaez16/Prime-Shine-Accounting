@@ -1,20 +1,16 @@
 import React, { useContext, useState } from 'react';
 import {
-    Container,
-    Header,
     Form,
     Label,
     Input,
     Button,
     Message,
-    Divider,
     InputOnChangeData,
 } from 'semantic-ui-react';
 import DeleteAccountModal from './deleteAccountModal/deleteAccountModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import useLocalization from '../../hooks/useLocalization';
 import { useNavigate } from 'react-router-dom';
-import './editProfilePage.css';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 
 export default function EditProfilePage() {
@@ -85,18 +81,16 @@ export default function EditProfilePage() {
     };
 
     return (
-        <Container className='EditProfilePage'>
-            <Header as='h1'>{t('Edit Profile')}</Header>
-            {error && <Message negative content={error} />}
-            <Container className='EditProfilePage_currentProfile'>
-                <Header as='h3'>
+        <div className='flex flex-col mx-auto w-1/2'>
+            <h1>{t('Edit Profile')}</h1>
+            <div className='my-8'>
+                <h3>
                     {t('Name')}: {userInfo.name}
-                </Header>
-                <Header as='h3'>
+                </h3>
+                <h3>
                     {t('Email')}: {userInfo.email}
-                </Header>
-            </Container>
-            <Divider hidden />
+                </h3>
+            </div>
             <Form>
                 <Form.Field>
                     <Label>{t('Name')}:</Label>
@@ -125,7 +119,7 @@ export default function EditProfilePage() {
                     />
                 </Form.Field>
             </Form>
-            <Container fluid className='EditProfilePage_buttons'>
+            <div className='flex flex-row gap-2 mt-4'>
                 <Button
                     disabled={!isFormValid()}
                     onClick={() => handleUserEditProfile()}
@@ -136,7 +130,8 @@ export default function EditProfilePage() {
                     trigger={<Button negative>{t('Delete Account')}</Button>}
                     onSubmit={() => handleDeleteAccount()}
                 />
-            </Container>
-        </Container>
+            </div>
+            {error && <Message negative content={error} />}
+        </div>
     );
 }
