@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Container, Header, Divider, Message } from 'semantic-ui-react';
+import { Message } from 'semantic-ui-react';
 import EditCustomerModal from './editCustomerModal/editCustomerModal';
 import WaveAPIClient from '../../../api/waveApiClient';
 import { US_COUNTRY_CODE } from '../../../utils/consts';
 import useLocalization from '../../../hooks/useLocalization';
-
-import './individualCustomerPage.css';
 import { WaveCustomer, WaveCustomerAddress } from '@/types/waveCustomer';
 import { CreateCustomerFormParams } from '../createCustomerModal/createCustomerModal';
 
@@ -24,10 +22,10 @@ export default function IndividualCustomerPage() {
         }
 
         return (
-            <React.Fragment>
-                <Header as='h3'>{t('Name')}:</Header>
+            <div>
+                <h3>{t('Name')}:</h3>
                 <p>{name}</p>
-            </React.Fragment>
+            </div>
         );
     };
 
@@ -37,10 +35,10 @@ export default function IndividualCustomerPage() {
         }
 
         return (
-            <React.Fragment>
-                <Header as='h3'>{t('Phone Number')}:</Header>
+            <div>
+                <h3>{t('Phone Number')}:</h3>
                 <p>{phone}</p>
-            </React.Fragment>
+            </div>
         );
     };
 
@@ -50,10 +48,10 @@ export default function IndividualCustomerPage() {
         }
 
         return (
-            <React.Fragment>
-                <Header as='h3'>{t('Mobile')}:</Header>
+            <div>
+                <h3>{t('Mobile')}:</h3>
                 <p>{mobile}</p>
-            </React.Fragment>
+            </div>
         );
     };
 
@@ -63,10 +61,10 @@ export default function IndividualCustomerPage() {
         }
 
         return (
-            <React.Fragment>
-                <Header as='h3'>{t('Email')}:</Header>
+            <div>
+                <h3>{t('Email')}:</h3>
                 <p>{email}</p>
-            </React.Fragment>
+            </div>
         );
     };
 
@@ -91,12 +89,14 @@ export default function IndividualCustomerPage() {
         const addressLine3 = `${city} ${provinceName}, ${postalCode}`;
 
         return (
-            <React.Fragment>
-                <Header as='h3'>{t('Address')}:</Header>
-                <p>{addressLine1}</p>
-                {addressLine2 && <p>{addressLine2}</p>}
-                <p>{addressLine3}</p>
-            </React.Fragment>
+            <div className='flex flex-col'>
+                <h3>{t('Address')}:</h3>
+                <div className='flex flex-col gap-1'>
+                    <span>{addressLine1}</span>
+                    {addressLine2 && <span>{addressLine2}</span>}
+                    <span>{addressLine3}</span>
+                </div>
+            </div>
         );
     };
 
@@ -150,9 +150,9 @@ export default function IndividualCustomerPage() {
     const customerPropElements = constructCustomerPropElements(customer);
 
     return (
-        <Container fluid className='IndividualCustomerPage'>
-            <Container fluid className='IndividualCustomerPage_header'>
-                <Header as='h1'>{customer.name}</Header>
+        <div className='flex flex-col gap-10'>
+            <div>
+                <h1>{customer.name}</h1>
                 {error &&
                     <Message
                         negative
@@ -176,22 +176,18 @@ export default function IndividualCustomerPage() {
                             });
                     }}
                 />
-            </Container>
-            <Divider hidden />
-            <Container fluid className='InvididualCustomerPage_props'>
+            </div>
+            <div className='flex flex-col gap-6'>
                 {
                     customerPropElements.map((customerElement, idx) => {
                         return (
                             <React.Fragment key={idx}>
-                                <Container fluid>
-                                    {customerElement}
-                                </Container>
-                                <Divider hidden />
+                                {customerElement}
                             </React.Fragment>
                         );
                     })
                 }
-            </Container>
-        </Container>
+            </div>
+        </div>
     );
 };
