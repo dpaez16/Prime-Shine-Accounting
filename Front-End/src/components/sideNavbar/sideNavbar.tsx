@@ -4,7 +4,6 @@ import LoginModal from '../loginModal/loginModal';
 import RegisterModal from '../registerModal/registerModal';
 import useLocalization from '../../hooks/useLocalization';
 import { Menu, Dropdown, Icon } from 'semantic-ui-react';
-import './sideNavbar.css';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import LanguageDropdown from './languageDropdown';
 
@@ -15,7 +14,7 @@ export default function SideNavbar() {
 
     const createDropdownLink = (url: string, name: string) => {
         return (
-            <a className="SideNavbar_menu_link" href={url}>
+            <a className='text-black' href={url}>
                 {name}
             </a>
         );
@@ -64,7 +63,7 @@ export default function SideNavbar() {
                         <Menu.Item>
                             <LoginModal
                                 trigger={
-                                    <span className="SideNavbar_menu_right_options">
+                                    <span className='cursor-pointer'>
                                         {t('Login')}
                                     </span>
                                 }
@@ -73,7 +72,7 @@ export default function SideNavbar() {
                         <Menu.Item>
                             <RegisterModal
                                 trigger={
-                                    <span className="SideNavbar_menu_right_options">
+                                    <span className='cursor-pointer'>
                                         {t('Register')}
                                     </span>
                                 }
@@ -85,7 +84,7 @@ export default function SideNavbar() {
                     isLoggedIn &&
                     <Menu.Item>
                         <Icon
-                            className="SideNavbar_menu_right_options"
+                            className='cursor-pointer'
                             name="home"
                             onClick={() => navigate('/')}
                         />
