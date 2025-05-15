@@ -1,8 +1,6 @@
 import React, { useContext } from 'react';
-import { Container, Header } from 'semantic-ui-react';
 import useLocalization from '../../hooks/useLocalization';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
-import './homePage.css';
 
 export default function HomePage() {
     const { userInfo } = useContext(LoginSessionContext);
@@ -23,13 +21,9 @@ export default function HomePage() {
     const welcomeElement = getWelcomeElement();
 
     return (
-        <Container
-            className="HomePage"
-            textAlign='center'
-            fluid
-        >
-            <Header as='h1'>Prime Shine Accounting</Header>
+        <div className='flex flex-col text-center'>
+            <h1>Prime Shine Accounting</h1>
             {welcomeElement}
-        </Container>
+        </div>
     );
 };
