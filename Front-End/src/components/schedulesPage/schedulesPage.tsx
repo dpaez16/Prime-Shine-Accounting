@@ -93,14 +93,16 @@ export default function SchedulesPage() {
   const sortedSchedules = schedules.sort((a, b) => a.startDay.getTime() - b.startDay.getTime());
 
   return (
-    <div>
+    <div className='flex flex-col mx-auto w-1/2'>
       <h1>{t('Schedules')}:</h1>
       {loading && <LoadingSegment />}
-      <CreateScheduleModal
-        onSubmit={(startDate) => {
-          createScheduleHandler(startDate);
-        }}
-      />
+      <div>
+        <CreateScheduleModal
+          onSubmit={(startDate) => {
+            createScheduleHandler(startDate);
+          }}
+        />
+      </div>
       {error && <Message negative content={error} />}
       <Table celled>
         <Table.Body>

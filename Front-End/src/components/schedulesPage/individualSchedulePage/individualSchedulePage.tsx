@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Button, Header, Container, Message } from 'semantic-ui-react';
+import { Button, Message } from 'semantic-ui-react';
 import { BlobProvider } from '@react-pdf/renderer';
 import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
@@ -11,7 +11,6 @@ import LoadingSegment from '../../loadingSegment/loadingSegment';
 import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
 import useLocalization from '../../../hooks/useLocalization';
 import { v4 as uuidV4 } from 'uuid';
-import './individualSchedulePage.css';
 import { WaveCustomer } from '@/types/waveCustomer';
 import { ScheduledCustomer } from '@/types/scheduledCustomer';
 import { Schedule } from '@/types/schedule';
@@ -197,7 +196,7 @@ export default function IndividualSchedulePage() {
 
     if (loading) {
         return (
-            <LoadingSegment className='IndividualSchedulePage_loading' />
+            <LoadingSegment />
         );
     }
 
@@ -210,9 +209,9 @@ export default function IndividualSchedulePage() {
     });
 
     return (
-        <Container fluid className="IndividualSchedulePage">
-            <Header as='h1'>{t('Schedule for Week of')} {datesOfService[0]} - {datesOfService[datesOfService.length - 1]}:</Header>
-            <Container fluid className='IndividualSchedulePage_buttons'>
+        <div className='flex flex-col'>
+            <h1>{t('Schedule for Week of')} {datesOfService[0]} - {datesOfService[datesOfService.length - 1]}:</h1>
+            <div className='flex flex-row gap-2'>
                 <CreateScheduledCustomerModal
                     datesOfService={datesOfService}
                     allCustomers={allCustomers}
@@ -236,20 +235,17 @@ export default function IndividualSchedulePage() {
                 >
                     {(blobObj) => {
                         const { loading, url } = blobObj;
-                        if (loading || !url) {
-                            return (<React.Fragment />);
-                        }
-
                         return (
-                            <Button onClick={() => window.open(url, '_blank')}
-                                    disabled={scheduleDays === undefined}
+                            <Button onClick={() => url && window.open(url, '_blank')}
+                                    disabled={loading || scheduleDays === undefined || !url}
+                                    loading={loading}
                             >
                                 {t('Preview Schedule')}
                             </Button>
                         );
                     }}
                 </BlobProvider>
-            </Container>
+            </div>
             {error &&
                 <Message
                     negative
@@ -274,6 +270,6 @@ export default function IndividualSchedulePage() {
                     );
                 })
             }
-        </Container>
+        </div>
     );
 };
