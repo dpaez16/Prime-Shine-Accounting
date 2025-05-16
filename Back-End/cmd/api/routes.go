@@ -11,6 +11,9 @@ func (app *application) routes() http.Handler {
 
 	router.GET("/api/ping", app.pingCheckHandler)
 
+	// route for login session verification
+	router.POST("/api/handshake", app.authenticate(app.handshakeHandler))
+
 	// user routes
 	router.POST("/api/login", app.loginUser)
 	router.POST("/api/register", app.createUser)

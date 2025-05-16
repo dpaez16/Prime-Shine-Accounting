@@ -5,15 +5,15 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 ## Available Scripts
 
 Note: Before running any script, do make sure the following environement variables are defined (via `.env.local` file or shell environment variables):
-- `REACT_APP_WAVE_TOKEN`
-- `REACT_APP_WAVE_ENDPOINT_URL`
-- `REACT_APP_WAVE_CLEANING_PRODUCT_NAME`
-- `REACT_APP_WAVE_BUSINESS_NAME`
-- `REACT_APP_SCHEDULE_API_ENDPOINT_URL`
+- `VITE_WAVE_TOKEN`
+- `VITE_WAVE_ENDPOINT_URL`
+- `VITE_WAVE_CLEANING_PRODUCT_NAME`
+- `VITE_WAVE_BUSINESS_NAME`
+- `VITE_SCHEDULE_API_ENDPOINT_URL`
 
 In the project directory, you can run:
 
-### `npm start`
+### `npm run dev`
 
 Runs the app in the development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
