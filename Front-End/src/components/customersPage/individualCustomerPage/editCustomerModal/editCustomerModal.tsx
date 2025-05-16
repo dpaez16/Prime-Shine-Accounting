@@ -6,7 +6,6 @@ import {
     Label,
     Input,
     Divider,
-    Header,
     Dropdown,
     InputOnChangeData,
     DropdownProps,
@@ -148,7 +147,7 @@ export default function EditCustomerModal(props: EditCustomerModalProps) {
                         />
                     </Form.Field>
                     <Divider hidden />
-                    <Header as="h3">{t('Address')}:</Header>
+                    <h3>{t('Address')}:</h3>
                     <Form.Field>
                         <Label>{t('Address Line 1')}:</Label>
                         <Input

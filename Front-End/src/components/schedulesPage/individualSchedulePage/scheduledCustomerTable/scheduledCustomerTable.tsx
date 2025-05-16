@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Table, Header, Container, Message } from 'semantic-ui-react';
+import { Table, Container, Message } from 'semantic-ui-react';
 import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
 import DeleteScheduleModal from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import { constructTimeStr, getDayOfWeekStr } from '../../../../utils/helpers';
@@ -35,9 +35,9 @@ export default function ScheduledCustomerTable(props: ScheduledCustomerTableProp
 
   return (
     <React.Fragment>
-      <Header as='h1'>
+      <h1>
         {t(getDayOfWeekStr(scheduleDayDate))} {scheduleDayDate}
-      </Header>
+      </h1>
       {error && <Message negative content={error} />}
       <Table celled className='ScheduledCustomerTable_table' key={uuidv4()}>
         <Table.Header>

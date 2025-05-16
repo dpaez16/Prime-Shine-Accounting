@@ -6,7 +6,6 @@ import {
     Label,
     Input,
     Divider,
-    Header,
     Dropdown,
     InputOnChangeData,
     DropdownProps,
@@ -125,7 +124,7 @@ export function CreateCustomerModal(props: CreateCustomerModalProps) {
                         <Input type="text" name="email" onChange={handleChange} />
                     </Form.Field>
                     <Divider hidden />
-                    <Header as="h3">{t('Address')}:</Header>
+                    <h3>{t('Address')}:</h3>
                     <Form.Field>
                         <Label>{t('Address Line 1')}:</Label>
                         <Input type="text" name="addressLine1" onChange={handleChange} />
