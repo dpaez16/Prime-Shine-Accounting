@@ -6,17 +6,33 @@ import useLocalization from '../../hooks/useLocalization';
 import { Menu, Dropdown, Icon } from 'semantic-ui-react';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import LanguageDropdown from './languageDropdown';
+import PrimeShineAPIClient from '@/api/primeShineApiClient';
 
 export default function SideNavbar() {
     const { userInfo, clearSession } = useContext(LoginSessionContext);
     const { t } = useLocalization();
     const navigate = useNavigate();
 
-    const createDropdownLink = (url: string, name: string) => {
+    const navigateToLink = (url: string) => {
+        PrimeShineAPIClient.handshake(userInfo?.token ?? null)
+            .then(() => {
+                navigate(url);
+            })
+            .catch(() => {
+                clearSession();
+                navigate('/');
+            });
+    };
+
+    const createDropdownLink = (url: string, text: string) => {
         return (
-            <a className='text-black' href={url}>
-                {name}
-            </a>
+            <Dropdown.Item onClick={(e) => {
+                // TODO: dropdown does not close sometimes when clicking a link
+                e.stopPropagation();
+                navigateToLink(url);
+            }}>
+                {text}
+            </Dropdown.Item>
         );
     };
 
@@ -26,21 +42,12 @@ export default function SideNavbar() {
         <Menu attached="top">
             {
                 isLoggedIn &&
-                <Dropdown item simple icon="bars">
+                <Dropdown item simple closeOnBlur icon='bars'>
                     <Dropdown.Menu>
-                        <Dropdown.Item>
-                            {createDropdownLink('/invoices', t('Invoices'))}
-                        </Dropdown.Item>
-                        <Dropdown.Item>
-                            {createDropdownLink('/customers', t('Customers'))}
-                        </Dropdown.Item>
-                        <Dropdown.Item>
-                            {createDropdownLink('/schedules', t('Schedules'))}
-                        </Dropdown.Item>
-                        <Dropdown.Divider />
-                        <Dropdown.Item>
-                            {createDropdownLink('/editProfile', t('Edit Profile'))}
-                        </Dropdown.Item>
+                        {createDropdownLink('/invoices', t('Invoices'))}
+                        {createDropdownLink('/customers', t('Customers'))}
+                        {createDropdownLink('/schedules', t('Schedules'))}
+                        {createDropdownLink('/editProfile', t('Edit Profile'))}
                         <Dropdown.Item
                             onClick={() => {
                                 clearSession();
