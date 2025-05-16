@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Table, Container, Header, Message } from 'semantic-ui-react';
+import { Table, Message } from 'semantic-ui-react';
 import CreateScheduleModal from './createScheduleModal/createScheduleModal';
 import EditScheduleModal from './editScheduleModal/editScheduleModal';
 import DeleteScheduleModal from './deleteScheduleModal/deleteScheduleModal';
@@ -9,7 +9,6 @@ import useLocalization from '../../hooks/useLocalization';
 import LoadingSegment from '../loadingSegment/loadingSegment';
 import { dateToStr } from '../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
-import './schedulesPage.css';
 import { Schedule } from '@/types/schedule';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 
@@ -94,21 +93,21 @@ export default function SchedulesPage() {
   const sortedSchedules = schedules.sort((a, b) => a.startDay.getTime() - b.startDay.getTime());
 
   return (
-    <Container fluid className='SchedulesPage'>
-      <Header as='h1'>{t('Schedules')}:</Header>
-      {loading && <LoadingSegment className='SchedulesPage_loading' />}
+    <div>
+      <h1>{t('Schedules')}:</h1>
+      {loading && <LoadingSegment />}
       <CreateScheduleModal
         onSubmit={(startDate) => {
           createScheduleHandler(startDate);
         }}
       />
       {error && <Message negative content={error} />}
-      <Table celled className='SchedulesPage_table'>
+      <Table celled>
         <Table.Body>
           {sortedSchedules.map((schedule) => {
             return (
               <Table.Row key={uuidV4()}>
-                <Table.Cell className='SchedulesPage_table_row_cell'>
+                <Table.Cell className='flex flex-row justify-between items-center'>
                   <a
                     href='/viewSchedule'
                     onClick={(e) => {
@@ -122,7 +121,7 @@ export default function SchedulesPage() {
                   >
                     {dateToStr(schedule.startDay)}
                   </a>
-                  <div>
+                  <div className='flex flex-row gap-2'>
                     <EditScheduleModal
                       schedule={schedule}
                       onSubmit={(startDay) => {
@@ -144,6 +143,6 @@ export default function SchedulesPage() {
           })}
         </Table.Body>
       </Table>
-    </Container>
+    </div>
   );
 }
