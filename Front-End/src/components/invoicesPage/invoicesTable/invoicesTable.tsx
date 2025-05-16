@@ -18,7 +18,7 @@ export default function InvoicesTable(props: InvoiceTableProps) {
   const { t } = useLocalization();
 
   if (props.loading) {
-    return <LoadingSegment className="InvoicesPage_table_loading" />;
+    return <LoadingSegment />;
   }
 
   return (

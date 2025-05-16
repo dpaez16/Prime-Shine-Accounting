@@ -5,7 +5,6 @@ import useLocalization from '@/hooks/useLocalization';
 import { fetchAllCustomers } from '@/utils/helpers';
 import React, { useContext } from 'react';
 import {
-    Container,
     Input,
     Dropdown,
     Button,
@@ -53,7 +52,7 @@ export const InvoicesSearchToolbar: React.FC<InvoicesSearchToolbarProps> = (prop
     });
 
     return (
-        <Container className="InvoicesPage_filters" fluid textAlign="center">
+        <div className='flex flex-row gap-5 mx-auto my-4 text-center'>
             <Dropdown
                 placeholder={t('All customers')!}
                 selection
@@ -101,6 +100,6 @@ export const InvoicesSearchToolbar: React.FC<InvoicesSearchToolbarProps> = (prop
             >
                 {t('Search')}
             </Button>
-        </Container>
+        </div>
     );
 };

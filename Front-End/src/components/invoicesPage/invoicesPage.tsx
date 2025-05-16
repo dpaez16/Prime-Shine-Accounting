@@ -17,7 +17,6 @@ import { WavePageInfo } from '@/types/wavePageInfo';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { InvoicesSearchToolbar } from './invoicesSearchToolbar/invoicesSearchToolbar';
 import { useInvoicesSearch } from './invoicesSearchToolbar/useInvoicesSearch';
-import './invoicesPage.css';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { EventListenerNames } from '@/utils/consts';
 
@@ -79,12 +78,14 @@ export default function InvoicesPage() {
     }, [pageNum]);
 
     return (
-        <Container fluid className="InvoicesPage">
-            <Header as="h1">{t('Invoices')}</Header>
+        <div className='flex flex-col'>
+            <h1>{t('Invoices')}</h1>
             {createInvoiceModalOpen && <CreateInvoiceModal
                 onClose={() => setCreateInvoiceModalOpen(false)}
             />}
-            <Button onClick={() => setCreateInvoiceModalOpen(true)}>{t('Create Invoice')}</Button>
+            <div>
+                <Button onClick={() => setCreateInvoiceModalOpen(true)}>{t('Create Invoice')}</Button>
+            </div>
             <InvoicesSearchToolbar
                 onSubmit={refetch}
                 handleFilterChange={handleFilterChange}
@@ -104,14 +105,11 @@ export default function InvoicesPage() {
                 <Pagination
                     boundaryRange={0}
                     activePage={pageNum}
-                    //ellipsisItem={null}
-                    //firstItem={null}
-                    //lastItem={null}
                     siblingRange={1}
                     totalPages={data.pageInfo.totalPages}
                     onPageChange={handlePageChange}
                 />
             }
-        </Container>
+        </div>
     );
 }
