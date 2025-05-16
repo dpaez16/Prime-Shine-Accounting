@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Table, Container, Message } from 'semantic-ui-react';
+import { Table, Message } from 'semantic-ui-react';
 import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
 import DeleteScheduleModal from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import { constructTimeStr, getDayOfWeekStr } from '../../../../utils/helpers';
@@ -59,7 +59,7 @@ export default function ScheduledCustomerTable(props: ScheduledCustomerTableProp
               scheduledCustomer.serviceEndTime,
             );
             const customerElement = (
-              <Container>
+              <div>
                 <p>
                   {t('Customer')}: {scheduledCustomer.metadata.name}
                 </p>
@@ -69,7 +69,7 @@ export default function ScheduledCustomerTable(props: ScheduledCustomerTableProp
                 <p>
                   {t('Service End Time')}: {serviceEndTime}
                 </p>
-              </Container>
+              </div>
             );
 
             return (
