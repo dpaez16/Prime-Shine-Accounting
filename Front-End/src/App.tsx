@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Container } from 'semantic-ui-react';
 import HomePage from './components/homePage/homePage';
 import EditProfilePage from './components/editProfilePage/editProfilePage';
 import SchedulesPage from './components/schedulesPage/schedulesPage';
@@ -9,7 +8,6 @@ import CustomersPage from './components/customersPage/customersPage';
 import IndividualCustomerPage from './components/customersPage/individualCustomerPage/individualCustomerPage';
 import InvoicesPage from './components/invoicesPage/invoicesPage';
 import SideNavbar from './components/sideNavbar/sideNavbar';
-import './App.css';
 import { LoginSession, LoginSessionContext } from './context/LoginSessionContext';
 import { UserInfo } from './types/userInfo';
 import { BusinessInfo } from './types/businessInfo';
@@ -35,7 +33,7 @@ export default function App() {
             <LoginSessionContext.Provider value={loginSession}>
             <React.Fragment>
                 <SideNavbar />
-                <Container fluid className="main-content">
+                <div className='p-8'>
                     <Routes>
                         <Route path="/" element={<HomePage />} />
                         {userInfo &&
@@ -49,7 +47,7 @@ export default function App() {
                             </>
                         }
                     </Routes>
-                </Container>
+                </div>
             </React.Fragment>
             </LoginSessionContext.Provider>
         </Router>
