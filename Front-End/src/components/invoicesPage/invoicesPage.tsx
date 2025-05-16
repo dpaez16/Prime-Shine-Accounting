@@ -1,7 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
 import {
-    Container,
-    Header,
     Divider,
     Pagination,
     Button,
