@@ -1,6 +1,5 @@
 import React from 'react';
 import { Dimmer, Loader, Segment } from 'semantic-ui-react';
-import './loadingSegment.css';
 
 type LoadingSegmentProps = {
     className?: string;
