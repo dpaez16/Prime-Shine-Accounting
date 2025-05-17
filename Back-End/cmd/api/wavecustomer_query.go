@@ -58,12 +58,43 @@ func (app *application) queryWaveCustomers(w http.ResponseWriter, r *http.Reques
 
 	customers, err := wave.GetAllCustomers(body.BusinessID)
 	if err != nil {
-		err = errors.Wrap(err, "GetCustomers")
+		err = errors.Wrap(err, "GetAllCustomers")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	data := jsondata{"customers": customers}
+	err = app.writeJSON(w, http.StatusOK, data, nil)
+	if err != nil {
+		err = errors.Wrap(err, "writeJSON")
+		app.serverErrorResponse(w, r, err)
+	}
+}
+
+type queryWaveCustomerBody struct {
+	BusinessID string `json:"businessID"`
+	CustomerID string `json:"customerID"`
+}
+
+// Route for querying a specific Wave customer.
+func (app *application) queryWaveCustomer(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	var body queryWaveCustomerBody
+	err := json.NewDecoder(r.Body).Decode(&body)
+
+	if err != nil {
+		err = errors.Wrap(err, "json deserialization")
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	customer, err := wave.GetCustomer(body.BusinessID, body.CustomerID)
+	if err != nil {
+		err = errors.Wrap(err, "GetCustomer")
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	data := jsondata{"customer": customer}
 	err = app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {
 		err = errors.Wrap(err, "writeJSON")

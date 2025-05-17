@@ -42,23 +42,23 @@ type WaveCustomersQueryData struct {
 func GetCustomers(businessID string, pageNum int, pageSize int) (*[]WaveCustomer, *WavePageInfoData, error) {
 	body := WaveGraphQLBody{
 		Query: `
-                    query($businessId: ID!, $pageNum: Int!, $pageSize: Int!) {
-                        business(id: $businessId) {
-                            customers(page: $pageNum, pageSize: $pageSize, sort: [NAME_ASC]) {
-                                pageInfo {
-                                    currentPage
-                                    totalPages
-                                    totalCount
-                                }
-                                edges {
-                                    node {
-                                        id
-                                        name
-                                    }
-                                }
-                            }
-                        }
-                    }
+					query($businessId: ID!, $pageNum: Int!, $pageSize: Int!) {
+						business(id: $businessId) {
+							customers(page: $pageNum, pageSize: $pageSize, sort: [NAME_ASC]) {
+								pageInfo {
+									currentPage
+									totalPages
+									totalCount
+								}
+								edges {
+									node {
+										id
+										name
+									}
+								}
+							}
+						}
+					}
 		`,
 		Variables: map[string]any{
 			"businessId": businessID,
@@ -107,4 +107,56 @@ func GetAllCustomers(businessID string) (*[]WaveCustomer, error) {
 	}
 
 	return &allCustomers, nil
+}
+
+type WaveCustomerQueryData struct {
+	Business struct {
+		Customer WaveCustomer `json:"customer"`
+	} `json:"business"`
+}
+
+func GetCustomer(businessID string, customerID string) (*WaveCustomer, error) {
+	body := WaveGraphQLBody{
+		Query: `
+					query($businessId: ID!, $customerId: ID!) {
+						business(id: $businessId) {
+							customer(id: $customerId) {
+								id
+								name
+								email
+								mobile
+								phone
+								address {
+									addressLine1
+									addressLine2
+									city
+									province {
+										code
+										name
+									}
+									postalCode
+								}
+							}
+						}
+					}
+		`,
+		Variables: map[string]any{
+			"businessId": businessID,
+			"customerId": customerID,
+		},
+	}
+
+	response, err := createWaveGraphQLRequest(body)
+	if err != nil {
+		return nil, errors.Wrap(err, "createWaveGraphQLRequest")
+	}
+
+	var queryData WaveCustomerQueryData
+	err = json.Unmarshal([]byte(response), &queryData)
+	if err != nil {
+		return nil, errors.Wrap(err, "json deserialization")
+	}
+
+	customer := queryData.Business.Customer
+	return &customer, nil
 }
