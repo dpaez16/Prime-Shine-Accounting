@@ -37,6 +37,10 @@ func (app *application) routes() http.Handler {
 	router.POST("/api/schedule/edit", app.authenticate(app.editSchedule))
 	router.POST("/api/schedule/delete", app.authenticate(app.deleteSchedule))
 
+	// wave customer routes
+	router.POST("/api/wave/customers/query", app.authenticate(app.queryWaveCustomersPaginated))
+	router.POST("/api/wave/customers/queryAll", app.authenticate(app.queryWaveCustomers))
+
 	// TODO: add pdf route?
 	// https://github.com/go-pdf/fpdf
 
