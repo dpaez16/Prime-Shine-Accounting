@@ -28,7 +28,7 @@ type WaveCustomer struct {
 	Address WaveCustomerAddress `json:"address"`
 }
 
-type WaveCustomersQueryData struct {
+type waveCustomersQueryData struct {
 	Business struct {
 		Customers struct {
 			PageInfo WavePageInfoData `json:"pageInfo"`
@@ -60,7 +60,7 @@ func GetCustomers(businessID string, pageNum int, pageSize int) (*[]WaveCustomer
 						}
 					}
 		`,
-		Variables: map[string]any{
+		Variables: WaveGraphQLVariables{
 			"businessId": businessID,
 			"pageNum":    pageNum,
 			"pageSize":   pageSize,
@@ -72,7 +72,7 @@ func GetCustomers(businessID string, pageNum int, pageSize int) (*[]WaveCustomer
 		return nil, nil, errors.Wrap(err, "createWaveGraphQLRequest")
 	}
 
-	var queryData WaveCustomersQueryData
+	var queryData waveCustomersQueryData
 	err = json.Unmarshal([]byte(response), &queryData)
 	if err != nil {
 		return nil, nil, errors.Wrap(err, "json deserialization")
@@ -109,7 +109,7 @@ func GetAllCustomers(businessID string) (*[]WaveCustomer, error) {
 	return &allCustomers, nil
 }
 
-type WaveCustomerQueryData struct {
+type waveCustomerQueryData struct {
 	Business struct {
 		Customer WaveCustomer `json:"customer"`
 	} `json:"business"`
@@ -140,7 +140,7 @@ func GetCustomer(businessID string, customerID string) (*WaveCustomer, error) {
 						}
 					}
 		`,
-		Variables: map[string]any{
+		Variables: WaveGraphQLVariables{
 			"businessId": businessID,
 			"customerId": customerID,
 		},
@@ -151,7 +151,7 @@ func GetCustomer(businessID string, customerID string) (*WaveCustomer, error) {
 		return nil, errors.Wrap(err, "createWaveGraphQLRequest")
 	}
 
-	var queryData WaveCustomerQueryData
+	var queryData waveCustomerQueryData
 	err = json.Unmarshal([]byte(response), &queryData)
 	if err != nil {
 		return nil, errors.Wrap(err, "json deserialization")
@@ -159,4 +159,55 @@ func GetCustomer(businessID string, customerID string) (*WaveCustomer, error) {
 
 	customer := queryData.Business.Customer
 	return &customer, nil
+}
+
+type editCustomerMutationData struct {
+	CustomerPatch struct {
+		DidSucceed  bool              `json:"didSucceed"`
+		InputErrors *[]WaveInputError `json:"inputErrors"`
+	} `json:"customerPatch"`
+}
+
+func EditCustomer(customerPatchInput map[string]any) error {
+	body := WaveGraphQLBody{
+		Query: `
+					mutation($input: CustomerPatchInput!) {
+						customerPatch(input: $input) {
+							didSucceed
+							inputErrors {
+								code
+								message
+								path
+							}
+						}
+					}
+		`,
+		Variables: WaveGraphQLVariables{
+			"input": customerPatchInput,
+		},
+	}
+
+	response, err := createWaveGraphQLRequest(body)
+	if err != nil {
+		return errors.Wrap(err, "createWaveGraphQLRequest")
+	}
+
+	var mutationData editCustomerMutationData
+	err = json.Unmarshal([]byte(response), &mutationData)
+	if err != nil {
+		return errors.Wrap(err, "json deserialization")
+	}
+
+	inputErrors := mutationData.CustomerPatch.InputErrors
+	didSucceed := mutationData.CustomerPatch.DidSucceed
+
+	if inputErrors != nil {
+		return errors.Errorf("%v", *inputErrors)
+	}
+
+	if !didSucceed {
+		return errors.New("Failed to edit customer.")
+	}
+
+	return nil
 }

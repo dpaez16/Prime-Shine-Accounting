@@ -18,9 +18,13 @@ type WavePageInfoData struct {
 	TotalCount  int `json:"totalCount"`
 }
 
+type WaveInputError map[string]any
+
+type WaveGraphQLVariables map[string]any
+
 type WaveGraphQLBody struct {
-	Query     string         `json:"query"`
-	Variables map[string]any `json:"variables"`
+	Query     string               `json:"query"`
+	Variables WaveGraphQLVariables `json:"variables"`
 }
 
 type WaveGraphQLError struct {
