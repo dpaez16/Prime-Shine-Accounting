@@ -38,10 +38,10 @@ export default function IndividualSchedulePage() {
         const customerId = rawScheduledCustomer.customerId;
 
         return WaveAPIClient2.fetchCustomer(businessId, customerId, userInfo.token)
-        .then(customerMetadata => {
+        .then(data => {
             return {
                 ...rawScheduledCustomer,
-                ...{ metadata: customerMetadata }
+                ...{ metadata: data.customer as WaveCustomer }
             } as ScheduledCustomer;
         })
         .catch(err => {
