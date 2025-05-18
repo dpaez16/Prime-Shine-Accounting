@@ -128,7 +128,7 @@ export default function CustomersPage() {
 
                                     e.preventDefault();
                                     const params = new URLSearchParams({
-                                        "customerID": customerID,
+                                        'customerID': customerID,
                                     });
 
                                     navigate(`/customer?${params.toString()}`);

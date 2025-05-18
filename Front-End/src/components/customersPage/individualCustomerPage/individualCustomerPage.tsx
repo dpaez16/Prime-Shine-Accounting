@@ -29,7 +29,7 @@ export default function IndividualCustomerPage() {
     const { t } = useLocalization();
     const params = useBrowserQuery<IndividualCustomerPageQuery>();
 
-    const { data, loading, error, refetch } = useDataFetcher<IndividualCustomerPageData>({ fetcher: () => WaveAPIClient2.fetchCustomer(businessInfo.businessId, params.customerID ?? 'undefined', userInfo.token) })
+    const { data, loading, error, refetch } = useDataFetcher<IndividualCustomerPageData>({ fetcher: () => WaveAPIClient2.fetchCustomer(businessInfo.businessId, params.customerID ?? 'undefined', userInfo.token) });
 
     const constructNameElement = (name: string | null) => {
         if (!name) {

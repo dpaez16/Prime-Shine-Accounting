@@ -1,5 +1,5 @@
-import { BusinessID } from "@/types/businessInfo";
-import { WaveCustomerID } from "@/types/waveCustomer";
+import { BusinessID } from '@/types/businessInfo';
+import { WaveCustomerID } from '@/types/waveCustomer';
 
 export class WaveAPIClient2 {
     static #createFetchRequest(

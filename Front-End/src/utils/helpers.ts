@@ -98,5 +98,5 @@ export const grabWorkingDays = function(dates: string[]) {
  */
 export const fetchAllCustomers = function(businessId: BusinessID, jwt: JWT | null) {
     return WaveAPIClient2.fetchAllCustomers(businessId, jwt)
-        .then(json => json.customers as WaveCustomer[])
+        .then(json => json.customers as WaveCustomer[]);
 };
