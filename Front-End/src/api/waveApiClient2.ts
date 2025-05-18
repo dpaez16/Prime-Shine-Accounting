@@ -1,5 +1,5 @@
 import { BusinessID } from '@/types/businessInfo';
-import { WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
+import { WaveCustomerCreateInput, WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
 
 export class WaveAPIClient2 {
     static #createFetchRequest(
@@ -59,5 +59,21 @@ export class WaveAPIClient2 {
         };
 
         return this.#createFetchRequest('/customer/edit', body, jwt);
+    }
+
+    static createCustomer(customerCreateInput: WaveCustomerCreateInput, jwt: string | null) {
+        const body = {
+            customerCreateInput,
+        };
+
+        return this.#createFetchRequest('/customer/create', body, jwt);
+    }
+
+    static deleteCustomer(customerID: WaveCustomerID, jwt: string | null) {
+        const body = {
+            customerID,
+        };
+
+        return this.#createFetchRequest('/customer/delete', body, jwt);
     }
 }

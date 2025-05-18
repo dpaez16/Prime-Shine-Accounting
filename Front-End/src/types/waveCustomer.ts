@@ -1,3 +1,4 @@
+import { BusinessInfo } from './businessInfo';
 import { Prettify } from './prettify';
 
 export type WaveCustomerAddress = {
@@ -20,15 +21,6 @@ export type WaveCustomer = {
   address: WaveCustomerAddress;
 };
 
-export type FetchWaveCustomersResponse = {
-  pageInfo: {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-  };
-  customers: WaveCustomer[];
-}
-
 export type WaveCustomerID = WaveCustomer['id'];
 
 export type WaveCustomerPatchInput = Prettify<
@@ -42,4 +34,9 @@ export type WaveCustomerPatchInput = Prettify<
       }
     >
   }>
+>;
+
+export type WaveCustomerCreateInput = Prettify<
+  Pick<BusinessInfo, 'businessId'> &
+  Omit<WaveCustomerPatchInput, 'id'>
 >;

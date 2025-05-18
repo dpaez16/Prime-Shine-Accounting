@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import DeleteCustomerModal from './deleteCustomerModal/deleteCustomerModal';
 import { CreateCustomerFormParams, CreateCustomerModal } from './createCustomerModal/createCustomerModal';
-import WaveAPIClient from '../../api/waveApiClient';
 import { fetchAllCustomers } from '../../utils/helpers';
 import { US_COUNTRY_CODE } from '../../utils/consts';
 import LoadingSegment from '../loadingSegment/loadingSegment';
@@ -9,34 +8,22 @@ import { Input, Table, Message } from 'semantic-ui-react';
 import useLocalization from '../../hooks/useLocalization';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidV4 } from 'uuid';
-import { WaveCustomer } from '@/types/waveCustomer';
+import { WaveCustomerCreateInput } from '@/types/waveCustomer';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
+import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { useDataFetcher } from '@/hooks/useDataFetcher';
 
 export default function CustomersPage() {
     const context = useContext(LoginSessionContext);
     const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
 
-    const [customers, setCustomers] = useState<WaveCustomer[]>([]);
+    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) })
     const [searchBarValue, setSearchBarValue] = useState('');
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const { t } = useLocalization();
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const businessId = businessInfo.businessId;
-
-        fetchAllCustomers(businessId, userInfo.token)
-            .then((customers) => {
-                setCustomers(customers);
-                setLoading(false);
-                setError(null);
-            })
-            .catch((err) => {
-                setError(err.message);
-            });
-    }, []);
+    const customers = data ?? [];
 
     const createCustomerHandler = (formParams: CreateCustomerFormParams) => {
         const businessId = businessInfo.businessId;
@@ -53,7 +40,7 @@ export default function CustomersPage() {
             postalCode,
         } = formParams;
 
-        const customerCreateInput = {
+        const customerCreateInput: WaveCustomerCreateInput = {
             businessId: businessId,
             name: name,
             phone: phone,
@@ -69,11 +56,11 @@ export default function CustomersPage() {
             },
         };
 
-        return WaveAPIClient.createCustomer(customerCreateInput);
+        return WaveAPIClient2.createCustomer(customerCreateInput, userInfo.token);
     };
 
     const deleteCustomerHandler = (customerId: string) => {
-        return WaveAPIClient.deleteCustomer(customerId);
+        return WaveAPIClient2.deleteCustomer(customerId, userInfo.token);
     };
 
     if (loading) {
@@ -88,7 +75,7 @@ export default function CustomersPage() {
     return (
         <div className='flex flex-col'>
             <h1>{t('Customers')}:</h1>
-            {error && <Message negative content={error} />}
+            {error && <Message negative content={error.message} />}
             <div className='flex flex-row gap-4'>
                 <Input
                     icon='search'
@@ -102,17 +89,11 @@ export default function CustomersPage() {
                 <CreateCustomerModal
                     onSubmit={(formParams) => {
                         createCustomerHandler(formParams)
-                            .then((newCustomer) => {
-                                const newCustomers = [...customers];
-                                newCustomers.push(newCustomer);
-                                newCustomers.sort((a, b) => a.name.localeCompare(b.name));
-
-                                setCustomers(newCustomers);
-                                setError(null);
+                            .then(() => {
+                                setSearchBarValue('');
+                                refetch();
                             })
-                            .catch((err) => {
-                                setError(err.message);
-                            });
+                            .catch((err) => alert('Failed to create customer: ' + err.message)); // TODO: use translation hook
                     }}
                 />
             </div>
@@ -138,23 +119,11 @@ export default function CustomersPage() {
                                 <DeleteCustomerModal
                                     onSubmit={() => {
                                         deleteCustomerHandler(customerID)
-                                            .then((didSucceed) => {
-                                                if (!didSucceed) {
-                                                    throw new Error('Could not delete customer.');
-                                                }
-
-                                                const newCustomers = [...customers];
-                                                const idx = newCustomers.findIndex(
-                                                    (c) => c.id === customerID,
-                                                );
-                                                newCustomers.splice(1, idx);
-
-                                                setCustomers(newCustomers);
-                                                setError(null);
+                                            .then(() => {
+                                                setSearchBarValue('');
+                                                refetch();
                                             })
-                                            .catch((err) => {
-                                                setError(err.message);
-                                            });
+                                            .catch((err) => alert('Failed to delete customer: ' + err.message)); // TODO: use translation hook
                                     }}
                                 />
                             </Table.Cell>

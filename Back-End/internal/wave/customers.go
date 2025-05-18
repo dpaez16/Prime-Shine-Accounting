@@ -211,3 +211,107 @@ func EditCustomer(customerPatchInput map[string]any) error {
 
 	return nil
 }
+
+type deleteCustomerMutationData struct {
+	CustomerDelete struct {
+		DidSucceed  bool              `json:"didSucceed"`
+		InputErrors *[]WaveInputError `json:"inputErrors"`
+	} `json:"customerDelete"`
+}
+
+func DeleteCustomer(customerID string) error {
+	body := WaveGraphQLBody{
+		Query: `
+					mutation($input: CustomerDeleteInput!) {
+						customerDelete(input: $input) {
+							didSucceed
+							inputErrors {
+								code
+								message
+								path
+							}
+						}
+					}
+		`,
+		Variables: WaveGraphQLVariables{
+			"input": map[string]any{
+				"id": customerID,
+			},
+		},
+	}
+
+	response, err := createWaveGraphQLRequest(body)
+	if err != nil {
+		return errors.Wrap(err, "createWaveGraphQLRequest")
+	}
+
+	var mutationData deleteCustomerMutationData
+	err = json.Unmarshal([]byte(response), &mutationData)
+	if err != nil {
+		return errors.Wrap(err, "json deserialization")
+	}
+
+	inputErrors := mutationData.CustomerDelete.InputErrors
+	didSucceed := mutationData.CustomerDelete.DidSucceed
+
+	if inputErrors != nil {
+		return errors.Errorf("%v", *inputErrors)
+	}
+
+	if !didSucceed {
+		return errors.New("Failed to delete customer.")
+	}
+
+	return nil
+}
+
+type createCustomerMutationData struct {
+	CustomerCreate struct {
+		DidSucceed  bool              `json:"didSucceed"`
+		InputErrors *[]WaveInputError `json:"inputErrors"`
+	} `json:"customerCreate"`
+}
+
+func CreateCustomer(customerCreateInput map[string]any) error {
+	body := WaveGraphQLBody{
+		Query: `
+					mutation($input: CustomerCreateInput!) {
+						customerCreate(input: $input) {
+							didSucceed
+							inputErrors {
+								code
+								message
+								path
+							}
+						}
+					}
+		`,
+		Variables: WaveGraphQLVariables{
+			"input": customerCreateInput,
+		},
+	}
+
+	response, err := createWaveGraphQLRequest(body)
+	if err != nil {
+		return errors.Wrap(err, "createWaveGraphQLRequest")
+	}
+
+	var mutationData createCustomerMutationData
+	err = json.Unmarshal([]byte(response), &mutationData)
+	if err != nil {
+		return errors.Wrap(err, "json deserialization")
+	}
+
+	inputErrors := mutationData.CustomerCreate.InputErrors
+	didSucceed := mutationData.CustomerCreate.DidSucceed
+
+	if inputErrors != nil {
+		return errors.Errorf("%v", *inputErrors)
+	}
+
+	if !didSucceed {
+		return errors.New("Failed to create customer.")
+	}
+
+	return nil
+}

@@ -39,7 +39,9 @@ func (app *application) routes() http.Handler {
 
 	// wave customer routes
 	router.POST("/api/wave/customer/query", app.authenticate(app.queryWaveCustomer))
+	router.POST("/api/wave/customer/create", app.authenticate(app.createWaveCustomer))
 	router.POST("/api/wave/customer/edit", app.authenticate(app.editWaveCustomer))
+	router.POST("/api/wave/customer/delete", app.authenticate(app.deleteWaveCustomer))
 	router.POST("/api/wave/customers/query", app.authenticate(app.queryWaveCustomersPaginated))
 	router.POST("/api/wave/customers/queryAll", app.authenticate(app.queryWaveCustomers))
 
