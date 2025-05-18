@@ -14,6 +14,7 @@ import { LoginSessionContext } from '@/context/LoginSessionContext';
 
 export default function CustomersPage() {
     const context = useContext(LoginSessionContext);
+    const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
 
     const [customers, setCustomers] = useState<WaveCustomer[]>([]);
@@ -26,7 +27,7 @@ export default function CustomersPage() {
     useEffect(() => {
         const businessId = businessInfo.businessId;
 
-        fetchAllCustomers(businessId)
+        fetchAllCustomers(businessId, userInfo.token)
             .then((customers) => {
                 setCustomers(customers);
                 setLoading(false);
@@ -118,25 +119,25 @@ export default function CustomersPage() {
             <Table celled>
                 <Table.Body>
                 {filteredCustomers.map((customer) => {
+                    const customerID = customer.id;
+
                     return (
                         <Table.Row key={uuidV4()}>
                             <Table.Cell className='flex flex-row justify-between items-center'>
-                                <a
-                                    href='/viewCustomer'
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        navigate('/viewCustomer', {
-                                            state: {
-                                                customer: customer,
-                                            },
-                                        });
-                                    }}
-                                >
+                                <a onClick={(e) => {
+
+                                    e.preventDefault();
+                                    const params = new URLSearchParams({
+                                        "customerID": customerID,
+                                    });
+
+                                    navigate(`/customer?${params.toString()}`);
+                                }}>
                                     {customer.name}
                                 </a>
                                 <DeleteCustomerModal
                                     onSubmit={() => {
-                                        deleteCustomerHandler(customer.id)
+                                        deleteCustomerHandler(customerID)
                                             .then((didSucceed) => {
                                                 if (!didSucceed) {
                                                     throw new Error('Could not delete customer.');
@@ -144,7 +145,7 @@ export default function CustomersPage() {
 
                                                 const newCustomers = [...customers];
                                                 const idx = newCustomers.findIndex(
-                                                    (c) => c.id === customer.id,
+                                                    (c) => c.id === customerID,
                                                 );
                                                 newCustomers.splice(1, idx);
 

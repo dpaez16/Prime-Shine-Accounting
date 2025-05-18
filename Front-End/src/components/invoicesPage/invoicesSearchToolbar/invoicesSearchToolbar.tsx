@@ -20,10 +20,11 @@ interface InvoicesSearchToolbarProps {
 
 export const InvoicesSearchToolbar: React.FC<InvoicesSearchToolbarProps> = (props) => {
     const context = useContext(LoginSessionContext);
+    const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
 
     const { t } = useLocalization();
-    const { data: customers, loading: loadingCustomers } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId) });
+    const { data: customers, loading: loadingCustomers } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
 
     const handleFilterChange = (
         _: React.ChangeEvent<HTMLInputElement> | React.SyntheticEvent<HTMLElement>,

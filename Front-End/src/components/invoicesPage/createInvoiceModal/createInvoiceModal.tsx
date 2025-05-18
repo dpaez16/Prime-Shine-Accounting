@@ -141,6 +141,7 @@ type CreateInvoiceModalProps = {
 
 export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
   const loginSession = useContext(LoginSessionContext);
+  const userInfo = loginSession.userInfo!;
   const businessInfo = loginSession.businessInfo!;
 
   const [items, setItems] = useState([] as InvoiceItem[]);
@@ -153,7 +154,7 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
   });
   const { t } = useLocalization();
 
-  const { data: customers, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => fetchAllCustomers(businessInfo.businessId) });
+  const { data: customers, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
 
   const getFormParams = () => {
     return {

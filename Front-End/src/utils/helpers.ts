@@ -1,6 +1,8 @@
 import { WaveCustomer } from '@/types/waveCustomer';
-import WaveAPIClient from '../api/waveApiClient';
 import { DAYS_OF_WEEK } from './consts';
+import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { JWT } from '@/types/userInfo';
+import { BusinessID } from '@/types/businessInfo';
 
 export const deleteItemFromArray = function(arr, valObj) {
     const val = valObj._id;
@@ -91,26 +93,10 @@ export const grabWorkingDays = function(dates: string[]) {
 
 /**
  * Fetches all customers from Wave.
- * @param {string} businessId - The business's unique ID.
- * @returns {Promise<WaveCustomer[]>} The promise with success returning all customers, otherwise an error for rejection.
+ * @param businessId - The business's unique ID.
+ * @returns A promise resolving to a list of all Wave customers.
  */
-export const fetchAllCustomers = async function(businessId: string) {
-    let pageNum = 1;
-    let allCustomers = [] as WaveCustomer[];
-
-    while (true) {
-        const results = await WaveAPIClient.fetchCustomers(businessId, pageNum);
-        const { pageInfo, customers } = results;
-        const { totalPages } = pageInfo;
-
-        allCustomers = [...allCustomers, ...customers];
-
-        if (totalPages === pageNum) {
-            break;
-        }
-
-        pageNum += 1;
-    }
-
-    return allCustomers;
+export const fetchAllCustomers = function(businessId: BusinessID, jwt: JWT | null) {
+    return WaveAPIClient2.fetchAllCustomers(businessId, jwt)
+        .then(json => json.customers as WaveCustomer[])
 };

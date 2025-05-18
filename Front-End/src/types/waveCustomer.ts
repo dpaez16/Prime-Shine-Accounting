@@ -26,3 +26,5 @@ export type FetchWaveCustomersResponse = {
   };
   customers: WaveCustomer[];
 }
+
+export type WaveCustomerID = WaveCustomer['id'];

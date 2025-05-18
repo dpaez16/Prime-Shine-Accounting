@@ -107,7 +107,7 @@ export default function IndividualSchedulePage() {
                 scheduleDayIdMap: scheduleDayIdMap
             });
 
-            return fetchAllCustomers(businessId);
+            return fetchAllCustomers(businessId, userInfo.token);
         })
         .then((newAllCustomers) => {
             setAllCustomers(newAllCustomers);

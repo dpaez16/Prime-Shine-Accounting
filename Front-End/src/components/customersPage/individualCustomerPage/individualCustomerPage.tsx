@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useContext } from 'react';
 import { Message } from 'semantic-ui-react';
 import EditCustomerModal from './editCustomerModal/editCustomerModal';
 import WaveAPIClient from '../../../api/waveApiClient';
@@ -7,14 +6,30 @@ import { US_COUNTRY_CODE } from '../../../utils/consts';
 import useLocalization from '../../../hooks/useLocalization';
 import { WaveCustomer, WaveCustomerAddress } from '@/types/waveCustomer';
 import { CreateCustomerFormParams } from '../createCustomerModal/createCustomerModal';
+import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
+import { WaveCustomerID } from '../../../types/waveCustomer';
+import LoadingSegment from '@/components/loadingSegment/loadingSegment';
+import { useBrowserQuery } from '@/hooks/useBrowserQuery';
+
+interface IndividualCustomerPageData {
+    customer: WaveCustomer;
+}
+
+type IndividualCustomerPageQuery = {
+    customerID?: string;
+};
 
 export default function IndividualCustomerPage() {
-    const [error, setError] = useState(null);
-    const { t } = useLocalization();
-    const location = useLocation();
-    const navigate = useNavigate();
+    const loginSession = useContext(LoginSessionContext);
+    const businessInfo = loginSession.businessInfo!;
+    const userInfo = loginSession.userInfo!;
 
-    const customer: WaveCustomer = location.state.customer;
+    const { t } = useLocalization();
+    const params = useBrowserQuery<IndividualCustomerPageQuery>();
+
+    const { data, loading, error, refetch } = useDataFetcher<IndividualCustomerPageData>({ fetcher: () => WaveAPIClient2.fetchCustomer(businessInfo.businessId, params.customerID ?? 'undefined', userInfo.token) })
 
     const constructNameElement = (name: string | null) => {
         if (!name) {
@@ -101,35 +116,25 @@ export default function IndividualCustomerPage() {
     };
 
     const constructCustomerPropElements = (customer: WaveCustomer) => {
-        const {
-            name,
-            phone,
-            mobile,
-            email,
-            address
-        } = customer;
-
         const elements = [
-            constructNameElement(name),
-            constructPhoneElement(phone),
-            constructMobileElement(mobile),
-            constructEmailElement(email),
-            constructAddressElement(address),
+            constructNameElement(customer.name),
+            constructPhoneElement(customer.phone),
+            constructMobileElement(customer.mobile),
+            constructEmailElement(customer.email),
+            constructAddressElement(customer.address),
         ];
 
         return elements.filter((element) => element !== null);
     };
 
-    const editCustomerHandler = (formParams: CreateCustomerFormParams) => {
+    const editCustomerHandler = (customerID: WaveCustomerID, formParams: CreateCustomerFormParams) => {
         const {
             name, phone, mobile, email,
             addressLine1, addressLine2, city, provinceCode, postalCode
         } = formParams;
 
-        const customerId = customer.id;
-
         const customerPatchInput = {
-            id: customerId,
+            id: customerID,
             name: name,
             phone: phone,
             mobile: mobile,
@@ -147,33 +152,35 @@ export default function IndividualCustomerPage() {
         return WaveAPIClient.editCustomer(customerPatchInput) as Promise<WaveCustomer>;
     };
 
+    if (loading) {
+        return (
+            <div>
+                <LoadingSegment />
+            </div>
+        );
+    }
+
+    const customer = data?.customer;
+    if (!customer || error) {
+        return (
+            <div>
+                <Message negative content={`Unable to load customer: ${error?.message}`} />
+            </div>
+        );
+    }
+
     const customerPropElements = constructCustomerPropElements(customer);
 
     return (
         <div className='flex flex-col gap-10'>
             <div>
                 <h1>{customer.name}</h1>
-                {error &&
-                    <Message
-                        negative
-                        content={error}
-                    />
-                }
                 <EditCustomerModal
                     customer={customer}
                     onSubmit={(formParams) => {
-                        editCustomerHandler(formParams)
-                            .then(newCustomer => {
-                                navigate('/viewCustomer', {
-                                    replace: true,
-                                    state: {
-                                        customer: newCustomer
-                                    }
-                                });
-                            })
-                            .catch(err => {
-                                setError(err.message);
-                            });
+                        editCustomerHandler(customer.id, formParams)
+                            .then(() => refetch())
+                            .catch(err => alert('Failed to edit customer: ' + err.message)); // TODO: use translation hook
                     }}
                 />
             </div>

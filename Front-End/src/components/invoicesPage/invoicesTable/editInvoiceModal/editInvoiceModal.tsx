@@ -131,6 +131,7 @@ type EditInvoiceModalProps = {
 
 export default function EditInvoiceModal(props: EditInvoiceModalProps) {
   const loginSession = useContext(LoginSessionContext);
+  const userInfo = loginSession.userInfo!;
   const businessInfo = loginSession.businessInfo!;
 
   const [invoiceServices, setInvoiceServices] = useState(props.invoice.items);
@@ -144,7 +145,7 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
 
   const { t } = useLocalization();
 
-  const { data, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => fetchAllCustomers(businessInfo.businessId) });
+  const { data, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
   const customers = data ?? [];
 
   const getFormParams = () => {

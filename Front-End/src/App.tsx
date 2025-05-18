@@ -42,7 +42,7 @@ export default function App() {
                                 <Route path="/schedules" element={<SchedulesPage />} />
                                 <Route path="/viewSchedule" element={<IndividualSchedulePage />} />
                                 <Route path="/customers" element={<CustomersPage />} />
-                                <Route path="/viewCustomer" element={<IndividualCustomerPage/>} />
+                                <Route path="/customer" element={<IndividualCustomerPage/>} />
                                 <Route path="/invoices" element={<InvoicesPage />} />
                             </>
                         }
