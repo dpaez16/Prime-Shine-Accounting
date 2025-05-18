@@ -1,5 +1,5 @@
 import { BusinessID } from '@/types/businessInfo';
-import { WaveCustomerID } from '@/types/waveCustomer';
+import { WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
 
 export class WaveAPIClient2 {
     static #createFetchRequest(
@@ -51,5 +51,13 @@ export class WaveAPIClient2 {
         };
 
         return this.#createFetchRequest('/customer/query', body, jwt);
+    }
+
+    static editCustomer(customerPatchInput: WaveCustomerPatchInput, jwt: string | null) {
+        const body = {
+            customerPatchInput,
+        };
+
+        return this.#createFetchRequest('/customer/edit', body, jwt);
     }
 }

@@ -1,10 +1,9 @@
 import React, { useContext } from 'react';
 import { Message } from 'semantic-ui-react';
 import EditCustomerModal from './editCustomerModal/editCustomerModal';
-import WaveAPIClient from '../../../api/waveApiClient';
 import { US_COUNTRY_CODE } from '../../../utils/consts';
 import useLocalization from '../../../hooks/useLocalization';
-import { WaveCustomer, WaveCustomerAddress } from '@/types/waveCustomer';
+import { WaveCustomer, WaveCustomerAddress, WaveCustomerPatchInput } from '@/types/waveCustomer';
 import { CreateCustomerFormParams } from '../createCustomerModal/createCustomerModal';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { WaveAPIClient2 } from '@/api/waveApiClient2';
@@ -133,7 +132,7 @@ export default function IndividualCustomerPage() {
             addressLine1, addressLine2, city, provinceCode, postalCode
         } = formParams;
 
-        const customerPatchInput = {
+        const customerPatchInput: WaveCustomerPatchInput = {
             id: customerID,
             name: name,
             phone: phone,
@@ -149,7 +148,7 @@ export default function IndividualCustomerPage() {
             }
         };
 
-        return WaveAPIClient.editCustomer(customerPatchInput) as Promise<WaveCustomer>;
+        return WaveAPIClient2.editCustomer(customerPatchInput, userInfo.token);
     };
 
     if (loading) {
