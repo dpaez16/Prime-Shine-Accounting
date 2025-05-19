@@ -74,29 +74,6 @@ export default class WaveAPIClient {
     }
 
     /**
-    * Fetches the identity business ID required for API calls to Wave's business API.
-    *
-    * @returns A promise resolving to the identity business ID.
-    */
-    static fetchIdentityBusinessID() {
-        const params = new URLSearchParams({
-           'include_personal': 'false',
-        });
-        const path = `/?${params.toString()}`;
-
-        return this.#createFetchBusinessAPIRequest(path, null, 'GET')
-            .then((businesses: InternalBusinessInfo[]) => {
-                const business = businesses.find(b => b.company_name === import.meta.env.VITE_WAVE_BUSINESS_NAME);
-
-                if (!business) {
-                    throw new Error('Could not find internal business info');
-                }
-
-                return business.id;
-            });
-    }
-
-    /**
     * Grabs the payments for an invoice.
     *
     * @param identityBusinessID The identity business ID obtained from `fetchIdentityBusinessID`.
@@ -160,100 +137,6 @@ export default class WaveAPIClient {
         const path = `/${identityBusinessID}/invoices/${invoiceID}/${paymentID}/`;
 
         return this.#createFetchBusinessAPIRequest(path, null, 'DELETE');
-    }
-
-    /**
-    * Fetches all metadata related to the business.
-    * @return {Promise<BusinessInfo>} The promise with success returning the business data, otherwise an error for rejection.
-    */
-    static fetchBusinessData() {
-        const requestBody = {
-            query: `
-                    {
-                        businesses {
-                            edges {
-                                node {
-                                    id
-                                    name
-                                    products {
-                                        edges {
-                                            node {
-                                                id
-                                                name
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    `,
-        };
-
-        return WaveAPIClient.#createFetchRequest(requestBody)
-            .then(async (response) => {
-                if (!response || (response.status !== 200 && response.status !== 201)) {
-                    const responseText = await response.text();
-                    throw new Error(`Could not fetch business: ${responseText}`);
-                }
-
-                return response.json();
-            })
-            .then((json) => {
-                if (json.errors && json.errors.length > 0) {
-                    throw new Error(
-                        `Could not fetch business: ${JSON.stringify(json.errors)}`,
-                    );
-                }
-
-                const businesses = json.data.businesses.edges;
-                let business = businesses.filter(
-                    (edge) => edge.node.name === import.meta.env.VITE_WAVE_BUSINESS_NAME,
-                );
-
-                if (business.length !== 1) {
-                    throw new Error(
-                        `Could not fetch business: ${import.meta.env.VITE_WAVE_BUSINESS_NAME}`,
-                    );
-                }
-
-                business = business[0].node;
-                const businessId = business.id;
-                const businessName = business.name;
-
-                const products = business.products.edges;
-                let product = products.filter((edge) =>
-                    edge.node.name === import.meta.env.VITE_WAVE_CLEANING_PRODUCT_NAME,
-                );
-
-                if (product.length !== 1) {
-                    throw new Error(
-                        `Could not fetch cleaning product: ${import.meta.env.VITE_WAVE_CLEANING_PRODUCT_NAME}`,
-                    );
-                }
-
-                product = product[0].node;
-                const productId = product.id;
-                const productName = product.name;
-
-                return {
-                    businessId: businessId,
-                    businessName: businessName,
-                    productId: productId,
-                    productName: productName,
-                };
-            })
-            .then(data => {
-                return this.fetchIdentityBusinessID().then(identityBusinessID => {
-                    return {
-                        ...data,
-                        identityBusinessID,
-                    } as BusinessInfo;
-                });
-            })
-            .catch((err) => {
-                throw err;
-            });
     }
 
     /**

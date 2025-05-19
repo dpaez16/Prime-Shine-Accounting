@@ -26,16 +26,11 @@ export default function RegisterModal(props: RegisterModalProps) {
         const { name, email, password } = userParams;
 
         return PrimeShineAPIClient.createUser(name, email, password)
-            .then((user) => {
-                return WaveAPIClient.fetchBusinessData()
-                    .then((businessInfo) => {
-                        return { user: user, businessInfo: businessInfo };
-                    })
-                    .catch((err) => {
-                        throw err;
-                    });
+            .then(data => {
+                const { userInfo: user, businessInfo } = data;
+                return { user: user, businessInfo: businessInfo };
             })
-            .catch((err) => {
+            .catch(err => {
                 throw err;
             });
     };

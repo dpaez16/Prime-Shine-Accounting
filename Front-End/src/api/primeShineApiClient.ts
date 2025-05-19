@@ -2,6 +2,7 @@ import { ScheduledCustomer } from '@/types/scheduledCustomer';
 import { ScheduleDay } from '@/types/scheduleDay';
 import { UserInfo } from '@/types/userInfo';
 import { Schedule } from '@/types/schedule';
+import { BusinessInfo } from '../types/businessInfo';
 
 export default class PrimeShineAPIClient {
     static #createFetchRequest(
@@ -45,11 +46,11 @@ export default class PrimeShineAPIClient {
 
     /**
     * Attempts to login the user to Prime Shine Accounting.
-    * @param {string} email - The user's email associated with their account.
-    * @param {string} password - The user's password associated with their account.
-    * @return {Promise<UserInfo>} The promise with success returning the user's info + session, otherwise an error for rejection.
+    * @param email - The user's email associated with their account.
+    * @param password - The user's password associated with their account.
+    * @return The promise with success returning the user's info + session, otherwise an error for rejection.
     */
-    static loginUser(email: string, password: string): Promise<UserInfo> {
+    static loginUser(email: string, password: string) {
         const body = {
             email: email,
             password: password,
@@ -57,8 +58,11 @@ export default class PrimeShineAPIClient {
 
         return PrimeShineAPIClient.#createFetchRequest('/login', body)
             .then((json) => {
-                const { jwt, user } = json;
-                return { ...user, token: jwt };
+                const { jwt, user, businessInfo } = json;
+                return {
+                    userInfo: { ...user, token: jwt } as UserInfo,
+                    businessInfo: businessInfo as BusinessInfo,
+                };
             })
             .catch((err) => {
                 throw new Error(`Could not login user: ${err.message}`);
@@ -67,16 +71,16 @@ export default class PrimeShineAPIClient {
 
     /**
     * Attempts to register the user to Prime Shine Accounting.
-    * @param {string} name - The user's name to be associated with their account.
-    * @param {string} email - The user's email to be associated with their account.
-    * @param {string} password - The user's password to be associated with their account.
-    * @return {Promise<UserInfo>} The promise with success returning the newly created user's info + session, otherwise an error for rejection.
+    * @param name - The user's name to be associated with their account.
+    * @param email - The user's email to be associated with their account.
+    * @param password - The user's password to be associated with their account.
+    * @return The promise with success returning the newly created user's info + session, otherwise an error for rejection.
     */
     static createUser(
         name: string,
         email: string,
         password: string,
-    ): Promise<UserInfo> {
+    ) {
         const body = {
             name: name,
             email: email,
@@ -85,8 +89,11 @@ export default class PrimeShineAPIClient {
 
         return PrimeShineAPIClient.#createFetchRequest('/register', body)
             .then((json) => {
-                const { jwt, user } = json;
-                return { ...user, token: jwt };
+                const { jwt, user, businessInfo } = json;
+                return {
+                    userInfo: { ...user, token: jwt } as UserInfo,
+                    businessInfo: businessInfo as BusinessInfo,
+                };
             })
             .catch((err) => {
                 throw new Error(`Could not create user: ${err.message}`);

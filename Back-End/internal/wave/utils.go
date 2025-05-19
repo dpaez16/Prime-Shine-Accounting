@@ -45,6 +45,10 @@ func getWaveAPIToken() string {
 	return os.Getenv("WAVE_TOKEN")
 }
 
+func getWaveBusinessURL() string {
+	return os.Getenv("WAVE_BUSINESS_URL")
+}
+
 func transformErrorsArrayIntoError(graphQLErrors []WaveGraphQLError) string {
 	var errorMessages []string
 
@@ -110,4 +114,41 @@ func createWaveGraphQLRequest(body WaveGraphQLBody) (string, error) {
 	}
 
 	return string(data), nil
+}
+
+func createWaveBusinessAPIRequest(method string, path string, body *map[string]any) (string, error) {
+	serializedBody, err := json.MarshalIndent(body, "", "\t")
+	if err != nil {
+		return "", errors.Wrap(err, "json serialization")
+	}
+
+	requestBody := bytes.NewBuffer(serializedBody)
+	req, err := http.NewRequest(method, getWaveBusinessURL()+path, requestBody)
+	if err != nil {
+		return "", errors.Wrapf(err, "creating the %v request", method)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %v", getWaveAPIToken()))
+
+	client := &http.Client{}
+	response, err := client.Do(req)
+	if err != nil {
+		return "", errors.Wrapf(err, "dispatching the %v request", method)
+	}
+
+	defer response.Body.Close()
+
+	responseBody, err := io.ReadAll(response.Body)
+	if err != nil {
+		return "", errors.Wrapf(err, "reading %v response body", method)
+	}
+
+	responseBodyText := string(responseBody)
+
+	if response.StatusCode != http.StatusOK && response.StatusCode != http.StatusCreated {
+		return "", errors.Wrap(err, responseBodyText)
+	}
+
+	return responseBodyText, nil
 }
