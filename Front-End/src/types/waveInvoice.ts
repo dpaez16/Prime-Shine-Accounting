@@ -34,3 +34,5 @@ export type WaveInvoice = {
   uuid: string;
   viewUrl: string;
 };
+
+export type WaveInvoiceID = WaveInvoice['id'];

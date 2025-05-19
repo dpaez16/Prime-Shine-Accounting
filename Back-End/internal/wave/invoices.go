@@ -129,6 +129,7 @@ func GetInvoices(businessID string, filterStruct WaveInvoiceFilterData) (*[]Wave
 	variablesStr, paramsStr := constructInvoiceFilterStrings(filterStruct)
 	variables := constructInvoiceGraphQLVariablesMap(businessID, filterStruct)
 
+	// TODO: reduce the amount of data grabbed to match use case
 	body := WaveGraphQLBody{
 		Query: fmt.Sprintf(`
 					query($businessId: ID!, %v) {
@@ -199,4 +200,72 @@ func GetInvoices(businessID string, filterStruct WaveInvoiceFilterData) (*[]Wave
 	}
 
 	return &invoices, &queryData.Business.Invoices.PageInfo, nil
+}
+
+type waveInvoiceQueryData struct {
+	Business struct {
+		Invoice WaveInvoice `json:"invoice"`
+	} `json:"business"`
+}
+
+func GetInvoice(businessID string, invoiceID string) (*WaveInvoice, error) {
+	body := WaveGraphQLBody{
+		Query: `
+					query($businessId: ID!, $invoiceId: ID!) {
+						business(id: $businessId) {
+							invoice(id: $invoiceId) {
+								id
+								createdAt
+								modifiedAt
+								pdfUrl
+								viewUrl
+								status
+								invoiceNumber
+								invoiceDate
+								customer {
+									id
+									name
+								}
+								amountDue {
+									value
+								}
+								amountPaid {
+									value
+								}
+								total {
+									value
+								}
+								memo
+								items {
+									product {
+										id
+										name
+									}
+									description
+									total {
+										value
+									}
+								}
+							}
+						}
+					}
+		`,
+		Variables: WaveGraphQLVariables{
+			"businessId": businessID,
+			"invoiceId":  invoiceID,
+		},
+	}
+
+	response, err := createWaveGraphQLRequest(body)
+	if err != nil {
+		return nil, errors.Wrap(err, "createWaveGraphQLRequest")
+	}
+
+	var queryData waveInvoiceQueryData
+	err = json.Unmarshal([]byte(response), &queryData)
+	if err != nil {
+		return nil, errors.Wrap(err, "json deserialization")
+	}
+
+	return &queryData.Business.Invoice, nil
 }
