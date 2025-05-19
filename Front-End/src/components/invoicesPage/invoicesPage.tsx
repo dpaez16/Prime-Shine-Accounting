@@ -6,7 +6,7 @@ import {
     Message,
     PaginationProps,
 } from 'semantic-ui-react';
-import WaveAPIClient, { WaveInvoiceFilterKey, WaveInvoiceFilterObj } from '../../api/waveApiClient';
+import { WaveInvoiceFilterKey, WaveInvoiceFilterObj } from '../../api/waveApiClient';
 import InvoicesTable from './invoicesTable/invoicesTable';
 import { CreateInvoiceModal } from './createInvoiceModal/createInvoiceModal';
 import useLocalization from '../../hooks/useLocalization';
@@ -17,6 +17,9 @@ import { InvoicesSearchToolbar } from './invoicesSearchToolbar/invoicesSearchToo
 import { useInvoicesSearch } from './invoicesSearchToolbar/useInvoicesSearch';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { EventListenerNames } from '@/utils/consts';
+import { WaveAPIClient2 } from '@/api/waveApiClient2';
+
+const PAGE_SIZE = 50;
 
 interface InvoicesData {
     invoices: WaveInvoice[];
@@ -25,6 +28,7 @@ interface InvoicesData {
 
 export default function InvoicesPage() {
     const context = useContext(LoginSessionContext);
+    const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
 
     const { t } = useLocalization();
@@ -48,7 +52,7 @@ export default function InvoicesPage() {
             return filtered;
         }, {} as WaveInvoiceFilterObj);
 
-        return WaveAPIClient.fetchInvoices(businessId, pageNum, filterParametersObj);
+        return WaveAPIClient2.fetchInvoices(businessId, { ...filterParametersObj, page: pageNum, pageSize: PAGE_SIZE, }, userInfo.token);
     };
 
     const handlePageChange = (

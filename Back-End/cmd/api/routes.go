@@ -45,6 +45,9 @@ func (app *application) routes() http.Handler {
 	router.POST("/api/wave/customers/query", app.authenticate(app.queryWaveCustomersPaginated))
 	router.POST("/api/wave/customers/queryAll", app.authenticate(app.queryWaveCustomers))
 
+	// wave invoice routes
+	router.POST("/api/wave/invoices/query", app.authenticate(app.queryWaveInvoices))
+
 	// TODO: add pdf route?
 	// https://github.com/go-pdf/fpdf
 

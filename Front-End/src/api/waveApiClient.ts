@@ -1,7 +1,4 @@
-import { BusinessInfo, InternalBusinessInfo } from '@/types/businessInfo';
-import { WaveInvoice } from '@/types/waveInvoice';
 import { WaveInvoicePayment } from '@/types/waveInvoicePayment';
-import { WavePageInfo } from '@/types/wavePageInfo';
 
 const WAVE_INVOICE_FILTERS = {
     customerId: {
@@ -22,6 +19,9 @@ const WAVE_INVOICE_FILTERS = {
     page: {
         type: 'Int',
     },
+    pageSize: {
+        type: 'Int',
+    }
 };
 
 export type WaveInvoiceFilterKey = keyof typeof WAVE_INVOICE_FILTERS;
@@ -137,130 +137,6 @@ export default class WaveAPIClient {
         const path = `/${identityBusinessID}/invoices/${invoiceID}/${paymentID}/`;
 
         return this.#createFetchBusinessAPIRequest(path, null, 'DELETE');
-    }
-
-    /**
-    * Fetches invoices from the business.
-    *
-    * Client can choose to include filters if they wish via the `filterParameters` argument.
-    * The filters should conform to the arguments to the `Business.invoices` field: https://developer.waveapps.com/hc/en-us/articles/360019968212-API-Reference
-    * @param {string} businessId - The business's unique ID.
-    * @param {number} [pageNum] - The page number to grab invoices from. Defaults to first page.
-    * @param {Object} [filterParameters] - Parameters to filter the invoices by. Defaults to no filters.
-    * @return {Promise<Object>} The promise with success returning an object containing the requested invoices and page info, otherwise an error for rejection.
-    */
-    static fetchInvoices(businessId: string, pageNum: number, filterParameters: WaveInvoiceFilterObj) {
-        const filterKeys = Object.keys({
-            ...filterParameters,
-            page: pageNum,
-        });
-
-        const variableDefsStr = filterKeys.map((key) => {
-            const waveInvoiceFilterMetadata = WAVE_INVOICE_FILTERS[key as WaveInvoiceFilterKey];
-            if (waveInvoiceFilterMetadata) {
-                return `$${key}: ${waveInvoiceFilterMetadata.type}`;
-            }
-
-            return '';
-        })
-        .filter((e) => e !== '')
-        .join(', ');
-
-        const parametersStr = filterKeys.map((key) => {
-            const waveInvoiceFilterMetadata = WAVE_INVOICE_FILTERS[key as WaveInvoiceFilterKey];
-            if (waveInvoiceFilterMetadata) {
-                return `${key}: $${key}`;
-            }
-
-            return '';
-        })
-        .filter((e) => e !== '')
-        .join(', ');
-
-        const requestBody = {
-            query: `
-                    query($businessId: ID!, ${variableDefsStr}) {
-                        business(id: $businessId) {
-                            invoices(sort: [INVOICE_DATE_DESC], ${parametersStr}) {
-                                pageInfo {
-                                    currentPage
-                                    totalPages
-                                    totalCount
-                                }
-                                edges {
-                                    node {
-                                        id
-                                        createdAt
-                                        modifiedAt
-                                        pdfUrl
-                                        viewUrl
-                                        status
-                                        invoiceNumber
-                                        invoiceDate
-                                        customer {
-                                            id
-                                            name
-                                        }
-                                        amountDue {
-                                            value
-                                        }
-                                        amountPaid {
-                                            value
-                                        }
-                                        total {
-                                            value
-                                        }
-                                        memo
-                                        items {
-                                            product {
-                                                id
-                                                name
-                                            }
-                                            description
-                                            total {
-                                                value
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    `,
-            variables: {
-                ...filterParameters,
-                businessId: businessId,
-                page: pageNum,
-            },
-        };
-
-        return WaveAPIClient.#createFetchRequest(requestBody)
-            .then(async (response) => {
-                if (!response || (response.status !== 200 && response.status !== 201)) {
-                    const responseText = await response.text();
-                    throw new Error(`Could not fetch invoices: ${responseText}`);
-                }
-
-                return response.json();
-            })
-            .then((json) => {
-                if (json.errors !== undefined) {
-                    throw new Error(
-                        `Could not fetch invoices: ${JSON.stringify(json.errors)}`,
-                    );
-                }
-
-                // TODO: process raw invoices into better format
-                return {
-                    pageInfo: json.data.business.invoices.pageInfo as WavePageInfo,
-                    invoices: json.data.business.invoices.edges.map(
-                        (rawInvoice) => rawInvoice.node,
-                    ) as WaveInvoice[],
-                };
-            })
-            .catch((err) => {
-                throw err;
-            });
     }
 
     /**
