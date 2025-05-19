@@ -2,7 +2,9 @@ package wave
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/pkg/errors"
 )
@@ -14,7 +16,12 @@ type WaveInternalBusinessInfo struct {
 }
 
 func GetInternalBusinessInfo() (string, error) {
-	data, err := createWaveBusinessAPIRequest(http.MethodGet, "/?include_personal=false", nil)
+	params := url.Values{}
+	params.Set("include_personal", "false")
+
+	path := fmt.Sprintf("/?%v", params.Encode())
+
+	data, err := createWaveBusinessAPIRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return "", errors.Wrap(err, "createWaveBusinessAPIRequest")
 	}
