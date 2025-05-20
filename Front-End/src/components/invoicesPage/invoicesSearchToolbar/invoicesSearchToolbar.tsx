@@ -1,4 +1,4 @@
-import WaveAPIClient, { WaveInvoiceFilterKey } from '@/api/waveApiClient';
+import WaveAPIClient, { WaveInvoiceFilterKey, WaveInvoiceFilterObj } from '@/api/waveApiClient';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import useLocalization from '@/hooks/useLocalization';
@@ -14,7 +14,7 @@ import {
 
 interface InvoicesSearchToolbarProps {
     onSubmit: () => void;
-    handleFilterChange: (key: WaveInvoiceFilterKey, value: string | null) => void;
+    handleFilterChange: <K extends WaveInvoiceFilterKey>(key: K, value: WaveInvoiceFilterObj[K]) => void;
     loading: boolean;
 }
 

@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Form, Label, Input, Button, Message, Modal } from 'semantic-ui-react';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
-import WaveAPIClient from '../../api/waveApiClient';
 import useLocalization from '../../hooks/useLocalization';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 

@@ -1,3 +1,6 @@
+import { Prettify } from './prettify';
+import { WaveCustomer } from './waveCustomer';
+
 export type WaveProduct = {
   id: string;
   name: string;
@@ -36,3 +39,18 @@ export type WaveInvoice = {
 };
 
 export type WaveInvoiceID = WaveInvoice['id'];
+
+export type WaveInvoicePatchInput = Prettify<
+  Pick<WaveInvoice, 'id' | 'invoiceDate' | 'memo'> &
+  {
+    customerId: WaveCustomer['id'],
+    items: Prettify<
+      Pick<WaveInvoiceItem, 'description'> &
+      {
+        productId: WaveProduct['id'],
+        quantity: number,
+        unitPrice: WaveCost['value'],
+      }
+    >[]
+  }
+>;

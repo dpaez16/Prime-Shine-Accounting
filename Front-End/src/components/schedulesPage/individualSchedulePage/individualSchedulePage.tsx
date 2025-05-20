@@ -6,7 +6,6 @@ import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTa
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
 import SchedulePDFDocument from './scheduledCustomerTable/schedulePdfDocument/schedulePdfDocument';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
-import WaveAPIClient from '../../../api/waveApiClient';
 import LoadingSegment from '../../loadingSegment/loadingSegment';
 import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
 import useLocalization from '../../../hooks/useLocalization';

@@ -1,31 +1,16 @@
+import { WaveCustomerID } from '@/types/waveCustomer';
 import { WaveInvoicePayment } from '@/types/waveInvoicePayment';
 
-const WAVE_INVOICE_FILTERS = {
-    customerId: {
-        type: 'ID',
-    },
-    status: {
-        type: 'InvoiceStatus',
-    },
-    invoiceDateStart: {
-        type: 'Date',
-    },
-    invoiceDateEnd: {
-        type: 'Date',
-    },
-    invoiceNumber: {
-        type: 'String',
-    },
-    page: {
-        type: 'Int',
-    },
-    pageSize: {
-        type: 'Int',
-    }
+export type WaveInvoiceFilterObj = {
+    customerId: WaveCustomerID | null,
+    invoiceDateStart: string  | null,
+    invoiceDateEnd: string  | null,
+    invoiceNumber: string | null,
+    page: number,
+    pageSize: number,
 };
 
-export type WaveInvoiceFilterKey = keyof typeof WAVE_INVOICE_FILTERS;
-export type WaveInvoiceFilterObj = Record<WaveInvoiceFilterKey, Date | string | number>;
+export type WaveInvoiceFilterKey = keyof WaveInvoiceFilterObj;
 
 export default class WaveAPIClient {
     static WAVE_INVOICE_STATUSES = [

@@ -18,7 +18,7 @@ export default function CustomersPage() {
     const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
 
-    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) })
+    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
     const [searchBarValue, setSearchBarValue] = useState('');
     const { t } = useLocalization();
     const navigate = useNavigate();

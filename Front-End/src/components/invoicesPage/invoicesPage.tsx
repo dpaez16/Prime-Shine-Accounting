@@ -5,8 +5,10 @@ import {
     Button,
     Message,
     PaginationProps,
+    Dropdown,
+    DropdownProps,
 } from 'semantic-ui-react';
-import { WaveInvoiceFilterKey, WaveInvoiceFilterObj } from '../../api/waveApiClient';
+import { WaveInvoiceFilterObj } from '../../api/waveApiClient';
 import InvoicesTable from './invoicesTable/invoicesTable';
 import { CreateInvoiceModal } from './createInvoiceModal/createInvoiceModal';
 import useLocalization from '../../hooks/useLocalization';
@@ -18,8 +20,7 @@ import { useInvoicesSearch } from './invoicesSearchToolbar/useInvoicesSearch';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { EventListenerNames } from '@/utils/consts';
 import { WaveAPIClient2 } from '@/api/waveApiClient2';
-
-const PAGE_SIZE = 50;
+import { InvoicesPagination } from './invoicesPagination';
 
 interface InvoicesData {
     invoices: WaveInvoice[];
@@ -33,34 +34,37 @@ export default function InvoicesPage() {
 
     const { t } = useLocalization();
     const [createInvoiceModalOpen, setCreateInvoiceModalOpen] = useState(false);
-    const { filterParameters, handleFilterChange, pageNum, setPageNum } = useInvoicesSearch();
+    const {
+        filterParameters,
+        handleFilterChange,
+        pageNumRef,
+        setPageNum,
+        pageSizeRef,
+        setPageSize,
+    } = useInvoicesSearch();
 
-    const { data, loading, error, refetch } = useDataFetcher<InvoicesData>({ fetcher: () => searchHandler() });
+    const { data, loading, error, refetch } = useDataFetcher<InvoicesData>({
+        fetcher: () => searchHandler(),
+    });
 
     const invoices = data?.invoices ?? [];
 
     const searchHandler = () => {
         const businessId = businessInfo.businessId;
 
-        const filterParametersObj = Object.keys(filterParameters).reduce((filtered, key) => {
-            const k = key as WaveInvoiceFilterKey;
+        const filterParametersObj = Object.entries(filterParameters)
+            .filter(entry => entry[1] !== null)
+            .reduce((filtered, entry) => ({ ...filtered, [entry[0]]: entry[1], }), {} as WaveInvoiceFilterObj);
 
-            if (filterParameters[k] !== '') {
-                filtered[k] = filterParameters[k];
-            }
-
-            return filtered;
-        }, {} as WaveInvoiceFilterObj);
-
-        return WaveAPIClient2.fetchInvoices(businessId, { ...filterParametersObj, page: pageNum, pageSize: PAGE_SIZE, }, userInfo.token);
-    };
-
-    const handlePageChange = (
-        _: React.MouseEvent<HTMLAnchorElement>,
-        data: PaginationProps,
-    ) => {
-        const activePage = data.activePage as number;
-        setPageNum(activePage);
+        return WaveAPIClient2.fetchInvoices(
+            businessId,
+            {
+                ...filterParametersObj,
+                page: pageNumRef.current,
+                pageSize: pageSizeRef.current,
+            },
+            userInfo.token,
+        );
     };
 
     useEffect(() => {
@@ -75,10 +79,6 @@ export default function InvoicesPage() {
         };
     }, []);
 
-    useEffect(() => {
-        refetch();
-    }, [pageNum]);
-
     return (
         <div className='flex flex-col'>
             <h1>{t('Invoices')}</h1>
@@ -89,7 +89,10 @@ export default function InvoicesPage() {
                 <Button onClick={() => setCreateInvoiceModalOpen(true)}>{t('Create Invoice')}</Button>
             </div>
             <InvoicesSearchToolbar
-                onSubmit={refetch}
+                onSubmit={() => {
+                    setPageNum(1);
+                    refetch();
+                }}
                 handleFilterChange={handleFilterChange}
                 loading={loading}
             />
@@ -102,16 +105,18 @@ export default function InvoicesPage() {
                     invoices={invoices}
                 />
             }
-            {
-                data?.pageInfo &&
-                <Pagination
-                    boundaryRange={0}
-                    activePage={pageNum}
-                    siblingRange={1}
-                    totalPages={data.pageInfo.totalPages}
-                    onPageChange={handlePageChange}
-                />
-            }
+            <InvoicesPagination
+                currentPageSize={pageSizeRef.current}
+                pageInfo={data?.pageInfo}
+                handlePageChange={newPageNum => {
+                    setPageNum(newPageNum);
+                    refetch();
+                }}
+                handlePageSizeChange={newPageSize => {
+                    setPageSize(newPageSize);
+                    refetch();
+                }}
+            />
         </div>
     );
 }

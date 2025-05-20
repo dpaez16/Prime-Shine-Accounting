@@ -26,7 +26,7 @@ export type InvoiceItem = {
   productId: string;
   quantity: number;
   unitPrice: string | number;
-  uuid: string;
+  uuid?: string;
 };
 
 type CreateInvoiceModalTableProps = {

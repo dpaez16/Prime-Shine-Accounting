@@ -269,3 +269,54 @@ func GetInvoice(businessID string, invoiceID string) (*WaveInvoice, error) {
 
 	return &queryData.Business.Invoice, nil
 }
+
+type editInvoiceMutationData struct {
+	InvoicePatch struct {
+		DidSucceed  bool              `json:"didSucceed"`
+		InputErrors *[]WaveInputError `json:"inputErrors"`
+	} `json:"invoicePatch"`
+}
+
+func EditInvoice(invoicePatchInput map[string]any) error {
+	body := WaveGraphQLBody{
+		Query: `
+					mutation($input: InvoicePatchInput!) {
+						invoicePatch(input: $input) {
+							didSucceed
+							inputErrors {
+								code
+								message
+								path
+							}
+						}
+					}
+		`,
+		Variables: WaveGraphQLVariables{
+			"input": invoicePatchInput,
+		},
+	}
+
+	response, err := createWaveGraphQLRequest(body)
+	if err != nil {
+		return errors.Wrap(err, "createWaveGraphQLRequest")
+	}
+
+	var mutationData editInvoiceMutationData
+	err = json.Unmarshal([]byte(response), &mutationData)
+	if err != nil {
+		return errors.Wrap(err, "json deserialization")
+	}
+
+	inputErrors := mutationData.InvoicePatch.InputErrors
+	didSucceed := mutationData.InvoicePatch.DidSucceed
+
+	if inputErrors != nil {
+		return errors.Errorf("%v", *inputErrors)
+	}
+
+	if !didSucceed {
+		return errors.New("Failed to edit invoice.")
+	}
+
+	return nil
+}
