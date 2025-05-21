@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import useLocalization from '@/hooks/useLocalization';
-import { WaveInvoicePatchInput } from '@/types/waveInvoice';
+import { WaveInvoiceService } from '@/types/waveInvoice';
 import { Button, Icon, Input, Table } from 'semantic-ui-react';
 import { v4 as uuidV4 } from 'uuid';
 
-export type InvoiceService = Pick<WaveInvoicePatchInput, 'items'>['items'][number] & { uuid: string };
+export type InvoiceService = WaveInvoiceService & { uuid: string };
 
 type EditInvoiceModalTableProps = {
     invoiceServices: InvoiceService[];

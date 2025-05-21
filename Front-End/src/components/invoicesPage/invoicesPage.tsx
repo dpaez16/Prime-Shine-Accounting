@@ -82,11 +82,11 @@ export default function InvoicesPage() {
     return (
         <div className='flex flex-col'>
             <h1>{t('Invoices')}</h1>
-            {createInvoiceModalOpen && <CreateInvoiceModal
-                onClose={() => setCreateInvoiceModalOpen(false)}
-            />}
+            {createInvoiceModalOpen && <CreateInvoiceModal onClose={() => setCreateInvoiceModalOpen(false)} />}
             <div>
-                <Button onClick={() => setCreateInvoiceModalOpen(true)}>{t('Create Invoice')}</Button>
+                <Button onClick={() => setCreateInvoiceModalOpen(true)}>
+                    {t('Create Invoice')}
+                </Button>
             </div>
             <InvoicesSearchToolbar
                 onSubmit={() => {
@@ -100,23 +100,25 @@ export default function InvoicesPage() {
             {error && <Message negative content={error.message} />}
             {
                 !error &&
-                <InvoicesTable
-                    loading={loading}
-                    invoices={invoices}
-                />
+                <>
+                    <InvoicesTable
+                        loading={loading}
+                        invoices={invoices}
+                    />
+                    <InvoicesPagination
+                        currentPageSize={pageSizeRef.current}
+                        pageInfo={data?.pageInfo}
+                        handlePageChange={newPageNum => {
+                            setPageNum(newPageNum);
+                            refetch();
+                        }}
+                        handlePageSizeChange={newPageSize => {
+                            setPageSize(newPageSize);
+                            refetch();
+                        }}
+                    />
+                </>
             }
-            <InvoicesPagination
-                currentPageSize={pageSizeRef.current}
-                pageInfo={data?.pageInfo}
-                handlePageChange={newPageNum => {
-                    setPageNum(newPageNum);
-                    refetch();
-                }}
-                handlePageSizeChange={newPageSize => {
-                    setPageSize(newPageSize);
-                    refetch();
-                }}
-            />
         </div>
     );
 }
