@@ -1,7 +1,7 @@
-import useLocalization from "@/hooks/useLocalization";
-import { WavePageInfo } from "@/types/wavePageInfo";
-import React from "react";
-import { Dropdown, DropdownProps, Pagination, PaginationProps } from "semantic-ui-react";
+import React from 'react';
+import useLocalization from '@/hooks/useLocalization';
+import { WavePageInfo } from '@/types/wavePageInfo';
+import { Dropdown, DropdownProps, Pagination, PaginationProps } from 'semantic-ui-react';
 
 interface InvoicesPaginationProps {
     pageInfo?: WavePageInfo;
@@ -50,7 +50,7 @@ export const InvoicesPagination: React.FC<InvoicesPaginationProps> = (props) => 
             value: pageSize.toString(),
             text: pageSize.toString(),
         };
-    })
+    });
 
     return (
         <div className='flex flex-row items-center gap-4 justify-end'>

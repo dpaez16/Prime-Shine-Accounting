@@ -1,7 +1,7 @@
 import { BusinessID } from '@/types/businessInfo';
 import { WaveCustomerCreateInput, WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
 import { WaveInvoiceFilterObj } from './waveApiClient';
-import { WaveInvoiceID, WaveInvoicePatchInput } from '@/types/waveInvoice';
+import { WaveInvoiceCreateInput, WaveInvoiceID, WaveInvoicePatchInput } from '@/types/waveInvoice';
 
 export class WaveAPIClient2 {
     static #createFetchRequest(
@@ -103,5 +103,21 @@ export class WaveAPIClient2 {
         };
 
         return this.#createFetchRequest('/invoice/edit', body, jwt);
+    }
+
+    static createInvoice(invoiceCreateInput: WaveInvoiceCreateInput, jwt: string | null) {
+        const body = {
+            invoiceCreateInput,
+        };
+
+        return this.#createFetchRequest('/invoice/create', body, jwt);
+    }
+
+    static deleteInvoice(invoiceID: WaveInvoiceID, jwt: string | null) {
+        const body = {
+            invoiceID,
+        };
+
+        return this.#createFetchRequest('/invoice/delete', body, jwt);
     }
 }

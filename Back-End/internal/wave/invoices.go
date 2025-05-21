@@ -320,3 +320,107 @@ func EditInvoice(invoicePatchInput map[string]any) error {
 
 	return nil
 }
+
+type deleteInvoiceMutationData struct {
+	InvoiceDelete struct {
+		DidSucceed  bool              `json:"didSucceed"`
+		InputErrors *[]WaveInputError `json:"inputErrors"`
+	} `json:"invoiceDelete"`
+}
+
+func DeleteInvoice(invoiceID string) error {
+	body := WaveGraphQLBody{
+		Query: `
+					mutation($input: InvoiceDeleteInput!) {
+						invoiceDelete(input: $input) {
+							didSucceed
+							inputErrors {
+								code
+								message
+								path
+							}
+						}
+					}
+		`,
+		Variables: WaveGraphQLVariables{
+			"input": map[string]any{
+				"invoiceId": invoiceID,
+			},
+		},
+	}
+
+	response, err := createWaveGraphQLRequest(body)
+	if err != nil {
+		return errors.Wrap(err, "createWaveGraphQLRequest")
+	}
+
+	var mutationData deleteInvoiceMutationData
+	err = json.Unmarshal([]byte(response), &mutationData)
+	if err != nil {
+		return errors.Wrap(err, "json deserialization")
+	}
+
+	inputErrors := mutationData.InvoiceDelete.InputErrors
+	didSucceed := mutationData.InvoiceDelete.DidSucceed
+
+	if inputErrors != nil {
+		return errors.Errorf("%v", *inputErrors)
+	}
+
+	if !didSucceed {
+		return errors.New("Failed to delete invoice.")
+	}
+
+	return nil
+}
+
+type createInvoiceMutationData struct {
+	InvoiceCreate struct {
+		DidSucceed  bool              `json:"didSucceed"`
+		InputErrors *[]WaveInputError `json:"inputErrors"`
+	} `json:"invoiceCreate"`
+}
+
+func CreateInvoice(invoiceCreateInput map[string]any) error {
+	body := WaveGraphQLBody{
+		Query: `
+					mutation($input: InvoiceCreateInput!) {
+						invoiceCreate(input: $input) {
+							didSucceed
+							inputErrors {
+								code
+								message
+								path
+							}
+						}
+					}
+		`,
+		Variables: WaveGraphQLVariables{
+			"input": invoiceCreateInput,
+		},
+	}
+
+	response, err := createWaveGraphQLRequest(body)
+	if err != nil {
+		return errors.Wrap(err, "createWaveGraphQLRequest")
+	}
+
+	var mutationData createInvoiceMutationData
+	err = json.Unmarshal([]byte(response), &mutationData)
+	if err != nil {
+		return errors.Wrap(err, "json deserialization")
+	}
+
+	inputErrors := mutationData.InvoiceCreate.InputErrors
+	didSucceed := mutationData.InvoiceCreate.DidSucceed
+
+	if inputErrors != nil {
+		return errors.Errorf("%v", *inputErrors)
+	}
+
+	if !didSucceed {
+		return errors.New("Failed to create invoice.")
+	}
+
+	return nil
+}

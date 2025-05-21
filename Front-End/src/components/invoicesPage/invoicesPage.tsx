@@ -1,14 +1,9 @@
 import React, { useEffect, useContext, useState } from 'react';
 import {
     Divider,
-    Pagination,
     Button,
     Message,
-    PaginationProps,
-    Dropdown,
-    DropdownProps,
 } from 'semantic-ui-react';
-import { WaveInvoiceFilterObj } from '../../api/waveApiClient';
 import InvoicesTable from './invoicesTable/invoicesTable';
 import { CreateInvoiceModal } from './createInvoiceModal/createInvoiceModal';
 import useLocalization from '../../hooks/useLocalization';
@@ -16,7 +11,7 @@ import { WaveInvoice } from '@/types/waveInvoice';
 import { WavePageInfo } from '@/types/wavePageInfo';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { InvoicesSearchToolbar } from './invoicesSearchToolbar/invoicesSearchToolbar';
-import { useInvoicesSearch } from './invoicesSearchToolbar/useInvoicesSearch';
+import { useInvoicesSearch, WaveInvoiceFilterObj } from './invoicesSearchToolbar/useInvoicesSearch';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { EventListenerNames } from '@/utils/consts';
 import { WaveAPIClient2 } from '@/api/waveApiClient2';

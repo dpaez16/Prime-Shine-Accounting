@@ -1,6 +1,17 @@
 import { useRef, useState } from 'react';
-import { WaveInvoiceFilterKey, WaveInvoiceFilterObj } from '@/api/waveApiClient';
 import { DEFAULT_PAGE_SIZE } from '../invoicesPagination';
+import { WaveCustomerID } from '@/types/waveCustomer';
+
+export type WaveInvoiceFilterObj = {
+    customerId: WaveCustomerID | null,
+    invoiceDateStart: string  | null,
+    invoiceDateEnd: string  | null,
+    invoiceNumber: string | null,
+    page: number,
+    pageSize: number,
+};
+
+export type WaveInvoiceFilterKey = keyof WaveInvoiceFilterObj;
 
 export const useInvoicesSearch = () => {
     const [filterParameters, setFilterParameters] = useState<WaveInvoiceFilterObj>({} as WaveInvoiceFilterObj);
@@ -37,7 +48,7 @@ export const useInvoicesSearch = () => {
 
     const setPageSize = (newPageSize: number) => {
         pageSizeRef.current = newPageSize;
-    }
+    };
 
     return {
         filterParameters,

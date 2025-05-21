@@ -15,11 +15,11 @@ import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { fetchAllCustomers } from '@/utils/helpers';
 import { WaveCustomer } from '@/types/waveCustomer';
-import WaveAPIClient from '@/api/waveApiClient';
 import { EventListenerNames } from '@/utils/consts';
 import { useCreateInvoiceForm } from './useCreateInvoiceForm';
 import { InvoiceItemsForm } from '../invoicesTable/editInvoiceModal/invoiceItemsForm';
 import { WaveInvoiceCreateInput } from '@/types/waveInvoice';
+import { WaveAPIClient2 } from '@/api/waveApiClient2';
 
 type CreateInvoiceModalProps = {
     onClose: () => void;
@@ -70,7 +70,7 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
 
     const onSubmit = () => {
         const formParams = getFormParams();
-        return WaveAPIClient.createInvoice(formParams);
+        return WaveAPIClient2.createInvoice(formParams, userInfo.token);
     };
 
     const customerOptions = customers.map(customer => {
