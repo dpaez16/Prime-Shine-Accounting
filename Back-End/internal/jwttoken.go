@@ -17,7 +17,7 @@ func getJWTSecret() []byte {
 func CreateToken(userID string) (string, error) {
 	jwtKey := getJWTSecret()
 	currentTime := jwt.NewNumericDate(time.Now())
-	expirationDate := jwt.NewNumericDate(time.Now().Add(2 * time.Hour))
+	expirationDate := jwt.NewNumericDate(time.Now().Add(4 * time.Hour))
 
 	claims := jwt.MapClaims{
 		"sub": userID,
