@@ -37,9 +37,14 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
     const customers = data ?? [];
 
     const getFormParams = () => {
+        const sanitizedInvoiceServices = invoiceServices.map(item => ({
+            ...item,
+            uuid: undefined,
+        }));
+
         return {
             ...invoiceParams,
-            items: invoiceServices,
+            items: sanitizedInvoiceServices,
         };
     };
 
