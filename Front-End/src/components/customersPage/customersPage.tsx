@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { v4 as uuidV4 } from 'uuid';
 import { WaveCustomerCreateInput } from '@/types/waveCustomer';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
-import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { WaveAPIClient } from '@/api/waveApiClient';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 
 export default function CustomersPage() {
@@ -56,11 +56,11 @@ export default function CustomersPage() {
             },
         };
 
-        return WaveAPIClient2.createCustomer(customerCreateInput, userInfo.token);
+        return WaveAPIClient.createCustomer(customerCreateInput, userInfo.token);
     };
 
     const deleteCustomerHandler = (customerId: string) => {
-        return WaveAPIClient2.deleteCustomer(customerId, userInfo.token);
+        return WaveAPIClient.deleteCustomer(customerId, userInfo.token);
     };
 
     if (loading) {

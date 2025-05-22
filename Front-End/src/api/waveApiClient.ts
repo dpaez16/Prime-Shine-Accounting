@@ -1,92 +1,123 @@
-import { WaveInvoicePayment } from '@/types/waveInvoicePayment';
+import { BusinessID } from '@/types/businessInfo';
+import { WaveCustomerCreateInput, WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
+import { WaveInvoiceCreateInput, WaveInvoiceID, WaveInvoicePatchInput } from '@/types/waveInvoice';
+import { WaveInvoiceFilterObj } from '@/components/invoicesPage/invoicesSearchToolbar/useInvoicesSearch';
 
-export default class WaveAPIClient {
-    static #createFetchBusinessAPIRequest(
+export class WaveAPIClient {
+    static #createFetchRequest(
         path: string,
-        body: object | null,
-        method: 'POST' | 'DELETE' | 'PATCH' | 'GET',
+        body: object,
+        jwt: string | null = null,
     ) {
-        return fetch(import.meta.env.VITE_WAVE_BUSINESS_ENDPOINT_URL + path, {
-            method: method,
-            body: body ? JSON.stringify(body) : null,
+        const url = `${import.meta.env.VITE_SCHEDULE_API_ENDPOINT_URL}/api/wave` + path;
+        return fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(body),
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${import.meta.env.VITE_WAVE_TOKEN}`,
+                'Authorization': jwt ?? '',
             },
         })
             .then(async (response) => {
                 if (!response || (response.status !== 200 && response.status !== 201)) {
-                    const responseText = await response.text();
-                    throw new Error(responseText);
+                    const data = await response.json();
+                    throw new Error(data.error);
                 }
 
                 return response.json();
             });
     }
 
-    /**
-    * Grabs the payments for an invoice.
-    *
-    * @param identityBusinessID The identity business ID obtained from `fetchIdentityBusinessID`.
-    * @param invoiceID The invoice to grab payments for.
-    * @returns A promise resolving to a list of the invoice's payments.
-    */
-    static getInvoicePayments(identityBusinessID: string, invoiceID: string) {
-        const params = new URLSearchParams({
-           'embed_accounts': 'true',
-           'embed_customer': 'true',
-           'embed_discounts': 'true',
-           'embed_deposits': 'true',
-           'embed_items': 'true',
-           'embed_payments': 'true',
-           'embed_products': 'true',
-           'embed_sales_taxes': 'true',
-           'embed_attachments': 'true',
-        });
-        const path = `/${identityBusinessID}/invoices/${invoiceID}/?${params.toString()}`;
+    static fetchCustomers(businessID: BusinessID, pageNum: number, pageSize: number, jwt: string | null) {
+        const body = {
+            businessID,
+            pageNum,
+            pageSize,
+        };
 
-        return this.#createFetchBusinessAPIRequest(path, null, 'GET');
+        return this.#createFetchRequest('/customers/query', body, jwt);
     }
 
-    /**
-    * Creates a payment for an invoice.
-    *
-    * @param identityBusinessID The identity business ID obtained from `fetchIdentityBusinessID`.
-    * @param invoiceID The invoice to grab payments for.
-    * @param paymentInfo The payment metadata.
-    * @returns A promise resolving to true if the operation was successful, false otherwise.
-    */
-    static createInvoicePayment(identityBusinessID: string, invoiceID: string, paymentInfo: WaveInvoicePayment) {
-        const path = `/${identityBusinessID}/invoices/${invoiceID}/payments/`;
+    static fetchAllCustomers(businessID: BusinessID, jwt: string | null) {
+        const body = {
+            businessID,
+        };
 
-        return this.#createFetchBusinessAPIRequest(path, paymentInfo, 'POST');
+        return this.#createFetchRequest('/customers/queryAll', body, jwt);
     }
 
-    /**
-    * Edits an invoice payment.
-    *
-    * @param identityBusinessID The identity business ID obtained from `fetchIdentityBusinessID`.
-    * @param invoiceID The invoice to grab payments for.
-    * @param paymentInfo The payment metadata.
-    * @returns A promise resolving to true if the operation was successful, false otherwise.
-    */
-    static editInvoicePayment(identityBusinessID: string, invoiceID: string, paymentInfo: WaveInvoicePayment) {
-        const path = `/${identityBusinessID}/invoices/${invoiceID}/payments/`;
+    static fetchCustomer(businessID: BusinessID, customerID: WaveCustomerID, jwt: string | null) {
+        const body = {
+            businessID,
+            customerID,
+        };
 
-        return this.#createFetchBusinessAPIRequest(path, paymentInfo, 'PATCH');
+        return this.#createFetchRequest('/customer/query', body, jwt);
     }
 
-    /**
-    * Deletes an invoice payment.
-    *
-    * @param identityBusinessID
-    * @param invoiceID
-    * @param paymentID
-    * @returns
-    */
-    static deleteInvoicePayment(identityBusinessID: string, invoiceID: string, paymentID: string) {
-        const path = `/${identityBusinessID}/invoices/${invoiceID}/${paymentID}/`;
+    static editCustomer(customerPatchInput: WaveCustomerPatchInput, jwt: string | null) {
+        const body = {
+            customerPatchInput,
+        };
 
-        return this.#createFetchBusinessAPIRequest(path, null, 'DELETE');
+        return this.#createFetchRequest('/customer/edit', body, jwt);
+    }
+
+    static createCustomer(customerCreateInput: WaveCustomerCreateInput, jwt: string | null) {
+        const body = {
+            customerCreateInput,
+        };
+
+        return this.#createFetchRequest('/customer/create', body, jwt);
+    }
+
+    static deleteCustomer(customerID: WaveCustomerID, jwt: string | null) {
+        const body = {
+            customerID,
+        };
+
+        return this.#createFetchRequest('/customer/delete', body, jwt);
+    }
+
+    static fetchInvoices(businessID: BusinessID, waveFilterObj: WaveInvoiceFilterObj, jwt: string | null) {
+        const body = {
+            businessID: businessID,
+            filterStruct: waveFilterObj,
+        };
+
+        return this.#createFetchRequest('/invoices/query', body, jwt);
+    }
+
+    static fetchInvoice(businessID: BusinessID, invoiceID: WaveInvoiceID, jwt: string | null) {
+        const body = {
+            businessID,
+            invoiceID,
+        };
+
+        return this.#createFetchRequest('/invoice/query', body, jwt);
+    }
+
+    static editInvoice(invoicePatchInput: WaveInvoicePatchInput, jwt: string | null) {
+        const body = {
+            invoicePatchInput,
+        };
+
+        return this.#createFetchRequest('/invoice/edit', body, jwt);
+    }
+
+    static createInvoice(invoiceCreateInput: WaveInvoiceCreateInput, jwt: string | null) {
+        const body = {
+            invoiceCreateInput,
+        };
+
+        return this.#createFetchRequest('/invoice/create', body, jwt);
+    }
+
+    static deleteInvoice(invoiceID: WaveInvoiceID, jwt: string | null) {
+        const body = {
+            invoiceID,
+        };
+
+        return this.#createFetchRequest('/invoice/delete', body, jwt);
     }
 }

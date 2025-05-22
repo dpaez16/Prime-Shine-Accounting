@@ -19,7 +19,7 @@ import { EventListenerNames } from '@/utils/consts';
 import { useCreateInvoiceForm } from './useCreateInvoiceForm';
 import { InvoiceItemsForm } from '../invoicesTable/editInvoiceModal/invoiceItemsForm';
 import { WaveInvoiceCreateInput } from '@/types/waveInvoice';
-import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { WaveAPIClient } from '@/api/waveApiClient';
 
 type CreateInvoiceModalProps = {
     onClose: () => void;
@@ -75,7 +75,7 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
 
     const onSubmit = () => {
         const formParams = getFormParams();
-        return WaveAPIClient2.createInvoice(formParams, userInfo.token);
+        return WaveAPIClient.createInvoice(formParams, userInfo.token);
     };
 
     const customerOptions = customers.map(customer => {

@@ -4,7 +4,7 @@ import useLocalization from '../../../../hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';
 import { constructDate, dateToStr } from '@/utils/helpers';
 import { EventListenerNames } from '@/utils/consts';
-import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { WaveAPIClient } from '@/api/waveApiClient';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 
 type DeleteInvoiceModalProps = {
@@ -23,7 +23,7 @@ export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
   const invoiceDate = constructDate(invoice.invoiceDate);
 
   const onSubmit = () => {
-    return WaveAPIClient2.deleteInvoice(invoice.id, userInfo.token);
+    return WaveAPIClient.deleteInvoice(invoice.id, userInfo.token);
   };
 
   return (

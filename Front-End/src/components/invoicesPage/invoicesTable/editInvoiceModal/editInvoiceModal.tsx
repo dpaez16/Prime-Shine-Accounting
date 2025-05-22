@@ -11,14 +11,13 @@ import {
   DropdownProps,
 } from 'semantic-ui-react';
 import useLocalization from '../../../../hooks/useLocalization';
-import { WaveInvoice } from '@/types/waveInvoice';
+import { WaveInvoice, WaveInvoicePatchInput } from '@/types/waveInvoice';
 import { WaveCustomer } from '@/types/waveCustomer';
-import { InvoiceParams } from '../../createInvoiceModal/createInvoiceModal';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { fetchAllCustomers } from '@/utils/helpers';
 import { EventListenerNames } from '@/utils/consts';
-import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { WaveAPIClient } from '@/api/waveApiClient';
 import { useEditInvoiceForm } from './useEditInvoiceForm';
 import { InvoiceItemsForm } from './invoiceItemsForm';
 
@@ -53,10 +52,10 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
 
     const isFormValid = () => {
         const formParams = getFormParams();
-        const OPTIONAL_FIELDS: (keyof InvoiceParams)[] = ['memo'];
+        const OPTIONAL_FIELDS: (keyof WaveInvoicePatchInput)[] = ['memo'];
 
         return Object.entries(formParams).reduce((acc, entry) => {
-            const key = entry[0] as keyof InvoiceParams;
+            const key = entry[0] as keyof WaveInvoicePatchInput;
             const value = entry[1];
 
             if (OPTIONAL_FIELDS.includes(key)) {
@@ -78,7 +77,7 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
 
     const onSubmit = () => {
         const formParams = getFormParams();
-        return WaveAPIClient2.editInvoice(formParams, userInfo.token);
+        return WaveAPIClient.editInvoice(formParams, userInfo.token);
     };
 
     const { invoice } = props;

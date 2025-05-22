@@ -14,7 +14,7 @@ import { InvoicesSearchToolbar } from './invoicesSearchToolbar/invoicesSearchToo
 import { useInvoicesSearch, WaveInvoiceFilterObj } from './invoicesSearchToolbar/useInvoicesSearch';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { EventListenerNames } from '@/utils/consts';
-import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { WaveAPIClient } from '@/api/waveApiClient';
 import { InvoicesPagination } from './invoicesPagination';
 
 interface InvoicesData {
@@ -51,7 +51,7 @@ export default function InvoicesPage() {
             .filter(entry => entry[1] !== null)
             .reduce((filtered, entry) => ({ ...filtered, [entry[0]]: entry[1], }), {} as WaveInvoiceFilterObj);
 
-        return WaveAPIClient2.fetchInvoices(
+        return WaveAPIClient.fetchInvoices(
             businessId,
             {
                 ...filterParametersObj,

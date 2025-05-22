@@ -14,7 +14,7 @@ import { WaveCustomer } from '@/types/waveCustomer';
 import { ScheduledCustomer } from '@/types/scheduledCustomer';
 import { Schedule } from '@/types/schedule';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
-import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { WaveAPIClient } from '@/api/waveApiClient';
 
 type ScheduleMetadata = {
   scheduleDays: Array<ScheduledCustomer[]>;
@@ -36,7 +36,7 @@ export default function IndividualSchedulePage() {
     const fetchMetadataForScheduledCustomer = (businessId: string, rawScheduledCustomer: ScheduledCustomer) => {
         const customerId = rawScheduledCustomer.customerId;
 
-        return WaveAPIClient2.fetchCustomer(businessId, customerId, userInfo.token)
+        return WaveAPIClient.fetchCustomer(businessId, customerId, userInfo.token)
         .then(data => {
             return {
                 ...rawScheduledCustomer,

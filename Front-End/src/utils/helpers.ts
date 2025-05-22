@@ -1,6 +1,6 @@
 import { WaveCustomer } from '@/types/waveCustomer';
 import { DAYS_OF_WEEK } from './consts';
-import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { WaveAPIClient } from '@/api/waveApiClient';
 import { JWT } from '@/types/userInfo';
 import { BusinessID } from '@/types/businessInfo';
 
@@ -97,6 +97,6 @@ export const grabWorkingDays = function(dates: string[]) {
  * @returns A promise resolving to a list of all Wave customers.
  */
 export const fetchAllCustomers = function(businessId: BusinessID, jwt: JWT | null) {
-    return WaveAPIClient2.fetchAllCustomers(businessId, jwt)
+    return WaveAPIClient.fetchAllCustomers(businessId, jwt)
         .then(json => json.customers as WaveCustomer[]);
 };

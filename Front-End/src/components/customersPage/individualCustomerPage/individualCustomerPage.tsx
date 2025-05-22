@@ -6,7 +6,7 @@ import useLocalization from '../../../hooks/useLocalization';
 import { WaveCustomer, WaveCustomerAddress, WaveCustomerPatchInput } from '@/types/waveCustomer';
 import { CreateCustomerFormParams } from '../createCustomerModal/createCustomerModal';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
-import { WaveAPIClient2 } from '@/api/waveApiClient2';
+import { WaveAPIClient } from '@/api/waveApiClient';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { WaveCustomerID } from '../../../types/waveCustomer';
 import LoadingSegment from '@/components/loadingSegment/loadingSegment';
@@ -28,7 +28,7 @@ export default function IndividualCustomerPage() {
     const { t } = useLocalization();
     const params = useBrowserQuery<IndividualCustomerPageQuery>();
 
-    const { data, loading, error, refetch } = useDataFetcher<IndividualCustomerPageData>({ fetcher: () => WaveAPIClient2.fetchCustomer(businessInfo.businessId, params.customerID ?? 'undefined', userInfo.token) });
+    const { data, loading, error, refetch } = useDataFetcher<IndividualCustomerPageData>({ fetcher: () => WaveAPIClient.fetchCustomer(businessInfo.businessId, params.customerID ?? 'undefined', userInfo.token) });
 
     const constructNameElement = (name: string | null) => {
         if (!name) {
@@ -148,7 +148,7 @@ export default function IndividualCustomerPage() {
             }
         };
 
-        return WaveAPIClient2.editCustomer(customerPatchInput, userInfo.token);
+        return WaveAPIClient.editCustomer(customerPatchInput, userInfo.token);
     };
 
     if (loading) {
