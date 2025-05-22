@@ -266,6 +266,31 @@ export default class PrimeShineAPIClient {
             });
     }
 
+    static getSchedulePDF(scheduleID: string, jwt: string) {
+        const url = `${import.meta.env.VITE_SCHEDULE_API_ENDPOINT_URL}/api/schedule/pdf`;
+        const body = {
+            scheduleID,
+        };
+
+        return fetch(url, {
+            method: 'POST',
+            body: JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': jwt,
+                'Accept': 'application/pdf',
+            },
+        })
+            .then(async (response) => {
+                if (!response || (response.status !== 200 && response.status !== 201)) {
+                    const data = await response.json();
+                    throw new Error(data.error);
+                }
+
+                return response.arrayBuffer();
+            });
+    }
+
     /**
     * Creates a schedule day for a schedule.
     * @param {number} dayOffset - 0-indexed offset for the day of the week.

@@ -7,7 +7,7 @@ import CreateScheduledCustomerModal from './createScheduledCustomerModal/createS
 import SchedulePDFDocument from './scheduledCustomerTable/schedulePdfDocument/schedulePdfDocument';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
 import LoadingSegment from '../../loadingSegment/loadingSegment';
-import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
+import { dateToStr, downloadBuffer, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
 import useLocalization from '../../../hooks/useLocalization';
 import { v4 as uuidV4 } from 'uuid';
 import { WaveCustomer } from '@/types/waveCustomer';
@@ -194,6 +194,12 @@ export default function IndividualSchedulePage() {
         });
     };
 
+    const exportSchedule = () => {
+        PrimeShineAPIClient.getSchedulePDF('', userInfo.token)
+            .then(pdf => downloadBuffer(pdf, 'schedule.pdf'))
+            .catch(err => alert('Unable to export schedule: ' + err.message)); // TODO: use translation hook
+    };
+
     if (loading) {
         return (
             <LoadingSegment />
@@ -245,6 +251,9 @@ export default function IndividualSchedulePage() {
                         );
                     }}
                 </BlobProvider>
+                <Button onClick={exportSchedule}>
+                    Export Schedule
+                </Button>
             </div>
             {error &&
                 <Message
