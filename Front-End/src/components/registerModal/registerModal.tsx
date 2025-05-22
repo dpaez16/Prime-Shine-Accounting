@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Form, Label, Input, Button, Message, Modal } from 'semantic-ui-react';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
-import WaveAPIClient from '../../api/waveApiClient';
 import useLocalization from '../../hooks/useLocalization';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 
@@ -26,16 +25,11 @@ export default function RegisterModal(props: RegisterModalProps) {
         const { name, email, password } = userParams;
 
         return PrimeShineAPIClient.createUser(name, email, password)
-            .then((user) => {
-                return WaveAPIClient.fetchBusinessData()
-                    .then((businessInfo) => {
-                        return { user: user, businessInfo: businessInfo };
-                    })
-                    .catch((err) => {
-                        throw err;
-                    });
+            .then(data => {
+                const { userInfo: user, businessInfo } = data;
+                return { user: user, businessInfo: businessInfo };
             })
-            .catch((err) => {
+            .catch(err => {
                 throw err;
             });
     };

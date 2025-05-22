@@ -4,3 +4,5 @@ export type UserInfo = {
   name: string;
   email: string;
 };
+
+export type JWT = UserInfo['token'];

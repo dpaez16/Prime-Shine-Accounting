@@ -6,7 +6,6 @@ import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTa
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
 import SchedulePDFDocument from './scheduledCustomerTable/schedulePdfDocument/schedulePdfDocument';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
-import WaveAPIClient from '../../../api/waveApiClient';
 import LoadingSegment from '../../loadingSegment/loadingSegment';
 import { dateToStr, fetchAllCustomers, grabWorkingDays } from '../../../utils/helpers';
 import useLocalization from '../../../hooks/useLocalization';
@@ -15,6 +14,7 @@ import { WaveCustomer } from '@/types/waveCustomer';
 import { ScheduledCustomer } from '@/types/scheduledCustomer';
 import { Schedule } from '@/types/schedule';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
+import { WaveAPIClient } from '@/api/waveApiClient';
 
 type ScheduleMetadata = {
   scheduleDays: Array<ScheduledCustomer[]>;
@@ -36,11 +36,11 @@ export default function IndividualSchedulePage() {
     const fetchMetadataForScheduledCustomer = (businessId: string, rawScheduledCustomer: ScheduledCustomer) => {
         const customerId = rawScheduledCustomer.customerId;
 
-        return WaveAPIClient.fetchCustomer(businessId, customerId)
-        .then(customerMetadata => {
+        return WaveAPIClient.fetchCustomer(businessId, customerId, userInfo.token)
+        .then(data => {
             return {
                 ...rawScheduledCustomer,
-                ...{ metadata: customerMetadata }
+                ...{ metadata: data.customer as WaveCustomer }
             } as ScheduledCustomer;
         })
         .catch(err => {
@@ -107,7 +107,7 @@ export default function IndividualSchedulePage() {
                 scheduleDayIdMap: scheduleDayIdMap
             });
 
-            return fetchAllCustomers(businessId);
+            return fetchAllCustomers(businessId, userInfo.token);
         })
         .then((newAllCustomers) => {
             setAllCustomers(newAllCustomers);

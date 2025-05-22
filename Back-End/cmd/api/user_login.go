@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"prime-shine-api/internal"
+	"prime-shine-api/internal/wave"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
@@ -37,6 +38,13 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
+	businessInfo, err := wave.GetBusinessInfo()
+	if err != nil {
+		err = errors.Wrap(err, "GetBusinessInfo")
+		app.serverErrorResponse(w, r, err)
+		return
+	}
+
 	token, err := internal.CreateToken(user.ID.String())
 	if err != nil {
 		err = errors.Wrap(err, "CreateToken")
@@ -44,7 +52,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	data := jsondata{"user": user, "jwt": token}
+	data := jsondata{"user": user, "businessInfo": businessInfo, "jwt": token}
 	err = app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {
 		err = errors.Wrap(err, "writeJSON")

@@ -37,6 +37,21 @@ func (app *application) routes() http.Handler {
 	router.POST("/api/schedule/edit", app.authenticate(app.editSchedule))
 	router.POST("/api/schedule/delete", app.authenticate(app.deleteSchedule))
 
+	// wave customer routes
+	router.POST("/api/wave/customer/query", app.authenticate(app.queryWaveCustomer))
+	router.POST("/api/wave/customer/create", app.authenticate(app.createWaveCustomer))
+	router.POST("/api/wave/customer/edit", app.authenticate(app.editWaveCustomer))
+	router.POST("/api/wave/customer/delete", app.authenticate(app.deleteWaveCustomer))
+	router.POST("/api/wave/customers/query", app.authenticate(app.queryWaveCustomersPaginated))
+	router.POST("/api/wave/customers/queryAll", app.authenticate(app.queryWaveCustomers))
+
+	// wave invoice routes
+	router.POST("/api/wave/invoices/query", app.authenticate(app.queryWaveInvoices))
+	router.POST("/api/wave/invoice/query", app.authenticate(app.queryWaveInvoice))
+	router.POST("/api/wave/invoice/create", app.authenticate(app.createWaveInvoice))
+	router.POST("/api/wave/invoice/edit", app.authenticate(app.editWaveInvoice))
+	router.POST("/api/wave/invoice/delete", app.authenticate(app.deleteWaveInvoice))
+
 	// TODO: add pdf route?
 	// https://github.com/go-pdf/fpdf
 

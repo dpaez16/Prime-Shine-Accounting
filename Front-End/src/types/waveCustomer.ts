@@ -1,6 +1,9 @@
+import { BusinessInfo } from './businessInfo';
+import { Prettify } from './prettify';
+
 export type WaveCustomerAddress = {
   addressLine1: string;
-  addressLine2: string | null;
+  addressLine2: string;
   city: string;
   province: {
     code: string;
@@ -12,17 +15,28 @@ export type WaveCustomerAddress = {
 export type WaveCustomer = {
   id: string;
   name: string;
-  email: string | null;
-  mobile: string | null;
-  phone: string | null;
+  email: string;
+  mobile: string;
+  phone: string;
   address: WaveCustomerAddress;
 };
 
-export type FetchWaveCustomersResponse = {
-  pageInfo: {
-    currentPage: number;
-    totalPages: number;
-    totalCount: number;
-  };
-  customers: WaveCustomer[];
-}
+export type WaveCustomerID = WaveCustomer['id'];
+
+export type WaveCustomerPatchInput = Prettify<
+  Omit<WaveCustomer, 'address'> &
+  Prettify<{
+    address: Prettify<
+      Omit<WaveCustomerAddress, 'province'> &
+      {
+        provinceCode: WaveCustomerAddress['province']['code'];
+        countryCode: string;
+      }
+    >
+  }>
+>;
+
+export type WaveCustomerCreateInput = Prettify<
+  Pick<BusinessInfo, 'businessId'> &
+  Omit<WaveCustomerPatchInput, 'id'>
+>;

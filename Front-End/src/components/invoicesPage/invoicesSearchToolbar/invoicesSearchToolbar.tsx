@@ -1,9 +1,8 @@
-import WaveAPIClient, { WaveInvoiceFilterKey } from '@/api/waveApiClient';
+import React, { useContext } from 'react';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import useLocalization from '@/hooks/useLocalization';
 import { fetchAllCustomers } from '@/utils/helpers';
-import React, { useContext } from 'react';
 import {
     Input,
     Dropdown,
@@ -11,19 +10,32 @@ import {
     InputOnChangeData,
     DropdownProps,
 } from 'semantic-ui-react';
+import { WaveInvoiceFilterKey, WaveInvoiceFilterObj } from './useInvoicesSearch';
+
+const WAVE_INVOICE_STATUSES = [
+    'Draft',
+    'Unsent',
+    'Sent',
+    'Viewed',
+    'Partial',
+    'Paid',
+    'Overpaid',
+    'Overdue',
+];
 
 interface InvoicesSearchToolbarProps {
     onSubmit: () => void;
-    handleFilterChange: (key: WaveInvoiceFilterKey, value: string | null) => void;
+    handleFilterChange: <K extends WaveInvoiceFilterKey>(key: K, value: WaveInvoiceFilterObj[K]) => void;
     loading: boolean;
 }
 
 export const InvoicesSearchToolbar: React.FC<InvoicesSearchToolbarProps> = (props) => {
     const context = useContext(LoginSessionContext);
+    const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
 
     const { t } = useLocalization();
-    const { data: customers, loading: loadingCustomers } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId) });
+    const { data: customers, loading: loadingCustomers } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
 
     const handleFilterChange = (
         _: React.ChangeEvent<HTMLInputElement> | React.SyntheticEvent<HTMLElement>,
@@ -43,7 +55,7 @@ export const InvoicesSearchToolbar: React.FC<InvoicesSearchToolbarProps> = (prop
         };
     });
 
-    const invoiceStatusOptions = WaveAPIClient.WAVE_INVOICE_STATUSES.map(waveStatus => {
+    const invoiceStatusOptions = WAVE_INVOICE_STATUSES.map(waveStatus => {
         return {
             key: waveStatus,
             value: waveStatus.toUpperCase(),

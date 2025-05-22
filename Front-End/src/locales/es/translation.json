@@ -55,7 +55,7 @@
     "Zip Code": "Código Postal",
     "Create": "Crear",
     "Are you sure?": "¿Estás Seguro?",
-    "Edit a Customer": "Editar un Cliente",
+    "Edit Customer": "Editar Cliente",
     "Invoices": "Facturas",
     "Create Invoice": "Crear Factura",
     "All customers": "Todos los Clientes",
@@ -78,5 +78,6 @@
     "Memo": "Nota",
     "Delete Invoice?": "¿Borrar Factura?",
     "Download PDF": "Descargar PDF",
-    "View Invoice to Print": "Ver Factura para Imprimir"
+    "View Invoice to Print": "Ver Factura para Imprimir",
+    "Results per page": "Resultados por página"
 }

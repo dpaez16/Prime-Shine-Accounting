@@ -55,7 +55,7 @@
     "Zip Code": "Zip Code",
     "Create": "Create",
     "Are you sure?": "Are you sure?",
-    "Edit a Customer": "Edit a Customer",
+    "Edit Customer": "Edit Customer",
     "Invoices": "Invoices",
     "Create Invoice": "Create Invoice",
     "All customers": "All customers",
@@ -78,5 +78,6 @@
     "Memo": "Memo",
     "Delete Invoice?": "Delete Invoice?",
     "Download PDF": "Download PDF",
-    "View Invoice to Print": "View Invoice to Print"
+    "View Invoice to Print": "View Invoice to Print",
+    "Results per page": "Results per page"
 }

@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Modal, Button } from 'semantic-ui-react';
 import useLocalization from '../../../../hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';
 import { constructDate, dateToStr } from '@/utils/helpers';
-import WaveAPIClient from '@/api/waveApiClient';
 import { EventListenerNames } from '@/utils/consts';
+import { WaveAPIClient } from '@/api/waveApiClient';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
 
 type DeleteInvoiceModalProps = {
   trigger: React.ReactElement;
@@ -12,6 +13,9 @@ type DeleteInvoiceModalProps = {
 };
 
 export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
+  const loginSession = useContext(LoginSessionContext);
+  const userInfo = loginSession.userInfo!;
+
   const [modalOpen, setModalOpen] = useState(false);
   const { t } = useLocalization();
 
@@ -19,7 +23,7 @@ export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
   const invoiceDate = constructDate(invoice.invoiceDate);
 
   const onSubmit = () => {
-    return WaveAPIClient.deleteInvoice(invoice.id);
+    return WaveAPIClient.deleteInvoice(invoice.id, userInfo.token);
   };
 
   return (

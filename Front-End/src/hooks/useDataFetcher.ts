@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 interface UseDataFetcherProps<T> {
     fetcher: () => Promise<T>;
+    deps?: object[];
 }
 
 export function useDataFetcher<T>(props: UseDataFetcherProps<T>) {
@@ -22,7 +23,7 @@ export function useDataFetcher<T>(props: UseDataFetcherProps<T>) {
 
     useEffect(() => {
         refetch();
-    }, []);
+    }, props.deps ?? []);
 
     return {
         data,
