@@ -195,7 +195,7 @@ export default function IndividualSchedulePage() {
     };
 
     const exportSchedule = () => {
-        PrimeShineAPIClient.getSchedulePDF('', userInfo.token)
+        PrimeShineAPIClient.getSchedulePDF(schedule._id, userInfo.token)
             .then(pdf => downloadBuffer(pdf, 'schedule.pdf'))
             .catch(err => alert('Unable to export schedule: ' + err.message)); // TODO: use translation hook
     };
