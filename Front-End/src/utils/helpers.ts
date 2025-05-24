@@ -100,3 +100,18 @@ export const fetchAllCustomers = function(businessId: BusinessID, jwt: JWT | nul
     return WaveAPIClient.fetchAllCustomers(businessId, jwt)
         .then(json => json.customers as WaveCustomer[]);
 };
+
+export const downloadBuffer = (buffer: ArrayBuffer, filename: string) => {
+    const blob = new Blob([buffer]);
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.setAttribute('download', filename);
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    window.URL.revokeObjectURL(url);
+};
