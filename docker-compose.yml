@@ -10,7 +10,6 @@ services:
         user: '${USER_ID}:${USER_GROUP}'
         command: sh -c 'npm ci && npm run dev -- --host 0.0.0.0'
         restart: always
-        env_file: './.env'
 
     go-api:
         image: 'golang:1.23.0-alpine'
