@@ -20,7 +20,8 @@ services:
         volumes:
             - './Back-End:/app'
             - '/etc/localtime:/etc/localtime:ro'
-            - '~/go:/root/go'
+            # include this if you want faster container bootup times
+            #- '${HOME}/go/pkg/mod:/root/go/pkg/mod'
         command: sh -c 'mkdir -p /.cache && chmod -R 777 /.cache && go run ./cmd/api'
         restart: always
         env_file: './.env'
