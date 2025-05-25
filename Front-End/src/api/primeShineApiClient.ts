@@ -267,7 +267,7 @@ export default class PrimeShineAPIClient {
     }
 
     static getSchedulePDF(scheduleID: string, jwt: string) {
-        const url = `${import.meta.env.VITE_SCHEDULE_API_ENDPOINT_URL}/api/schedule/pdf`;
+        const url = '/api/schedule/pdf';
         const body = {
             scheduleID,
         };
