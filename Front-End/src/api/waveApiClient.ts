@@ -2,7 +2,6 @@ import { BusinessID } from '@/types/businessInfo';
 import { WaveCustomerCreateInput, WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
 import { WaveInvoiceCreateInput, WaveInvoiceID, WaveInvoicePatchInput } from '@/types/waveInvoice';
 import { WaveInvoiceFilterObj } from '@/components/invoicesPage/invoicesSearchToolbar/useInvoicesSearch';
-import { ENDPOINT_URL } from '../utils/consts';
 
 export class WaveAPIClient {
     static #createFetchRequest(
@@ -10,7 +9,7 @@ export class WaveAPIClient {
         body: object,
         jwt: string | null = null,
     ) {
-        const url = `${ENDPOINT_URL}/api/wave` + path;
+        const url = '/api/wave' + path;
         return fetch(url, {
             method: 'POST',
             body: JSON.stringify(body),
