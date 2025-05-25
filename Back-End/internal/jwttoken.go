@@ -9,6 +9,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const JWT_ISSUER = "prime-shine-api"
+
 func getJWTSecret() []byte {
 	return []byte(os.Getenv("JWT_TOKEN"))
 }
@@ -24,8 +26,8 @@ func CreateToken(userID string) (string, error) {
 		"iat": currentTime,
 		"nbf": currentTime,
 		"exp": expirationDate,
-		"iss": "prime-shine-api",
-		"aud": []string{"prime-shine-api"},
+		"iss": JWT_ISSUER,
+		"aud": []string{JWT_ISSUER},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -39,7 +41,7 @@ func CreateToken(userID string) (string, error) {
 
 func verifyHelper(token *jwt.Token) (interface{}, error) {
 	if token.Method != jwt.SigningMethodHS256 {
-		return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 	}
 
 	jwtKey := getJWTSecret()
@@ -53,7 +55,7 @@ func VerifyToken(tokenStr string) (bool, error) {
 		return false, errors.Wrap(err, "jwt.Parse")
 	}
 
-	if issuer, err := token.Claims.GetIssuer(); err != nil || issuer != "prime-shine-api" {
+	if issuer, err := token.Claims.GetIssuer(); err != nil || issuer != JWT_ISSUER {
 		return false, errors.Wrap(err, "GetIssuer")
 	}
 
