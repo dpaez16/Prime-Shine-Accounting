@@ -23,6 +23,7 @@ docker compose up -d
 
 TODOs:
 - Front-End:
+  - Generate proper `favicon.ico`
   - Unit tests (for components)
   - Refactoring
   - Consider loading translations via API calls
