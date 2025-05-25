@@ -3,6 +3,7 @@ import { ScheduleDay } from '@/types/scheduleDay';
 import { UserInfo } from '@/types/userInfo';
 import { Schedule } from '@/types/schedule';
 import { BusinessInfo } from '../types/businessInfo';
+import { ENDPOINT_URL } from '../utils/consts';
 
 export default class PrimeShineAPIClient {
     static #createFetchRequest(
@@ -10,7 +11,7 @@ export default class PrimeShineAPIClient {
         body: object,
         jwt: string | null = null,
     ) {
-        const url = `${import.meta.env.VITE_SCHEDULE_API_ENDPOINT_URL}/api` + path;
+        const url = `${ENDPOINT_URL}/api` + path;
         return fetch(url, {
             method: 'POST',
             body: JSON.stringify(body),

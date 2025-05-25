@@ -2,7 +2,6 @@ package wave
 
 import (
 	"encoding/json"
-	"os"
 
 	"github.com/pkg/errors"
 )
@@ -36,14 +35,6 @@ type businessesQueryData struct {
 			Node WaveBusiness `json:"node"`
 		} `json:"edges"`
 	} `json:"businesses"`
-}
-
-func GetWaveBusinessName() string {
-	return os.Getenv("WAVE_BUSINESS_NAME")
-}
-
-func GetWaveProductName() string {
-	return os.Getenv("WAVE_CLEANING_PRODUCT_NAME")
 }
 
 func GetBusinessInfo() (*WaveBusinessInfo, error) {
@@ -81,7 +72,7 @@ func GetBusinessInfo() (*WaveBusinessInfo, error) {
 		return nil, errors.Wrap(err, "json deserialization")
 	}
 
-	businessName := GetWaveBusinessName()
+	businessName := WAVE_BUSINESS_NAME
 	businessEdges := businessesData.Businesses.Edges
 	var foundBusiness *WaveBusiness = nil
 
@@ -97,7 +88,7 @@ func GetBusinessInfo() (*WaveBusinessInfo, error) {
 		return nil, errors.New("Could not find primary Wave business data")
 	}
 
-	productName := GetWaveProductName()
+	productName := WAVE_CLEANING_PRODUCT_NAME
 	productEdges := foundBusiness.Products.Edges
 	var foundProduct *WaveBusinessProduct = nil
 

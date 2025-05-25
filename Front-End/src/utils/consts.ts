@@ -1,3 +1,5 @@
+export const ENDPOINT_URL = 'http://localhost:5000';
+
 export const US_COUNTRY_CODE = 'US';
 
 export const US_STATES = [

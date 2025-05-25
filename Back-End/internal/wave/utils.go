@@ -37,16 +37,8 @@ type WaveGraphQLResponse struct {
 	Errors *[]WaveGraphQLError `json:"errors"`
 }
 
-func getWaveGraphQLSecret() string {
-	return os.Getenv("WAVE_GRAPHQL_URL")
-}
-
 func getWaveAPIToken() string {
 	return os.Getenv("WAVE_TOKEN")
-}
-
-func getWaveBusinessURL() string {
-	return os.Getenv("WAVE_BUSINESS_URL")
 }
 
 func transformErrorsArrayIntoError(graphQLErrors []WaveGraphQLError) string {
@@ -70,7 +62,7 @@ func createWaveGraphQLRequest(body WaveGraphQLBody) (string, error) {
 	}
 
 	requestBody := bytes.NewBuffer(serializedBody)
-	req, err := http.NewRequest("POST", getWaveGraphQLSecret(), requestBody)
+	req, err := http.NewRequest("POST", WAVE_GRAPHQL_URL, requestBody)
 	if err != nil {
 		return "", errors.Wrap(err, "creating the POST request")
 	}
@@ -123,7 +115,7 @@ func createWaveBusinessAPIRequest(method string, path string, body *map[string]a
 	}
 
 	requestBody := bytes.NewBuffer(serializedBody)
-	req, err := http.NewRequest(method, getWaveBusinessURL()+path, requestBody)
+	req, err := http.NewRequest(method, WAVE_BUSINESS_URL+path, requestBody)
 	if err != nil {
 		return "", errors.Wrapf(err, "creating the %v request", method)
 	}

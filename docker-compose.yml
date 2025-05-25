@@ -1,0 +1,26 @@
+services:
+    react:
+        image: 'node:20.11.1-slim'
+        ports:
+            - '3000:3000'
+        working_dir: /home/node/app/
+        volumes:
+            - './Front-End:/home/node/app'
+            - '/etc/localtime:/etc/localtime:ro'
+        user: '${USER_ID}:${USER_GROUP}'
+        command: sh -c 'npm ci && npm run dev -- --host 0.0.0.0'
+        restart: always
+
+    go-api:
+        image: 'golang:1.23.0-alpine'
+        ports:
+            - '5000:5000'
+        working_dir: /app/
+        volumes:
+            - './Back-End:/app'
+            - '/etc/localtime:/etc/localtime:ro'
+            # include this if you want faster container bootup times
+            #- '${HOME}/go/pkg/mod:/root/go/pkg/mod'
+        command: sh -c 'mkdir -p /.cache && chmod -R 777 /.cache && go run ./cmd/api'
+        restart: always
+        env_file: './.env'

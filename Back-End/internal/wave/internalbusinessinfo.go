@@ -32,7 +32,7 @@ func GetInternalBusinessInfo() (string, error) {
 		return "", errors.Wrap(err, "json deserialization")
 	}
 
-	businessName := GetWaveBusinessName()
+	businessName := WAVE_BUSINESS_NAME
 	for _, business := range businesses {
 		if business.CompanyName == businessName {
 			return business.ID, nil
