@@ -8,10 +8,11 @@ import (
 	"os"
 	"os/signal"
 	"prime-shine-api/internal/data"
+	"prime-shine-api/internal/db"
 	"syscall"
 	"time"
 
-	"github.com/jackc/pgx"
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
@@ -21,10 +22,10 @@ type config struct {
 }
 
 type application struct {
-	config     config
-	logger     *log.Logger
-	dbClient   *data.MongoClient
-	dbClientPG *pgx.Conn
+	config   config
+	logger   *log.Logger
+	dbClient *data.MongoClient
+	db       *sqlx.DB
 }
 
 func waitForSignals(app *application) {
@@ -40,7 +41,7 @@ func waitForSignals(app *application) {
 		panic(errors.Wrap(err, "db disconnect"))
 	}
 
-	if err := app.dbClientPG.Close(); err != nil {
+	if err := app.db.Close(); err != nil {
 		panic(errors.Wrap(err, "db disconnect"))
 	}
 
@@ -56,16 +57,16 @@ func main() {
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 	dbClient := data.ConnectDB()
-	dbClientPG, err := data.ConnectDB_PG()
+	db, err := db.SetupDB(logger)
 	if err != nil {
 		logger.Fatalf("Could not connect to database: %v", err.Error())
 	}
 
 	app := &application{
-		config:     cfg,
-		logger:     logger,
-		dbClient:   dbClient,
-		dbClientPG: dbClientPG,
+		config:   cfg,
+		logger:   logger,
+		dbClient: dbClient,
+		db:       db,
 	}
 
 	server := &http.Server{
