@@ -11,7 +11,7 @@ import (
 )
 
 type ScheduledCustomer struct {
-	ID         int                `db:"scheduledcustomerid" json:"scheduledCustomerID"`
+	ID         int                `db:"scheduledcustomerid" json:"_id"`
 	CustomerID string             `db:"wave_customerid" json:"customerId"`
 	StartTime  pgtype.Timestamptz `db:"start_time" json:"serviceStartTime"`
 	EndTime    pgtype.Timestamptz `db:"end_time" json:"serviceEndTime"`
