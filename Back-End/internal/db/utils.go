@@ -12,3 +12,10 @@ func GetDateFromTimeStruct(t time.Time) pgtype.Date {
 		Valid: true,
 	}
 }
+
+func GetTimestamptzFromTimeStruct(t time.Time) pgtype.Timestamptz {
+	return pgtype.Timestamptz{
+		Time:  t,
+		Valid: true,
+	}
+}

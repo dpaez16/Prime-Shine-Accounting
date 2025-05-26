@@ -26,11 +26,6 @@ func (app *application) routes() http.Handler {
 	router.POST("/api/scheduledCustomer/edit", app.authenticate(app.editScheduledCustomer))
 	router.POST("/api/scheduledCustomer/delete", app.authenticate(app.deleteScheduledCustomer))
 
-	// schedule day routes
-	router.POST("/api/scheduleDay/query", app.authenticate(app.queryScheduleDays))
-	router.POST("/api/scheduleDay/create", app.authenticate(app.createScheduleDay))
-	router.POST("/api/scheduleDay/delete", app.authenticate(app.deleteScheduleDay))
-
 	// schedule routes
 	router.POST("/api/schedule/query", app.authenticate(app.querySchedules))
 	router.POST("/api/schedule/create", app.authenticate(app.createSchedule))

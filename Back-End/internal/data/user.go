@@ -30,10 +30,8 @@ func FindOneUser(readConn db.ReadDBExecutor, filter map[string]any) (*User, erro
 		argNum := len(args) + 1
 		whereClause := fmt.Sprintf("%v = $%v", k, argNum)
 
-		if k == "userid" || k == "email" {
-			whereClauses = append(whereClauses, whereClause)
-			args = append(args, v)
-		}
+		whereClauses = append(whereClauses, whereClause)
+		args = append(args, v)
 	}
 
 	query := fmt.Sprintf(`
@@ -115,7 +113,7 @@ func CreateUser(tx db.WriteDBExecutor, name string, email string, password strin
 	}
 
 	// Grab the newly created user
-	newUser, err := FindOneUser(tx, map[string]any{"email": email})
+	newUser, err := FindOneUser(tx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneUser")
 	}

@@ -29,10 +29,8 @@ func FindOneSchedule(readConn db.ReadDBExecutor, filter map[string]any) (*Schedu
 		argNum := len(args) + 1
 		whereClause := fmt.Sprintf("%v = $%v", k, argNum)
 
-		if k == "scheduleid" || k == "userid" || k == "start_day" {
-			whereClauses = append(whereClauses, whereClause)
-			args = append(args, v)
-		}
+		whereClauses = append(whereClauses, whereClause)
+		args = append(args, v)
 	}
 
 	query := fmt.Sprintf(`
@@ -101,7 +99,7 @@ func CreateSchedule(tx db.WriteDBExecutor, startDay pgtype.Date, userID int) (*S
 	}
 
 	// Grab the newly created schedule
-	newSchedule, err := FindOneSchedule(tx, map[string]any{"start_day": startDay, "userid": userID})
+	newSchedule, err := FindOneSchedule(tx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneSchedule")
 	}
