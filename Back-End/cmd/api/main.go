@@ -35,7 +35,12 @@ func waitForSignals(app *application) {
 
 	app.logger.Printf("Caught signal %s", s.String())
 	app.logger.Printf("Disconnecting from %s database", app.config.env)
+
 	if err := app.dbClient.Disconnect(); err != nil {
+		panic(errors.Wrap(err, "db disconnect"))
+	}
+
+	if err := app.dbClientPG.Close(); err != nil {
 		panic(errors.Wrap(err, "db disconnect"))
 	}
 
@@ -75,6 +80,6 @@ func main() {
 
 	logger.Printf("Connected to %s database!", cfg.env)
 	logger.Printf("Starting %s server on %s", cfg.env, server.Addr)
-	err := server.ListenAndServe()
+	err = server.ListenAndServe()
 	logger.Fatal(errors.Wrap(err, "server.ListenAndServe"))
 }
