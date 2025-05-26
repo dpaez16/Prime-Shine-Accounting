@@ -13,6 +13,8 @@ services:
 
     go-api:
         image: 'golang:1.23.0-alpine'
+        depends_on:
+            - postgres
         ports:
             - '5000:5000'
         working_dir: /app/
