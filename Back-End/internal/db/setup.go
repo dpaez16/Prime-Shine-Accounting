@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 
-	_ "github.com/jackc/pgx"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func getDBConnectionURL() string {
@@ -20,11 +20,11 @@ func getDBConnectionURL() string {
 	password := os.Getenv("POSTGRES_PASSWORD")
 
 	return fmt.Sprintf(
-		"postgres://%v:%v@%v:%v/%v",
-		user,
-		password,
+		"host=%s port=%d user=%s password=%s dbname=%s",
 		host,
 		5432, // default PostgreSQL port
+		user,
+		password,
 		database,
 	)
 }
@@ -42,20 +42,20 @@ func SetupDB(logger *log.Logger) (*sqlx.DB, error) {
 }
 
 func connectToDb(logger *log.Logger, dsn string) (*sqlx.DB, error) {
-	connDb, err := sql.Open("postgres", dsn)
+	connDb, err := sql.Open("pgx", dsn)
 	if err != nil {
 		return nil, errors.Wrap(err, "open database connection")
 	}
 
 	// TODO: Add logs to queries
-	conn := sqlx.NewDb(connDb, "postgres")
+	conn := sqlx.NewDb(connDb, "pgx")
 
 	err = conn.Ping()
 	if err != nil {
 		return nil, errors.Wrap(err, "ping database")
 	}
 
-	logger.Println("Connected to database")
+	logger.Println("Connected to Postgres database")
 
 	return conn, nil
 }
