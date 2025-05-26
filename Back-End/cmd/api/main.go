@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jackc/pgx"
 	"github.com/pkg/errors"
 )
 
@@ -20,9 +21,10 @@ type config struct {
 }
 
 type application struct {
-	config   config
-	logger   *log.Logger
-	dbClient *data.MongoClient
+	config     config
+	logger     *log.Logger
+	dbClient   *data.MongoClient
+	dbClientPG *pgx.Conn
 }
 
 func waitForSignals(app *application) {
@@ -49,11 +51,16 @@ func main() {
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 	dbClient := data.ConnectDB()
+	dbClientPG, err := data.ConnectDB_PG()
+	if err != nil {
+		logger.Fatalf("Could not connect to database: %v", err.Error())
+	}
 
 	app := &application{
-		config:   cfg,
-		logger:   logger,
-		dbClient: dbClient,
+		config:     cfg,
+		logger:     logger,
+		dbClient:   dbClient,
+		dbClientPG: dbClientPG,
 	}
 
 	server := &http.Server{

@@ -9,9 +9,10 @@ import (
 
 func ConnectDB_PG() (*pgx.Conn, error) {
 	connection, err := pgx.Connect(pgx.ConnConfig{
+		Host:     os.Getenv("POSTGRES_HOST"),
+		Database: os.Getenv("POSTGRES_DB"),
 		User:     os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
-		Host:     os.Getenv("POSTGRES_HOST"),
 	})
 
 	if err != nil {
