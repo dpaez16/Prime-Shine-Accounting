@@ -9,7 +9,7 @@ import useLocalization from '../../hooks/useLocalization';
 import LoadingSegment from '../loadingSegment/loadingSegment';
 import { dateToStr } from '../../utils/helpers';
 import { v4 as uuidV4 } from 'uuid';
-import { Schedule } from '@/types/schedule';
+import { Schedule, ScheduleID } from '@/types/schedule';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 
 export default function SchedulesPage() {
@@ -36,7 +36,7 @@ export default function SchedulesPage() {
       });
   };
 
-  const editScheduleHandler = (startDay: Date, scheduleId: string) => {
+  const editScheduleHandler = (startDay: Date, scheduleId: ScheduleID) => {
     const jwt = userInfo.token;
 
     PrimeShineAPIClient.editSchedule(startDay, scheduleId, jwt)
@@ -55,17 +55,14 @@ export default function SchedulesPage() {
       });
   };
 
-  const deleteScheduleHandler = (startDay: Date) => {
-    const userId = userInfo._id;
+  const deleteScheduleHandler = (scheduleID: ScheduleID) => {
     const jwt = userInfo.token;
 
-    PrimeShineAPIClient.deleteSchedule(startDay, userId, jwt)
-      .then((didSucceed) => {
-        console.log(didSucceed);
-
+    PrimeShineAPIClient.deleteSchedule(scheduleID, jwt)
+      .then(() => {
         const newSchedules = [...schedules];
         const idx = newSchedules.findIndex(
-          (schedule) => schedule.startDay === startDay,
+          (schedule) => schedule._id === scheduleID,
         );
         newSchedules.splice(idx, 1);
 
@@ -126,17 +123,11 @@ export default function SchedulesPage() {
                   <div className='flex flex-row gap-2'>
                     <EditScheduleModal
                       schedule={schedule}
-                      onSubmit={(startDay) => {
-                        const scheduleId = schedule._id;
-                        editScheduleHandler(startDay, scheduleId);
-                      }}
+                      onSubmit={(startDay) => editScheduleHandler(startDay, schedule._id)}
                     />
                     <DeleteScheduleModal
                       startDay={dateToStr(schedule.startDay)}
-                      onSubmit={() => {
-                        const startDay = schedule.startDay;
-                        deleteScheduleHandler(startDay);
-                      }}
+                      onSubmit={() => deleteScheduleHandler(schedule._id)}
                     />
                   </div>
                 </Table.Cell>

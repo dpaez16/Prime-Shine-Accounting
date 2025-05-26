@@ -1,7 +1,7 @@
 import { ScheduledCustomer } from '@/types/scheduledCustomer';
 import { ScheduleDay } from '@/types/scheduleDay';
 import { UserInfo } from '@/types/userInfo';
-import { Schedule } from '@/types/schedule';
+import { Schedule, ScheduleID } from '@/types/schedule';
 import { BusinessInfo } from '../types/businessInfo';
 
 export default class PrimeShineAPIClient {
@@ -215,7 +215,7 @@ export default class PrimeShineAPIClient {
     * @param {string} jwt - The user's JSON web token.
     * @return {Promise<Schedule>} The promise with success returning the edited schedule, otherwise an error for rejection.
     */
-    static editSchedule(startDay: Date, scheduleId: string, jwt: string) {
+    static editSchedule(startDay: Date, scheduleId: ScheduleID, jwt: string) {
         const requestBody = {
             startDay: startDay,
             scheduleID: scheduleId,
@@ -238,19 +238,13 @@ export default class PrimeShineAPIClient {
 
     /**
     * Deletes a schedule.
-    * @param {Date} startDay - The start day for the schedule.
-    * @param {string} userId - The user's unique ID.
+    * @param {string} scheduleID - ID of the schedule.
     * @param {string} jwt - The user's JSON web token.
     * @return {Promise<boolean>} The promise with success returning a boolean flag indiciating whether the delete was successful, otherwise an error for rejection.
     */
-    static deleteSchedule(
-        startDay: Date,
-        userId: string,
-        jwt: string,
-    ): Promise<boolean> {
+    static deleteSchedule(scheduleID: ScheduleID, jwt: string): Promise<boolean> {
         const requestBody = {
-            startDay: startDay,
-            userID: userId,
+            scheduleID,
         };
 
         return PrimeShineAPIClient.#createFetchRequest(
@@ -258,15 +252,13 @@ export default class PrimeShineAPIClient {
             requestBody,
             jwt,
         )
-            .then((json) => {
-                return json.success;
-            })
+            .then(() => true)
             .catch((err) => {
                 throw new Error(`Could not delete schedule: ${err.message}`);
             });
     }
 
-    static getSchedulePDF(scheduleID: string, jwt: string) {
+    static getSchedulePDF(scheduleID: ScheduleID, jwt: string) {
         const url = '/api/schedule/pdf';
         const body = {
             scheduleID,

@@ -3,14 +3,14 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"prime-shine-api/internal/data"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type querySchedulesBody struct {
-	UserID primitive.ObjectID `json:userID`
+	UserID int `json:"userID"`
 }
 
 // Route for querying schedules.
@@ -24,7 +24,7 @@ func (app *application) querySchedules(w http.ResponseWriter, r *http.Request, _
 		return
 	}
 
-	schedules, err := app.dbClient.QuerySchedules(body.UserID)
+	schedules, err := data.QuerySchedules(app.db, body.UserID)
 	if err != nil {
 		err = errors.Wrap(err, "QuerySchedules")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())

@@ -1,67 +1,78 @@
 package data
 
 import (
-	"context"
+	"database/sql"
+	"fmt"
+	"prime-shine-api/internal/db"
+	"strings"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Schedule struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	StartDay primitive.DateTime `bson:"startDay" json:"startDay"`
-	User     primitive.ObjectID `bson:"user" json:"user"`
-}
-
-func (db *MongoClient) getSchedulesCollection() *mongo.Collection {
-	return db.Client.Database(db.DatabaseName).Collection("schedules")
+	ID       int         `db:"scheduleid" json:"_id"`
+	UserID   int         `db:"userid" json:"-"`
+	StartDay pgtype.Date `db:"start_day" json:"startDay"`
 }
 
 // Finds one schedule.
 // If runtime errors occur, an error is returned.
 // Otherwise, a schedule and nil error is returned.
-func (db *MongoClient) FindOneSchedule(filter bson.M) (*Schedule, error) {
-	var schedule Schedule
-	collection := db.getSchedulesCollection()
+func FindOneSchedule(readConn db.ReadDBExecutor, filter map[string]any) (*Schedule, error) {
+	schedule := &Schedule{}
 
-	err := collection.FindOne(context.TODO(), filter).Decode(&schedule)
-	if err != nil {
-		switch {
-		case errors.Is(err, mongo.ErrNoDocuments):
-			return nil, nil
-		default:
-			return nil, errors.Wrap(err, "schedules.FindOne")
+	var args []any
+	var whereClauses []string
+
+	for k, v := range filter {
+		argNum := len(args) + 1
+		whereClause := fmt.Sprintf("%v = $%v", k, argNum)
+
+		if k == "scheduleid" || k == "userid" || k == "start_day" {
+			whereClauses = append(whereClauses, whereClause)
+			args = append(args, v)
 		}
 	}
 
-	return &schedule, nil
+	query := fmt.Sprintf(`
+		SELECT   scheduleid
+			   , start_day
+		  FROM schedules
+		 WHERE %v
+	`, strings.Join(whereClauses, " AND "))
+
+	err := readConn.Get(schedule, query, args...)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, errors.Wrap(err, "Get")
+	}
+
+	return schedule, nil
 }
 
 // Gets schedules for a user.
-func (db *MongoClient) QuerySchedules(userID primitive.ObjectID) ([]Schedule, error) {
-	collection := db.getSchedulesCollection()
+func QuerySchedules(readConn db.ReadDBExecutor, userID int) ([]*Schedule, error) {
+	entries := []*Schedule{}
+	query := `
+		SELECT *
+		  FROM schedules
+		 WHERE userid = $1
+	`
 
-	filter := bson.M{"user": userID}
-	cursor, err := collection.Find(context.TODO(), filter)
+	err := readConn.Select(&entries, query, userID)
 	if err != nil {
-		return nil, errors.Wrap(err, "schedules.Find")
+		return nil, errors.Wrap(err, "Select")
 	}
 
-	var schedules []Schedule
-	err = cursor.All(context.TODO(), &schedules)
-	if err != nil {
-		return nil, errors.Wrap(err, "cursor.All")
-	}
-
-	return schedules, nil
+	return entries, nil
 }
 
 // Creates a schedule for a user.
-func (db *MongoClient) CreateSchedule(startDay primitive.DateTime, userID primitive.ObjectID) (*Schedule, error) {
-	filter := bson.M{"startDay": startDay, "user": userID}
-	schedule, err := db.FindOneSchedule(filter)
+func CreateSchedule(tx db.WriteDBExecutor, startDay pgtype.Date, userID int) (*Schedule, error) {
+	filter := map[string]any{"start_day": startDay, "user": userID}
+	schedule, err := FindOneSchedule(tx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneSchedule")
 	}
@@ -70,25 +81,38 @@ func (db *MongoClient) CreateSchedule(startDay primitive.DateTime, userID primit
 		return nil, errors.New("Schedule exists already.")
 	}
 
-	newSchedule := Schedule{
-		StartDay: startDay,
-		User:     userID,
-	}
+	result, err := tx.Exec(`
+		INSERT INTO schedules
+		(userid, start_day)
+		VALUES ($1, $2)
+	`, userID, startDay)
 
-	collection := db.getSchedulesCollection()
-	result, err := collection.InsertOne(context.TODO(), newSchedule)
 	if err != nil {
-		return nil, errors.Wrap(err, "schedules.InsertOne")
+		return nil, errors.Wrap(err, "tx.Exec")
 	}
 
-	newSchedule.ID = result.InsertedID.(primitive.ObjectID)
-	return &newSchedule, nil
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return nil, errors.Wrap(err, "RowsAffected")
+	}
+
+	if rowsAffected != 1 {
+		return nil, errors.New("failed to insert users entry")
+	}
+
+	// Grab the newly created schedule
+	newSchedule, err := FindOneSchedule(tx, map[string]any{"start_day": startDay, "userid": userID})
+	if err != nil {
+		return nil, errors.Wrap(err, "FindOneSchedule")
+	}
+
+	return newSchedule, nil
 }
 
 // Edits a schedule.
-func (db *MongoClient) EditSchedule(newStartDay primitive.DateTime, scheduleID primitive.ObjectID) (*Schedule, error) {
-	filter := bson.M{"_id": scheduleID}
-	schedule, err := db.FindOneSchedule(filter)
+func EditSchedule(tx db.WriteDBExecutor, newStartDay pgtype.Date, scheduleID int) (*Schedule, error) {
+	filter := map[string]any{"scheduleid": scheduleID}
+	schedule, err := FindOneSchedule(tx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneSchedule")
 	}
@@ -97,8 +121,8 @@ func (db *MongoClient) EditSchedule(newStartDay primitive.DateTime, scheduleID p
 		return nil, errors.New("Cannot find schedule.")
 	}
 
-	filter = bson.M{"startDay": newStartDay, "user": schedule.User}
-	foundSchedule, err := db.FindOneSchedule(filter)
+	filter = map[string]any{"start_day": newStartDay, "userid": schedule.UserID}
+	foundSchedule, err := FindOneSchedule(tx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneSchedule")
 	}
@@ -109,27 +133,32 @@ func (db *MongoClient) EditSchedule(newStartDay primitive.DateTime, scheduleID p
 
 	schedule.StartDay = newStartDay
 
-	updateFilter := bson.D{{"_id", scheduleID}}
-	update := bson.D{
-		{"$set", bson.D{
-			{"startDay", newStartDay},
-		}},
-	}
-
-	collection := db.getSchedulesCollection()
-	_, err = collection.UpdateOne(context.TODO(), updateFilter, update)
+	result, err := tx.Exec(`
+		UPDATE schedules
+		SET    start_day = $1
+		WHERE scheduleid = $2
+	`, schedule.StartDay, schedule.ID)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "schedules.UpdateOne")
+		return nil, errors.Wrap(err, "tx.Exec")
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return nil, errors.Wrap(err, "RowsAffected")
+	}
+
+	if rowsAffected == 0 {
+		return nil, errors.New("schedule was not mutated")
 	}
 
 	return schedule, nil
 }
 
 // Deletes a schedule for a user.
-func (db *MongoClient) DeleteSchedule(startDay primitive.DateTime, userID primitive.ObjectID) (bool, error) {
-	filter := bson.M{"startDay": startDay, "user": userID}
-	schedule, err := db.FindOneSchedule(filter)
+func DeleteSchedule(tx db.WriteDBExecutor, scheduleID int) (bool, error) {
+	filter := map[string]any{"scheduleid": scheduleID}
+	schedule, err := FindOneSchedule(tx, filter)
 	if err != nil {
 		return false, errors.Wrap(err, "FindOneSchedule")
 	}
@@ -138,35 +167,13 @@ func (db *MongoClient) DeleteSchedule(startDay primitive.DateTime, userID primit
 		return false, errors.New("Cannot find schedule.")
 	}
 
-	scheduleDays, err := db.QueryScheduleDays(schedule.ID)
-	if err != nil {
-		return false, errors.Wrap(err, "QueryScheduleDays")
-	}
-
-	for _, scheduleDay := range scheduleDays {
-		success, err := db.DeleteScheduleDay(schedule.ID, scheduleDay.DayOffset)
-		if err != nil {
-			return false, errors.Wrap(err, "DeleteScheduleDay")
-		}
-
-		if !success {
-			return false, errors.Wrapf(err, "Failed to remove schedule day %s", scheduleDay.ID)
-		}
-	}
-
-	collection := db.getSchedulesCollection()
-
-	deleteFilter := bson.D{{"_id", schedule.ID}}
-	result := collection.FindOneAndDelete(context.TODO(), deleteFilter)
-	err = result.Err()
+	_, err = tx.Exec(`
+		DELETE FROM schedules
+		WHERE scheduleid = $1
+	`, scheduleID)
 
 	if err != nil {
-		switch {
-		case errors.Is(err, mongo.ErrNoDocuments):
-			return false, nil
-		default:
-			return false, errors.Wrap(err, "schedules.FindOneAndDelete")
-		}
+		return false, errors.Wrap(err, "tx.Exec")
 	}
 
 	return true, nil

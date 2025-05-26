@@ -9,11 +9,10 @@ import (
 	"codeberg.org/go-pdf/fpdf"
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type getSchedulePDFBody struct {
-	ScheduleID primitive.ObjectID `json:"scheduleID"`
+	ScheduleID int `json:"scheduleID"`
 }
 
 // Route for generating a schedule PDF.
