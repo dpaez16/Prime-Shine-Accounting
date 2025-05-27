@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Button, Message } from 'semantic-ui-react';
-import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
+import { ScheduledCustomerTable } from './scheduledCustomerTable/scheduledCustomerTable';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
 import { LoadingSegment } from '../../loadingSegment/loadingSegment';
 import { dateToStr, downloadBuffer } from '../../../utils/helpers';
@@ -10,7 +10,7 @@ import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { WaveCustomer, WaveCustomerID } from '@/types/waveCustomer';
 import { FullScheduledCustomer } from '@/types/scheduledCustomer';
-import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
+import { CreateScheduledCustomerModal } from './createScheduledCustomerModal/createScheduledCustomerModal';
 import { DAYS_OF_WEEK, EventListenerNames } from '@/utils/consts';
 import { WaveAPIClient } from '@/api/waveApiClient';
 import { useBrowserQuery } from '@/hooks/useBrowserQuery';

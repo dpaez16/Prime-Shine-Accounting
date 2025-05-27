@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Table, Dropdown } from 'semantic-ui-react';
-import DeleteInvoiceModal from './deleteInvoiceModal/deleteInvoiceModal';
-import EditInvoiceModal from './editInvoiceModal/editInvoiceModal';
+import { DeleteInvoiceModal } from './deleteInvoiceModal/deleteInvoiceModal';
+import { EditInvoiceModal } from './editInvoiceModal/editInvoiceModal';
 import { LoadingSegment } from '../../loadingSegment/loadingSegment';
 import useLocalization from '../../../hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';

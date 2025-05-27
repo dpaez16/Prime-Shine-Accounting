@@ -1,9 +1,9 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, Message } from 'semantic-ui-react';
-import CreateScheduleModal from './createScheduleModal/createScheduleModal';
-import EditScheduleModal from './editScheduleModal/editScheduleModal';
-import DeleteScheduleModal from './deleteScheduleModal/deleteScheduleModal';
+import { CreateScheduleModal } from './createScheduleModal/createScheduleModal';
+import { EditScheduleModal } from './editScheduleModal/editScheduleModal';
+import { DeleteScheduleModal } from './deleteScheduleModal/deleteScheduleModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import useLocalization from '../../hooks/useLocalization';
 import { LoadingSegment } from '../loadingSegment/loadingSegment';

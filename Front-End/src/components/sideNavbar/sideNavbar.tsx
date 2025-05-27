@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LoginModal from '../loginModal/loginModal';
-import RegisterModal from '../registerModal/registerModal';
+import { LoginModal } from '../loginModal/loginModal';
+import { RegisterModal } from '../registerModal/registerModal';
 import useLocalization from '../../hooks/useLocalization';
 import { Menu, Dropdown, Icon } from 'semantic-ui-react';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
-import LanguageDropdown from './languageDropdown';
+import { LanguageDropdown } from './languageDropdown';
 import PrimeShineAPIClient from '@/api/primeShineApiClient';
 
 export const SideNavbar: React.FC = () => {

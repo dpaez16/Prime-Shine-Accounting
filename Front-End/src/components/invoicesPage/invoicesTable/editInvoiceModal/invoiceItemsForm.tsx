@@ -12,7 +12,7 @@ type EditInvoiceModalTableProps = {
     onChange: (invoiceServices: InvoiceService[]) => void;
 };
 
-export function InvoiceItemsForm(props: EditInvoiceModalTableProps) {
+export const InvoiceItemsForm: React.FC<EditInvoiceModalTableProps> = (props) => {
     const context = useContext(LoginSessionContext);
     const businessInfo = context.businessInfo!;
 
@@ -121,4 +121,4 @@ export function InvoiceItemsForm(props: EditInvoiceModalTableProps) {
             </Table.Footer>
         </Table>
     );
-}
+};

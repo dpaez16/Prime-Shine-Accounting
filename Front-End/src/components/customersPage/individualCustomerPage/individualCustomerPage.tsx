@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { Message } from 'semantic-ui-react';
-import EditCustomerModal from './editCustomerModal/editCustomerModal';
+import { EditCustomerModal } from './editCustomerModal/editCustomerModal';
 import { US_COUNTRY_CODE } from '../../../utils/consts';
 import useLocalization from '../../../hooks/useLocalization';
 import { WaveCustomer, WaveCustomerAddress, WaveCustomerPatchInput } from '@/types/waveCustomer';

@@ -6,7 +6,7 @@ import { FullScheduledCustomer } from '@/types/scheduledCustomer';
 import { ScheduleID } from '@/types/schedule';
 import { DeleteScheduledCustomerModal } from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import { EventListenerNames } from '@/utils/consts';
-import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
+import { EditScheduledCustomerModal } from './editScheduledCustomerModal/editScheduledCustomerModal';
 
 type ScheduledCustomerTableProps = {
     date: string;

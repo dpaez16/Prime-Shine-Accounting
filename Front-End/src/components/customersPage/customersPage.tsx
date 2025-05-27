@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import DeleteCustomerModal from './deleteCustomerModal/deleteCustomerModal';
+import { DeleteCustomerModal } from './deleteCustomerModal/deleteCustomerModal';
 import { CreateCustomerFormParams, CreateCustomerModal } from './createCustomerModal/createCustomerModal';
 import { US_COUNTRY_CODE } from '../../utils/consts';
 import { LoadingSegment } from '../loadingSegment/loadingSegment';

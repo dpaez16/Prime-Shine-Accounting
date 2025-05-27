@@ -24,7 +24,7 @@ type CreateInvoiceModalProps = {
     onClose: () => void;
 };
 
-export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
+export const CreateInvoiceModal: React.FC<CreateInvoiceModalProps> = (props) => {
     const loginSession = useContext(LoginSessionContext);
     const userInfo = loginSession.userInfo!;
     const businessInfo = loginSession.businessInfo!;
@@ -142,4 +142,4 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
             </Modal.Actions>
         </Modal>
     );
-}
+};

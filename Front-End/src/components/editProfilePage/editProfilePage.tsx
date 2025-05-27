@@ -7,7 +7,7 @@ import {
     Message,
     InputOnChangeData,
 } from 'semantic-ui-react';
-import DeleteAccountModal from './deleteAccountModal/deleteAccountModal';
+import { DeleteAccountModal } from './deleteAccountModal/deleteAccountModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import useLocalization from '../../hooks/useLocalization';
 import { useNavigate } from 'react-router-dom';

@@ -4,7 +4,7 @@ import {
     Button,
     Message,
 } from 'semantic-ui-react';
-import InvoicesTable from './invoicesTable/invoicesTable';
+import { InvoicesTable } from './invoicesTable/invoicesTable';
 import { CreateInvoiceModal } from './createInvoiceModal/createInvoiceModal';
 import useLocalization from '../../hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';
