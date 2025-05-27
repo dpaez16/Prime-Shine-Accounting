@@ -16,12 +16,12 @@ export default function SchedulesPage() {
     const context = useContext(LoginSessionContext);
     const userInfo = context.userInfo!;
 
-    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => PrimeShineAPIClient.fetchSchedules(userInfo._id, userInfo.token) });
+    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => PrimeShineAPIClient.fetchSchedules(userInfo.userID, userInfo.token) });
     const { t } = useLocalization();
     const navigate = useNavigate();
 
     const createScheduleHandler = (startDay: Date) => {
-        const userId = userInfo._id;
+        const userId = userInfo.userID;
         const jwt = userInfo.token;
 
         PrimeShineAPIClient.createSchedule(startDay, userId, jwt)
@@ -65,7 +65,7 @@ export default function SchedulesPage() {
                                 <a onClick={(e) => {
                                     e.preventDefault();
                                     const params = new URLSearchParams({
-                                        'scheduleID': schedule._id,
+                                        'scheduleID': schedule.scheduleID.toString(),
                                     });
 
                                     navigate(`/schedule?${params.toString()}`);
@@ -75,11 +75,11 @@ export default function SchedulesPage() {
                                 <div className='flex flex-row gap-2'>
                                     <EditScheduleModal
                                         schedule={schedule}
-                                        onSubmit={(startDay) => editScheduleHandler(startDay, schedule._id)}
+                                        onSubmit={(startDay) => editScheduleHandler(startDay, schedule.scheduleID)}
                                     />
                                     <DeleteScheduleModal
                                         startDay={dateToStr(schedule.startDay)}
-                                        onSubmit={() => deleteScheduleHandler(schedule._id)}
+                                        onSubmit={() => deleteScheduleHandler(schedule.scheduleID)}
                                     />
                                 </div>
                             </Table.Cell>

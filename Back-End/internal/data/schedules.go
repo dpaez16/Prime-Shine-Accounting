@@ -11,7 +11,7 @@ import (
 )
 
 type Schedule struct {
-	ID       int         `db:"scheduleid" json:"_id"`
+	ID       int         `db:"scheduleid" json:"scheduleID"`
 	UserID   int         `db:"userid" json:"-"`
 	StartDay pgtype.Date `db:"start_day" json:"startDay"`
 }

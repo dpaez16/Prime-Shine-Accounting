@@ -1,6 +1,6 @@
 export type Schedule = {
-    _id: number;
+    scheduleID: number;
     startDay: Date;
 };
 
-export type ScheduleID = Schedule['_id'];
+export type ScheduleID = Schedule['scheduleID'];

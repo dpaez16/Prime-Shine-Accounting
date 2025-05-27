@@ -1,19 +1,5 @@
 import { DAYS_OF_WEEK } from './consts';
 
-export const deleteItemFromArray = function(arr, valObj) {
-    const val = valObj._id;
-    const idx = arr.findIndex(obj => obj._id === val);
-    arr.splice(idx, 1);
-    return arr;
-};
-
-export const replaceItemFromArray = function(arr, valObj, newObj) {
-    const val = valObj._id;
-    const idx = arr.findIndex(obj => obj._id === val);
-    arr.splice(idx, 1, newObj);
-    return arr;
-};
-
 /**
  * Constructs a date string in `mm/dd/yyyy` format.
  * @param date - The date to convert to a string.
