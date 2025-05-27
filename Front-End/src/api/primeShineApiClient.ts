@@ -1,5 +1,5 @@
 import { ScheduledCustomer, ScheduledCustomerID } from '@/types/scheduledCustomer';
-import { JWT, UserInfo } from '@/types/userInfo';
+import { JWT, UserID, UserInfo } from '@/types/userInfo';
 import { Schedule, ScheduleID } from '@/types/schedule';
 import { BusinessInfo } from '../types/businessInfo';
 import { WaveCustomerID } from '@/types/waveCustomer';
@@ -105,7 +105,7 @@ export default class PrimeShineAPIClient {
     * @param name - The user's name.
     * @param email - The user's email.
     * @param password - The user's password.
-    * @param userId - The user's unique ID.
+    * @param userID - The user's unique ID.
     * @param jwt - The user's JSON web token.
     * @return A promise resolving to a UserInfo object reflecting the changes.
     */
@@ -113,11 +113,11 @@ export default class PrimeShineAPIClient {
         name: string,
         email: string,
         password: string,
-        userId: string,
+        userID: UserID,
         jwt: JWT,
     ) {
         const body = {
-            userID: userId,
+            userID: userID,
             name: name,
             email: email,
             password: password,
@@ -132,13 +132,13 @@ export default class PrimeShineAPIClient {
 
     /**
     * Attempts to delete the user's account.
-    * @param userId - The user's unique ID.
+    * @param userID - The user's unique ID.
     * @param jwt - The user's JSON web token.
     * @return A promise resolving to true for a successful operation.
     */
-    static deleteUser(userId: string, jwt: JWT): Promise<boolean> {
+    static deleteUser(userID: UserID, jwt: JWT): Promise<boolean> {
         const body = {
-            userID: userId,
+            userID: userID,
         };
 
         return PrimeShineAPIClient.#createFetchRequest('/users/delete', body, jwt)
@@ -150,13 +150,13 @@ export default class PrimeShineAPIClient {
 
     /**
     * Fetches schedules for a particular user.
-    * @param userId - The user's unique ID.
+    * @param userID - The user's unique ID.
     * @param jwt - The user's JSON web token.
     * @return A promise resolving to a list of the user's schedules.
     */
-    static fetchSchedules(userId: string, jwt: JWT) {
+    static fetchSchedules(userID: UserID, jwt: JWT) {
         const requestBody = {
-            userID: userId,
+            userID: userID,
         };
 
         return PrimeShineAPIClient.#createFetchRequest(
@@ -201,14 +201,14 @@ export default class PrimeShineAPIClient {
     /**
     * Creates a schedule.
     * @param startDay - The day that the schedule begins with.
-    * @param userId - The user's unique ID.
+    * @param userID - The user's unique ID.
     * @param jwt - The user's JSON web token.
     * @return A promise resolving to the newly created schedule.
     */
-    static createSchedule(startDay: Date, userId: string, jwt: JWT) {
+    static createSchedule(startDay: Date, userID: UserID, jwt: JWT) {
         const requestBody = {
             startDay: startDay,
-            userID: userId,
+            userID: userID,
         };
 
         return PrimeShineAPIClient.#createFetchRequest(

@@ -62,17 +62,14 @@ export default function SchedulesPage() {
                     return (
                         <Table.Row key={idx}>
                             <Table.Cell className='flex flex-row justify-between items-center'>
-                                <a
-                                    href='/viewSchedule'
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        navigate('/viewSchedule', {
-                                            state: {
-                                                schedule: schedule,
-                                            },
-                                        });
-                                    }}
-                                >
+                                <a onClick={(e) => {
+                                    e.preventDefault();
+                                    const params = new URLSearchParams({
+                                        'scheduleID': schedule._id,
+                                    });
+
+                                    navigate(`/schedule?${params.toString()}`);
+                                }}>
                                     {dateToStr(schedule.startDay)}
                                 </a>
                                 <div className='flex flex-row gap-2'>

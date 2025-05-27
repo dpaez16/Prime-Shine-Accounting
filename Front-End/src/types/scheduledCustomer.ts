@@ -1,7 +1,7 @@
 import { WaveCustomer, WaveCustomerID } from './waveCustomer';
 
 export type ScheduledCustomer = {
-    scheduledCustomerID: string;
+    scheduledCustomerID: number;
     waveCustomerID: WaveCustomerID;
     startTime: string;
     endTime: string;

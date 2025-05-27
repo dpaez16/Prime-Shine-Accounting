@@ -105,7 +105,6 @@ export default function CustomersPage() {
                         <Table.Row key={uuidV4()}>
                             <Table.Cell className='flex flex-row justify-between items-center'>
                                 <a onClick={(e) => {
-
                                     e.preventDefault();
                                     const params = new URLSearchParams({
                                         'customerID': customerID,

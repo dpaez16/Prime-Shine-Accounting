@@ -1,6 +1,6 @@
 import { BusinessInfo } from './businessInfo';
 import { Prettify } from './prettify';
-import { WaveCustomer } from './waveCustomer';
+import { WaveCustomer, WaveCustomerID } from './waveCustomer';
 
 export type WaveProduct = {
     id: string;
@@ -23,7 +23,7 @@ export type WaveInvoice = {
     amountPaid: WaveCost;
     createdAt: string; // Date Timestamp
     customer: {
-        id: string;
+        id: WaveCustomerID;
         name: string;
     };
     id: string;

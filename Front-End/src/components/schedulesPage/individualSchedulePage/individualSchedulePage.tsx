@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import { Button, Message } from 'semantic-ui-react';
 import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
@@ -14,6 +13,11 @@ import { FullScheduledCustomer } from '@/types/scheduledCustomer';
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
 import { DAYS_OF_WEEK, EventListenerNames } from '@/utils/consts';
 import { WaveAPIClient } from '@/api/waveApiClient';
+import { useBrowserQuery } from '@/hooks/useBrowserQuery';
+
+type IndividualCustomerPageQuery = {
+    scheduleID?: string;
+};
 
 export default function IndividualSchedulePage() {
     const context = useContext(LoginSessionContext);
@@ -22,12 +26,12 @@ export default function IndividualSchedulePage() {
 
     const [ createModalOpen, setCreateModalOpen ] = useState(false);
 
+    const params = useBrowserQuery<IndividualCustomerPageQuery>();
     const { t } = useLocalization();
-    const location = useLocation();
-    const schedule = location.state.schedule as Schedule;
+    const scheduleID = parseInt(params.scheduleID ?? '-1');
 
     const { data, loading, error, refetch } = useDataFetcher({
-        fetcher: () => getScheduleContents(schedule._id),
+        fetcher: () => getScheduleContents(scheduleID),
     });
 
     useEffect(() => {
@@ -46,6 +50,7 @@ export default function IndividualSchedulePage() {
         const businessID = businessInfo.businessId;
         const jwt = userInfo.token;
 
+        const schedule = await PrimeShineAPIClient.fetchSchedule(scheduleID, userInfo.token);
         const allCustomers = await WaveAPIClient.fetchAllCustomers(businessID, jwt);
         const waveCustomerByID = new Map<WaveCustomerID, WaveCustomer>();
         allCustomers.forEach(waveCustomer => {
@@ -73,11 +78,26 @@ export default function IndividualSchedulePage() {
             dayBins[idx].push(fullScheduledCustomer);
         });
 
-        return dayBins;
+        return {
+            schedule,
+            dayBins,
+        };
+    };
+
+    const constructDatesOfService = (schedule?: Schedule): string[] => {
+        if (!schedule) {
+            return [];
+        }
+
+        return DAYS_OF_WEEK.map((_, idx) => {
+            const date = new Date(schedule!.startDay);
+            date.setUTCDate(date.getUTCDate() + idx);
+            return dateToStr(date);
+        });
     };
 
     const exportSchedule = () => {
-        PrimeShineAPIClient.getSchedulePDF(schedule._id, userInfo.token)
+        PrimeShineAPIClient.getSchedulePDF(scheduleID, userInfo.token)
             .then(pdf => downloadBuffer(pdf, 'schedule.pdf'))
             .catch(err => alert('Unable to export schedule: ' + err.message)); // TODO: use translation hook
     };
@@ -88,13 +108,10 @@ export default function IndividualSchedulePage() {
         );
     }
 
-    const datesOfService = [...Array(7).keys()].map(idx => {
-        const date = new Date(schedule.startDay);
-        date.setUTCDate(date.getUTCDate() + idx);
-        return dateToStr(date);
-    });
+    const dayBins = data?.dayBins ?? {};
+    const schedule = data?.schedule;
 
-    const dayBins = data ?? {};
+    const datesOfService = constructDatesOfService(schedule);
 
     return (
         <div className='flex flex-col'>
@@ -102,7 +119,7 @@ export default function IndividualSchedulePage() {
                 createModalOpen &&
                 <CreateScheduledCustomerModal
                     datesOfService={datesOfService}
-                    scheduleID={schedule._id}
+                    scheduleID={scheduleID}
                     onSubmit={() => {
                         refetch();
                         setCreateModalOpen(false);
@@ -127,7 +144,7 @@ export default function IndividualSchedulePage() {
                             <ScheduledCustomerTable
                                 key={idx}
                                 date={date}
-                                scheduleID={schedule._id}
+                                scheduleID={scheduleID}
                                 scheduledCustomers={dayBins[idx]}
                             />
                         );
