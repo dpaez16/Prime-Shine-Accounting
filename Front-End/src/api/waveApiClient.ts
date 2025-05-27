@@ -1,5 +1,5 @@
 import { BusinessID } from '@/types/businessInfo';
-import { WaveCustomerCreateInput, WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
+import { WaveCustomer, WaveCustomerCreateInput, WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
 import { WaveInvoiceCreateInput, WaveInvoiceID, WaveInvoicePatchInput } from '@/types/waveInvoice';
 import { WaveInvoiceFilterObj } from '@/components/invoicesPage/invoicesSearchToolbar/useInvoicesSearch';
 
@@ -52,7 +52,8 @@ export class WaveAPIClient {
             customerID,
         };
 
-        return this.#createFetchRequest('/customer/query', body, jwt);
+        return this.#createFetchRequest('/customer/query', body, jwt)
+            .then(data => data.customer as WaveCustomer);
     }
 
     static editCustomer(customerPatchInput: WaveCustomerPatchInput, jwt: string | null) {

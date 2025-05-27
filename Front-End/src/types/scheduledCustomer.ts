@@ -1,10 +1,14 @@
-import { WaveCustomer } from './waveCustomer';
+import { WaveCustomer, WaveCustomerID } from './waveCustomer';
 
 export type ScheduledCustomer = {
-  _id: string;
-  customerId: string;
-  serviceStartTime: string;
-  serviceEndTime: string;
-  scheduleDay: string;
-  metadata: WaveCustomer;
+    scheduledCustomerID: string;
+    waveCustomerID: WaveCustomerID;
+    startTime: string;
+    endTime: string;
+    dayOffset: number;
 };
+
+export type FullScheduledCustomer = ScheduledCustomer & { metadata: WaveCustomer };
+export type ScheduledCustomerID = ScheduledCustomer['scheduledCustomerID'];
+
+export type ScheduledCustomerCreateInput = Omit<ScheduledCustomer, 'scheduledCustomerID'>;

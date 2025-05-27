@@ -7,12 +7,12 @@ import {
 } from '@/utils/helpers';
 import useLocalization from '@/hooks/useLocalization';
 import { v4 as uuidv4 } from 'uuid';
-import { ScheduledCustomer } from '@/types/scheduledCustomer';
+import { FullScheduledCustomer } from '@/types/scheduledCustomer';
 import { WaveCustomerAddress } from '@/types/waveCustomer';
 
 type SchedulePDFDocumentProps = {
   datesOfService: string[];
-  scheduleDays: Array<ScheduledCustomer[]>;
+  scheduleDays: Array<FullScheduledCustomer[]>;
 };
 
 export default function SchedulePDFDocument(props: SchedulePDFDocumentProps) {
@@ -35,7 +35,7 @@ export default function SchedulePDFDocument(props: SchedulePDFDocumentProps) {
     return `(${addressStr})`;
   };
 
-  const constructCustomerEntry = (scheduledCustomer: ScheduledCustomer) => {
+  const constructCustomerEntry = (scheduledCustomer: FullScheduledCustomer) => {
     const name = scheduledCustomer.metadata.name;
     const serviceStartTime = constructTimeStr(
       scheduledCustomer.serviceStartTime,

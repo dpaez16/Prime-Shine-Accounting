@@ -11,10 +11,10 @@ import (
 )
 
 type ScheduledCustomer struct {
-	ID         int                `db:"scheduledcustomerid" json:"_id"`
-	CustomerID string             `db:"wave_customerid" json:"customerId"`
-	StartTime  pgtype.Timestamptz `db:"start_time" json:"serviceStartTime"`
-	EndTime    pgtype.Timestamptz `db:"end_time" json:"serviceEndTime"`
+	ID         int                `db:"scheduledcustomerid" json:"scheduledCustomerID"`
+	CustomerID string             `db:"wave_customerid" json:"waveCustomerID"`
+	StartTime  pgtype.Timestamptz `db:"start_time" json:"startTime"`
+	EndTime    pgtype.Timestamptz `db:"end_time" json:"endTime"`
 	DayOffset  int                `db:"day_offset" json:"dayOffset"`
 	ScheduleID int                `db:"scheduleid" json:"-"`
 }

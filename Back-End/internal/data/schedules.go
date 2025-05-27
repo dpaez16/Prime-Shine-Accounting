@@ -69,7 +69,7 @@ func QuerySchedules(readConn db.ReadDBExecutor, userID int) ([]*Schedule, error)
 
 // Creates a schedule for a user.
 func CreateSchedule(tx db.WriteDBExecutor, startDay pgtype.Date, userID int) (*Schedule, error) {
-	filter := map[string]any{"start_day": startDay, "user": userID}
+	filter := map[string]any{"start_day": startDay, "userid": userID}
 	schedule, err := FindOneSchedule(tx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneSchedule")

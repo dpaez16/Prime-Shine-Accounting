@@ -45,8 +45,12 @@ func (app *application) createSchedule(w http.ResponseWriter, r *http.Request, _
 		}
 	}()
 
-	startDay := db.GetDateFromTimeStruct(body.StartDay)
-	schedule, err := data.CreateSchedule(lazyTx, startDay, body.UserID)
+	schedule, err := data.CreateSchedule(
+		lazyTx,
+		db.GetDateFromTimeStruct(body.StartDay),
+		body.UserID,
+	)
+
 	if err != nil {
 		err = errors.Wrap(err, "CreateSchedule")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())

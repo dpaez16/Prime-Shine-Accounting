@@ -13,7 +13,7 @@ import (
 
 type editScheduledCustomerBody struct {
 	ScheduledCustomerID int       `json:"scheduledCustomerID"`
-	CustomerID          string    `json:"customerID"`
+	CustomerID          string    `json:"waveCustomerID"`
 	StartTime           time.Time `json:"startTime"`
 	EndTime             time.Time `json:"endTime"`
 	DayOffset           int       `json:"dayOffset"`

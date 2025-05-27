@@ -45,8 +45,7 @@ func (app *application) editSchedule(w http.ResponseWriter, r *http.Request, _ h
 		}
 	}()
 
-	startDay := db.GetDateFromTimeStruct(body.StartDay)
-	schedule, err := data.EditSchedule(lazyTx, startDay, body.ScheduleID)
+	schedule, err := data.EditSchedule(lazyTx, db.GetDateFromTimeStruct(body.StartDay), body.ScheduleID)
 	if err != nil {
 		err = errors.Wrap(err, "EditSchedule")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
