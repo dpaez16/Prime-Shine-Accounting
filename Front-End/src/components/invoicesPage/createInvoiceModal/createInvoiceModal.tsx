@@ -13,7 +13,6 @@ import {
 import useLocalization from '../../../hooks/useLocalization';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
-import { fetchAllCustomers } from '@/utils/helpers';
 import { WaveCustomer } from '@/types/waveCustomer';
 import { EventListenerNames } from '@/utils/consts';
 import { useCreateInvoiceForm } from './useCreateInvoiceForm';
@@ -33,7 +32,7 @@ export function CreateInvoiceModal(props: CreateInvoiceModalProps) {
     const { invoiceParams, setInvoiceParam, invoiceServices, setInvoiceServices } = useCreateInvoiceForm();
     const { t } = useLocalization();
 
-    const { data, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
+    const { data, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => WaveAPIClient.fetchAllCustomers(businessInfo.businessId, userInfo.token) });
     const customers = data ?? [];
 
     const getFormParams = () => {

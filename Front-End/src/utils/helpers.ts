@@ -1,8 +1,4 @@
-import { WaveCustomer } from '@/types/waveCustomer';
 import { DAYS_OF_WEEK } from './consts';
-import { WaveAPIClient } from '@/api/waveApiClient';
-import { JWT } from '@/types/userInfo';
-import { BusinessID } from '@/types/businessInfo';
 
 export const deleteItemFromArray = function(arr, valObj) {
     const val = valObj._id;
@@ -103,18 +99,8 @@ export const grabWorkingDays = (dates: string[]) => {
 };
 
 /**
- * Fetches all customers from Wave.
- * @param businessId - The business's unique ID.
- * @returns A promise resolving to a list of all Wave customers.
- */
-export const fetchAllCustomers = (businessId: BusinessID, jwt: JWT | null) => {
-    return WaveAPIClient.fetchAllCustomers(businessId, jwt)
-        .then(json => json.customers as WaveCustomer[]);
-};
-
-/**
  * Downloads a file to the client.
- * @param buffer - The file's contents that will be downloaded. 
+ * @param buffer - The file's contents that will be downloaded.
  * @param filename - The name that the downloaded file will be named as.
  */
 export const downloadBuffer = (buffer: ArrayBuffer, filename: string) => {

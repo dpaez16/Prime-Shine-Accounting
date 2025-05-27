@@ -124,9 +124,7 @@ export default class PrimeShineAPIClient {
         };
 
         return PrimeShineAPIClient.#createFetchRequest('/users/edit', body, jwt)
-            .then((json) => {
-                return json.user as UserInfo;
-            })
+            .then(data => data.user as UserInfo)
             .catch((err) => {
                 throw new Error(`Could not edit user: ${err.message}`);
             });
@@ -344,9 +342,7 @@ export default class PrimeShineAPIClient {
             requestBody,
             jwt,
         )
-            .then((json) => {
-                return json.scheduledCustomer as ScheduledCustomer;
-            })
+            .then(data => data.scheduledCustomer as ScheduledCustomer)
             .catch((err) => {
                 throw new Error(`Could not create scheduled customer: ${err.message}`);
             });
@@ -386,9 +382,7 @@ export default class PrimeShineAPIClient {
             requestBody,
             jwt,
         )
-            .then((json) => {
-                return json.scheduledCustomer as ScheduledCustomer;
-            })
+            .then(data => data.scheduledCustomer as ScheduledCustomer)
             .catch((err) => {
                 throw new Error(`Could not edit scheduled customer: ${err.message}`);
             });

@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import DeleteCustomerModal from './deleteCustomerModal/deleteCustomerModal';
 import { CreateCustomerFormParams, CreateCustomerModal } from './createCustomerModal/createCustomerModal';
-import { fetchAllCustomers } from '../../utils/helpers';
 import { US_COUNTRY_CODE } from '../../utils/consts';
 import LoadingSegment from '../loadingSegment/loadingSegment';
 import { Input, Table, Message } from 'semantic-ui-react';
@@ -18,7 +17,7 @@ export default function CustomersPage() {
     const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
 
-    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
+    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => WaveAPIClient.fetchAllCustomers(businessInfo.businessId, userInfo.token) });
     const [searchBarValue, setSearchBarValue] = useState('');
     const { t } = useLocalization();
     const navigate = useNavigate();

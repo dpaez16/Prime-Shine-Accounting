@@ -4,7 +4,7 @@ import { Button, Message } from 'semantic-ui-react';
 import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
 import LoadingSegment from '../../loadingSegment/loadingSegment';
-import { dateToStr, downloadBuffer, fetchAllCustomers } from '../../../utils/helpers';
+import { dateToStr, downloadBuffer } from '../../../utils/helpers';
 import useLocalization from '../../../hooks/useLocalization';
 import { Schedule, ScheduleID } from '@/types/schedule';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
@@ -13,6 +13,7 @@ import { WaveCustomer, WaveCustomerID } from '@/types/waveCustomer';
 import { FullScheduledCustomer } from '@/types/scheduledCustomer';
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
 import { DAYS_OF_WEEK, EventListenerNames } from '@/utils/consts';
+import { WaveAPIClient } from '@/api/waveApiClient';
 
 export default function IndividualSchedulePage() {
     const context = useContext(LoginSessionContext);
@@ -45,11 +46,11 @@ export default function IndividualSchedulePage() {
         const businessID = businessInfo.businessId;
         const jwt = userInfo.token;
 
-        const allCustomers = await fetchAllCustomers(businessID, jwt);
+        const allCustomers = await WaveAPIClient.fetchAllCustomers(businessID, jwt);
         const waveCustomerByID = new Map<WaveCustomerID, WaveCustomer>();
         allCustomers.forEach(waveCustomer => {
             waveCustomerByID.set(waveCustomer.id, waveCustomer);
-        })
+        });
 
         const dayBins: Record<number, FullScheduledCustomer[]> = {};
         for (let idx = 0; idx < DAYS_OF_WEEK.length; idx++) {

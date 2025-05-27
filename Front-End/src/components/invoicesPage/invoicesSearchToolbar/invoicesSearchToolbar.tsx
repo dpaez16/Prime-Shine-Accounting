@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import useLocalization from '@/hooks/useLocalization';
-import { fetchAllCustomers } from '@/utils/helpers';
 import {
     Input,
     Dropdown,
@@ -11,6 +10,7 @@ import {
     DropdownProps,
 } from 'semantic-ui-react';
 import { WaveInvoiceFilterKey, WaveInvoiceFilterObj } from './useInvoicesSearch';
+import { WaveAPIClient } from '@/api/waveApiClient';
 
 const WAVE_INVOICE_STATUSES = [
     'Draft',
@@ -35,7 +35,7 @@ export const InvoicesSearchToolbar: React.FC<InvoicesSearchToolbarProps> = (prop
     const businessInfo = context.businessInfo!;
 
     const { t } = useLocalization();
-    const { data: customers, loading: loadingCustomers } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
+    const { data: customers, loading: loadingCustomers } = useDataFetcher({ fetcher: () => WaveAPIClient.fetchAllCustomers(businessInfo.businessId, userInfo.token) });
 
     const handleFilterChange = (
         _: React.ChangeEvent<HTMLInputElement> | React.SyntheticEvent<HTMLElement>,

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { Modal, Button } from 'semantic-ui-react';
 import useLocalization from '../../../../../hooks/useLocalization';
 import { FullScheduledCustomer } from '@/types/scheduledCustomer';
@@ -52,4 +52,4 @@ export const DeleteScheduledCustomerModal: React.FC<DeleteScheduledCustomerModal
             </Modal.Actions>
         </Modal>
     );
-}
+};

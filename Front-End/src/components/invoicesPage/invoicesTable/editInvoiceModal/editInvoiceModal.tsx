@@ -15,7 +15,6 @@ import { WaveInvoice, WaveInvoicePatchInput } from '@/types/waveInvoice';
 import { WaveCustomer } from '@/types/waveCustomer';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
-import { fetchAllCustomers } from '@/utils/helpers';
 import { EventListenerNames } from '@/utils/consts';
 import { WaveAPIClient } from '@/api/waveApiClient';
 import { useEditInvoiceForm } from './useEditInvoiceForm';
@@ -31,7 +30,7 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
     const userInfo = loginSession.userInfo!;
     const businessInfo = loginSession.businessInfo!;
 
-    const { data, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
+    const { data, loading } = useDataFetcher<WaveCustomer[]>({ fetcher: () => WaveAPIClient.fetchAllCustomers(businessInfo.businessId, userInfo.token) });
     const { invoiceParams, setInvoiceParam, invoiceServices, setInvoiceServices } = useEditInvoiceForm(props.invoice);
 
     const { t } = useLocalization();

@@ -1,12 +1,13 @@
 import React, { useContext } from 'react';
 import { Modal, Button, Dropdown, Form, Label, Input, InputOnChangeData } from 'semantic-ui-react';
-import { fetchAllCustomers, fuseDateTime } from '../../../../utils/helpers';
+import { fuseDateTime } from '../../../../utils/helpers';
 import useLocalization from '../../../../hooks/useLocalization';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useCreateScheduledCustomerForm } from './useCreateScheduledCustomerForm';
 import PrimeShineAPIClient from '@/api/primeShineApiClient';
 import { ScheduleID } from '@/types/schedule';
+import { WaveAPIClient } from '@/api/waveApiClient';
 
 type CreateScheduledCustomerModalProps = {
     datesOfService: string[];
@@ -23,7 +24,7 @@ export default function CreateScheduledCustomerModal(props: CreateScheduledCusto
     const { formParams, setFormParam, formValid } = useCreateScheduledCustomerForm();
 
     const { t } = useLocalization();
-    const { data, loading } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) })
+    const { data, loading } = useDataFetcher({ fetcher: () => WaveAPIClient.fetchAllCustomers(businessInfo.businessId, userInfo.token) });
 
     const allCustomers = data ?? [];
     const customerOptions = allCustomers.map(customer => {
@@ -67,7 +68,7 @@ export default function CreateScheduledCustomerModal(props: CreateScheduledCusto
             userInfo.token,
         )
             .then(() => props.onSubmit())
-            .catch((err) => alert('Failed to create scheduled customer' + err.message)) // TODO: use translation hook
+            .catch((err) => alert('Failed to create scheduled customer' + err.message)); // TODO: use translation hook
     };
 
     return (
