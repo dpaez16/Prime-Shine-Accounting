@@ -160,7 +160,7 @@ export default class PrimeShineAPIClient {
         };
 
         return PrimeShineAPIClient.#createFetchRequest(
-            '/schedule/query',
+            '/schedules/query',
             requestBody,
             jwt,
         )
@@ -173,6 +173,28 @@ export default class PrimeShineAPIClient {
             })
             .catch((err) => {
                 throw new Error(`Could not fetch schedules: ${err.message}`);
+            });
+    }
+
+    /**
+    * Fetches a specific schedule.
+    * @param scheduleID - ID of the schedule to fetch.
+    * @param jwt - The user's JSON web token.
+    * @return A promise resolving to the requested schedule.
+    */
+    static fetchSchedule(scheduleID: ScheduleID, jwt: JWT) {
+        const requestBody = {
+            scheduleID,
+        };
+
+        return PrimeShineAPIClient.#createFetchRequest(
+            '/schedule/query',
+            requestBody,
+            jwt,
+        )
+            .then(data => data.schedule as Schedule)
+            .catch((err) => {
+                throw new Error(`Could not fetch schedule: ${err.message}`);
             });
     }
 
