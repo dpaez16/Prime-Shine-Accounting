@@ -1,39 +1,55 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Modal, Button } from 'semantic-ui-react';
 import useLocalization from '../../../../../hooks/useLocalization';
+import { FullScheduledCustomer } from '@/types/scheduledCustomer';
+import { constructTimeStr } from '@/utils/helpers';
+import PrimeShineAPIClient from '@/api/primeShineApiClient';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
 
-type DeleteScheduleModalProps = {
-  customer: React.ReactElement;
-  onSubmit: () => void;
+type DeleteScheduledCustomerModalProps = {
+    scheduledCustomer: FullScheduledCustomer;
+    onSubmit: () => void;
+    onClose: () => void;
 };
 
-export default function DeleteScheduleModal(props: DeleteScheduleModalProps) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const { t } = useLocalization();
+export const DeleteScheduledCustomerModal: React.FC<DeleteScheduledCustomerModalProps> = (props) => {
+    const context = useContext(LoginSessionContext);
+    const userInfo = context.userInfo!;
 
-  return (
-    <Modal
-      onClose={() => setModalOpen(false)}
-      onOpen={() => setModalOpen(true)}
-      open={modalOpen}
-      trigger={<Button negative>{t('Delete')}</Button>}
-    >
-      <Modal.Header>{t('Delete Customer?')}</Modal.Header>
-      <Modal.Content>{props.customer}</Modal.Content>
-      <Modal.Actions>
-        <Button color="black" onClick={() => setModalOpen(false)}>
-          {t('Cancel')}
-        </Button>
-        <Button
-          onClick={() => {
-            props.onSubmit();
-            setModalOpen(false);
-          }}
-          negative
+    const { t } = useLocalization();
+    const customer = props.scheduledCustomer;
+
+    const handleSubmit = () => {
+        PrimeShineAPIClient.deleteScheduledCustomer(
+            customer.scheduledCustomerID,
+            userInfo.token,
+        )
+            .then(() => props.onSubmit())
+            .catch((err) => alert('Failed to delete scheduled customer: ' + err.message)); // TODO: use translation hook
+    };
+
+    return (
+        <Modal
+            onClose={() => props.onClose()}
+            open={true}
         >
-          {t('Ok')}
-        </Button>
-      </Modal.Actions>
-    </Modal>
-  );
+            <Modal.Header>{t('Delete Customer?')}</Modal.Header>
+            <Modal.Content>
+                <p>{t('Customer')}: {customer.metadata.name}</p>
+                <p>{t('Service Start Time')}: {constructTimeStr(customer.startTime)}</p>
+                <p>{t('Service End Time')}: {constructTimeStr(customer.endTime)}</p>
+            </Modal.Content>
+            <Modal.Actions>
+                <Button color="black" onClick={() => props.onClose()}>
+                    {t('Cancel')}
+                </Button>
+                <Button
+                    onClick={() => handleSubmit()}
+                    negative
+                >
+                    {t('Ok')}
+                </Button>
+            </Modal.Actions>
+        </Modal>
+    );
 }

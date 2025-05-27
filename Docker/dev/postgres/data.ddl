@@ -7,6 +7,6 @@ insert into users (name, email, password) values
 
 insert into schedules (userid, start_day)
 select users.userid,
-       '08/16/2025'
+       '08/11/2025'
   from users
  where users.name = 'Bob';

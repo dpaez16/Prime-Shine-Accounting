@@ -208,7 +208,7 @@ func DeleteScheduledCustomer(tx db.WriteDBExecutor, scheduledCustomerID int) (bo
 	}
 
 	_, err = tx.Exec(`
-		DELETE FROM users
+		DELETE FROM scheduled_customers
 		WHERE scheduledcustomerid = $1
 	`, scheduledCustomerID)
 

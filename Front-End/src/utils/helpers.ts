@@ -20,10 +20,10 @@ export const replaceItemFromArray = function(arr, valObj, newObj) {
 
 /**
  * Constructs a date string in `mm/dd/yyyy` format.
- * @param {Date} date - The date to convert to a string.
- * @return {Date} The constructed date.
+ * @param date - The date to convert to a string.
+ * @return The constructed date.
  */
-export const dateToStr = function(date: Date) {
+export const dateToStr = (date: Date) => {
     const month = date.getUTCMonth() + 1;
     const day = date.getUTCDate();
     const year = date.getUTCFullYear();
@@ -36,20 +36,20 @@ export const dateToStr = function(date: Date) {
 
 /**
  * Constructs a date suitable for WaveApps. Time is set to 00:00.
- * @param {string} date - The day constructed in `mm/dd/yyyy` format.
- * @return {Date} The constructed date.
+ * @param date - The day constructed in `mm/dd/yyyy` format.
+ * @return The constructed date.
  */
-export const constructDate = function(date: string) {
+export const constructDate = (date: string) => {
     // Wave likes invoice dates in yyyy-mm-dd
     return new Date(`${date} 00:00`);
 };
 
 /**
  * Constructs a time in `hh:mm AM/PM` format.
- * @param {string} dateEpochStr - The date serialized in epoch format.
- * @return {string} The constructed date.
+ * @param dateEpochStr - The date serialized in epoch format.
+ * @return The constructed date.
  */
-export const constructTimeStr = function(dateEpochStr: string) {
+export const constructTimeStr = (dateEpochStr: string) => {
     const date = new Date(dateEpochStr);
 
     let hours = date.getHours();
@@ -60,15 +60,15 @@ export const constructTimeStr = function(dateEpochStr: string) {
         hours -= 12;
     }
 
-    return `${hours}:${minutes} ${timePeriod}`;
+    return `${hours.toString().padStart(2, '0')}:${minutes} ${timePeriod}`;
 };
 
 /**
  * Constructs a time in `hh:mm` format.
- * @param {string} dateEpochStr - The date serialized in epoch format.
- * @return {string} The constructed date.
+ * @param dateEpochStr - The date serialized in epoch format.
+ * @return The constructed date.
  */
-export const constructMilitaryTimeStr = function(dateEpochStr: string) {
+export const constructMilitaryTimeStr = (dateEpochStr: string) => {
     const date = new Date(dateEpochStr);
 
     const hours = `${date.getHours()}`.padStart(2, '0');
@@ -77,17 +77,28 @@ export const constructMilitaryTimeStr = function(dateEpochStr: string) {
     return `${hours}:${minutes}`;
 };
 
-export const fuseDateTime = function(dateStr: string, timeStr: string) {
+/**
+ * Fuses a mm/dd/yyyy date string with a hh:mm time string into a Date object.
+ * @param dateStr - The mm/dd/yyyy date string.
+ * @param timeStr - The hh:mm time string.
+ * @returns The newly constructed Date object.
+ */
+export const fuseDateTime = (dateStr: string, timeStr: string) => {
     return new Date(`${dateStr} ${timeStr}`);
 };
 
-export const getDayOfWeekStr = function(dateStr: string) {
+/**
+ * Get the day of the week from a mm/dd/yyyy date string.
+ * @param dateStr - The mm/dd/yyyy date string.
+ * @returns The day of the week.
+ */
+export const getDayOfWeekStr = (dateStr: string) => {
     const date = fuseDateTime(dateStr, '00:00');
     const dayOfWeekIdx = date.getDay();
     return DAYS_OF_WEEK[dayOfWeekIdx];
 };
 
-export const grabWorkingDays = function(dates: string[]) {
+export const grabWorkingDays = (dates: string[]) => {
     return dates.filter(date => getDayOfWeekStr(date) !== DAYS_OF_WEEK[0]);
 };
 
@@ -96,11 +107,16 @@ export const grabWorkingDays = function(dates: string[]) {
  * @param businessId - The business's unique ID.
  * @returns A promise resolving to a list of all Wave customers.
  */
-export const fetchAllCustomers = function(businessId: BusinessID, jwt: JWT | null) {
+export const fetchAllCustomers = (businessId: BusinessID, jwt: JWT | null) => {
     return WaveAPIClient.fetchAllCustomers(businessId, jwt)
         .then(json => json.customers as WaveCustomer[]);
 };
 
+/**
+ * Downloads a file to the client.
+ * @param buffer - The file's contents that will be downloaded. 
+ * @param filename - The name that the downloaded file will be named as.
+ */
 export const downloadBuffer = (buffer: ArrayBuffer, filename: string) => {
     const blob = new Blob([buffer]);
     const url = window.URL.createObjectURL(blob);

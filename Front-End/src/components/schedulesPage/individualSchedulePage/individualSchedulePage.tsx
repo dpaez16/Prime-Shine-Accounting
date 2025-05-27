@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button, Message } from 'semantic-ui-react';
 import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
@@ -12,7 +12,7 @@ import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { WaveCustomer, WaveCustomerID } from '@/types/waveCustomer';
 import { FullScheduledCustomer } from '@/types/scheduledCustomer';
 import CreateScheduledCustomerModal from './createScheduledCustomerModal/createScheduledCustomerModal';
-import { DAYS_OF_WEEK } from '@/utils/consts';
+import { DAYS_OF_WEEK, EventListenerNames } from '@/utils/consts';
 
 export default function IndividualSchedulePage() {
     const context = useContext(LoginSessionContext);
@@ -28,6 +28,18 @@ export default function IndividualSchedulePage() {
     const { data, loading, error, refetch } = useDataFetcher({
         fetcher: () => getScheduleContents(schedule._id),
     });
+
+    useEffect(() => {
+        const refetchData = () => {
+            refetch();
+        };
+
+        window.addEventListener(EventListenerNames.mutateScheduledCustomers, refetchData);
+
+        return () => {
+            window.removeEventListener(EventListenerNames.mutateScheduledCustomers, refetchData);
+        };
+    }, []);
 
     const getScheduleContents = async (scheduleID: ScheduleID) => {
         const businessID = businessInfo.businessId;
