@@ -62,6 +62,12 @@ func (app *application) querySchedule(w http.ResponseWriter, r *http.Request, _ 
 		return
 	}
 
+	if schedule == nil {
+		err = errors.New("could not find schedule")
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	data := jsondata{"schedule": schedule}
 	err = app.writeJSON(w, http.StatusOK, data, nil)
 	if err != nil {
