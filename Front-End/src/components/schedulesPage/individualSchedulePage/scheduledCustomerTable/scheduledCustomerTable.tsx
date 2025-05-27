@@ -6,6 +6,7 @@ import { FullScheduledCustomer } from '@/types/scheduledCustomer';
 import { ScheduleID } from '@/types/schedule';
 import { DeleteScheduledCustomerModal } from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
 import { EventListenerNames } from '@/utils/consts';
+import EditScheduledCustomerModal from './editScheduledCustomerModal/editScheduledCustomerModal';
 
 type ScheduledCustomerTableProps = {
     date: string;
@@ -14,6 +15,7 @@ type ScheduledCustomerTableProps = {
 };
 
 export default function ScheduledCustomerTable(props: ScheduledCustomerTableProps) {
+    const [ editScheduledCustomer, setEditScheduledCustomer ] = useState<FullScheduledCustomer | null>(null);
     const [ deleteScheduledCustomer, setDeleteScheduledCustomer ] = useState<FullScheduledCustomer | null>(null);
     const { t } = useLocalization();
 
@@ -29,6 +31,19 @@ export default function ScheduledCustomerTable(props: ScheduledCustomerTableProp
 
     return (
         <div className='flex flex-col'>
+            {
+                editScheduledCustomer !== null &&
+                <EditScheduledCustomerModal
+                    dateOfService={props.date}
+                    scheduleID={props.scheduleID}
+                    scheduledCustomer={editScheduledCustomer}
+                    onClose={() => setEditScheduledCustomer(null)}
+                    onSubmit={() => {
+                        setEditScheduledCustomer(null);
+                        window.dispatchEvent(new Event(EventListenerNames.mutateScheduledCustomers));
+                    }}
+                />
+            }
             {
                 deleteScheduledCustomer !== null &&
                 <DeleteScheduledCustomerModal
@@ -66,7 +81,11 @@ export default function ScheduledCustomerTable(props: ScheduledCustomerTableProp
                                     <Table.Cell>{startTime}</Table.Cell>
                                     <Table.Cell>{endTime}</Table.Cell>
                                     <Table.Cell>
-                                    <Button>{t('Edit')}</Button>
+                                    <Button
+                                        onClick={() => setEditScheduledCustomer(scheduledCustomer)}
+                                    >
+                                        {t('Edit')}
+                                    </Button>
                                     <Button
                                         negative
                                         onClick={() => setDeleteScheduledCustomer(scheduledCustomer)}

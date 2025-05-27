@@ -38,9 +38,9 @@ export default function SchedulePDFDocument(props: SchedulePDFDocumentProps) {
   const constructCustomerEntry = (scheduledCustomer: FullScheduledCustomer) => {
     const name = scheduledCustomer.metadata.name;
     const serviceStartTime = constructTimeStr(
-      scheduledCustomer.serviceStartTime,
+      scheduledCustomer.startTime,
     );
-    const serviceEndTime = constructTimeStr(scheduledCustomer.serviceEndTime);
+    const serviceEndTime = constructTimeStr(scheduledCustomer.endTime);
 
     const address = scheduledCustomer.metadata.address;
     const addressStr = constructCustomerAddressStr(address);

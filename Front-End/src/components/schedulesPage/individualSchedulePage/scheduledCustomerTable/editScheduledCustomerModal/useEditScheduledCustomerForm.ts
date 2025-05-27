@@ -1,15 +1,16 @@
-import { ScheduledCustomerCreateInput } from '@/types/scheduledCustomer';
+import { ScheduledCustomer } from '@/types/scheduledCustomer';
 import { useState } from 'react';
 
-export const useCreateScheduledCustomerForm = () => {
-    const [ formParams, setFormParams ] = useState<ScheduledCustomerCreateInput>({
-        waveCustomerID: '',
-        dayOffset: 0,
-        startTime: '',
-        endTime: '',
+export const useEditScheduledCustomerForm = (scheduledCustomer: ScheduledCustomer) => {
+    const [ formParams, setFormParams ] = useState<ScheduledCustomer>({
+        scheduledCustomerID: scheduledCustomer.scheduledCustomerID,
+        waveCustomerID: scheduledCustomer.waveCustomerID,
+        dayOffset: scheduledCustomer.dayOffset,
+        startTime: scheduledCustomer.startTime,
+        endTime: scheduledCustomer.endTime,
     });
 
-    const setFormParam = <K extends keyof ScheduledCustomerCreateInput>(key: K, value: ScheduledCustomerCreateInput[K]) => {
+    const setFormParam = <K extends keyof ScheduledCustomer>(key: K, value: ScheduledCustomer[K]) => {
         setFormParams({
             ...formParams,
             [key]: value,
