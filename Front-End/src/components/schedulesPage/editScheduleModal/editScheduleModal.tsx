@@ -9,7 +9,7 @@ type EditScheduleModalProps = {
   onSubmit: (startDate: Date) => void;
 }
 
-export default function EditScheduleModal(props: EditScheduleModalProps) {
+export const EditScheduleModal: React.FC<EditScheduleModalProps> = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [isDateValid, setIsDateValid] = useState(false);
   const { t } = useLocalization();
@@ -77,4 +77,4 @@ export default function EditScheduleModal(props: EditScheduleModalProps) {
       </Modal.Actions>
     </Modal>
   );
-}
+};

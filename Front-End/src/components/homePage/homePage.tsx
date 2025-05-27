@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import useLocalization from '../../hooks/useLocalization';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 
-export default function HomePage() {
+export const HomePage: React.FC = () => {
     const { userInfo } = useContext(LoginSessionContext);
     const { t } = useLocalization();
 

@@ -16,7 +16,7 @@ type CreateScheduledCustomerModalProps = {
     onSubmit: () => void;
 };
 
-export default function CreateScheduledCustomerModal(props: CreateScheduledCustomerModalProps) {
+export const CreateScheduledCustomerModal: React.FC<CreateScheduledCustomerModalProps> = (props) => {
     const context = useContext(LoginSessionContext);
     const businessInfo = context.businessInfo!;
     const userInfo = context.userInfo!;
@@ -139,4 +139,4 @@ export default function CreateScheduledCustomerModal(props: CreateScheduledCusto
             </Modal.Actions>
         </Modal>
     );
-}
+};

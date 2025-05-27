@@ -7,7 +7,7 @@ type DeleteScheduleModalProps = {
   onSubmit: () => void;
 };
 
-export default function DeleteScheduleModal(props: DeleteScheduleModalProps) {
+export const DeleteScheduleModal: React.FC<DeleteScheduleModalProps> = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const { t } = useLocalization();
 
@@ -42,4 +42,4 @@ export default function DeleteScheduleModal(props: DeleteScheduleModalProps) {
       </Modal.Actions>
     </Modal>
   );
-}
+};

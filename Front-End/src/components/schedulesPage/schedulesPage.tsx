@@ -6,13 +6,13 @@ import EditScheduleModal from './editScheduleModal/editScheduleModal';
 import DeleteScheduleModal from './deleteScheduleModal/deleteScheduleModal';
 import PrimeShineAPIClient from '../../api/primeShineApiClient';
 import useLocalization from '../../hooks/useLocalization';
-import LoadingSegment from '../loadingSegment/loadingSegment';
+import { LoadingSegment } from '../loadingSegment/loadingSegment';
 import { dateToStr } from '../../utils/helpers';
 import { ScheduleID } from '@/types/schedule';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 
-export default function SchedulesPage() {
+export const SchedulesPage: React.FC = () => {
     const context = useContext(LoginSessionContext);
     const userInfo = context.userInfo!;
 
@@ -90,4 +90,4 @@ export default function SchedulesPage() {
             </Table>
         </div>
     );
-}
+};

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Table, Dropdown } from 'semantic-ui-react';
 import DeleteInvoiceModal from './deleteInvoiceModal/deleteInvoiceModal';
 import EditInvoiceModal from './editInvoiceModal/editInvoiceModal';
-import LoadingSegment from '../../loadingSegment/loadingSegment';
+import { LoadingSegment } from '../../loadingSegment/loadingSegment';
 import useLocalization from '../../../hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';
 import { constructDate, dateToStr } from '@/utils/helpers';
@@ -12,7 +12,7 @@ type InvoiceTableProps = {
   invoices: WaveInvoice[];
 };
 
-export default function InvoicesTable(props: InvoiceTableProps) {
+export const InvoicesTable: React.FC<InvoiceTableProps> = (props) => {
   const [editingInvoice, setEditingInvoice] = useState<WaveInvoice | null>(null);
   const { t } = useLocalization();
 
@@ -84,4 +84,4 @@ export default function InvoicesTable(props: InvoiceTableProps) {
       </Table>
     </>
   );
-}
+};

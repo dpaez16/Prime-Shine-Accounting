@@ -13,7 +13,7 @@ import useLocalization from '../../hooks/useLocalization';
 import { useNavigate } from 'react-router-dom';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 
-export default function EditProfilePage() {
+export const EditProfilePage: React.FC = () => {
     const context = useContext(LoginSessionContext);
     const { updateUserInfo, clearSession } = context;
     const userInfo = context.userInfo!;
@@ -134,4 +134,4 @@ export default function EditProfilePage() {
             {error && <Message negative content={error} />}
         </div>
     );
-}
+};

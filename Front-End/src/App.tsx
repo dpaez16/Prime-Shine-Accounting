@@ -1,19 +1,19 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomePage from './components/homePage/homePage';
-import EditProfilePage from './components/editProfilePage/editProfilePage';
-import SchedulesPage from './components/schedulesPage/schedulesPage';
-import IndividualSchedulePage from './components/schedulesPage/individualSchedulePage/individualSchedulePage';
-import CustomersPage from './components/customersPage/customersPage';
-import IndividualCustomerPage from './components/customersPage/individualCustomerPage/individualCustomerPage';
-import InvoicesPage from './components/invoicesPage/invoicesPage';
-import SideNavbar from './components/sideNavbar/sideNavbar';
+import { HomePage } from './components/homePage/homePage';
+import { EditProfilePage } from './components/editProfilePage/editProfilePage';
+import { SchedulesPage } from './components/schedulesPage/schedulesPage';
+import { IndividualSchedulePage } from './components/schedulesPage/individualSchedulePage/individualSchedulePage';
+import { CustomersPage } from './components/customersPage/customersPage';
+import { IndividualCustomerPage } from './components/customersPage/individualCustomerPage/individualCustomerPage';
+import { InvoicesPage } from './components/invoicesPage/invoicesPage';
+import { SideNavbar } from './components/sideNavbar/sideNavbar';
 import { LoginSession, LoginSessionContext } from './context/LoginSessionContext';
 import { UserInfo } from './types/userInfo';
 import { BusinessInfo } from './types/businessInfo';
 import useLocalStorage from './hooks/useLocalStorage';
 
-export default function App() {
+export const App: React.FC = () => {
     const { localStorageValue: userInfo, setLocalStorageValue: setUserInfo } = useLocalStorage<UserInfo>('userInfo');
     const { localStorageValue: businessInfo, setLocalStorageValue: setBusinessInfo } = useLocalStorage<BusinessInfo>('businessInfo');
 

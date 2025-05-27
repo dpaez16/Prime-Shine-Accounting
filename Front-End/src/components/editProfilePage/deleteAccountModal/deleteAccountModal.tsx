@@ -7,7 +7,7 @@ type DeleteAccountModalProps = {
     onSubmit: () => void;
 };
 
-export default function DeleteAccountModal(props: DeleteAccountModalProps) {
+export const DeleteAccountModal: React.FC<DeleteAccountModalProps> = (props) => {
     const [modalOpen, setModalOpen] = useState(false);
     const { t } = useLocalization();
 
@@ -39,4 +39,4 @@ export default function DeleteAccountModal(props: DeleteAccountModalProps) {
             </Modal.Actions>
         </Modal>
     );
-}
+};

@@ -5,7 +5,7 @@ type LoadingSegmentProps = {
     className?: string;
 };
 
-export default function LoadingSegment(props: LoadingSegmentProps) {
+export const LoadingSegment: React.FC<LoadingSegmentProps> = (props) => {
     return (
         <Segment className={props.className ?? ''}>
             <Dimmer active inverted>

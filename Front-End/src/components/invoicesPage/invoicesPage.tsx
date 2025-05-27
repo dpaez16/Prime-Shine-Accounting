@@ -22,7 +22,7 @@ interface InvoicesData {
     pageInfo: WavePageInfo;
 }
 
-export default function InvoicesPage() {
+export const InvoicesPage: React.FC = () => {
     const context = useContext(LoginSessionContext);
     const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
@@ -116,4 +116,4 @@ export default function InvoicesPage() {
             }
         </div>
     );
-}
+};

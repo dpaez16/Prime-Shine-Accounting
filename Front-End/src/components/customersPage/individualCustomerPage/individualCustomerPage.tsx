@@ -9,14 +9,14 @@ import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { WaveAPIClient } from '@/api/waveApiClient';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { WaveCustomerID } from '../../../types/waveCustomer';
-import LoadingSegment from '@/components/loadingSegment/loadingSegment';
+import { LoadingSegment } from '@/components/loadingSegment/loadingSegment';
 import { useBrowserQuery } from '@/hooks/useBrowserQuery';
 
 type IndividualCustomerPageQuery = {
     customerID?: string;
 };
 
-export default function IndividualCustomerPage() {
+export const IndividualCustomerPage: React.FC = () => {
     const loginSession = useContext(LoginSessionContext);
     const businessInfo = loginSession.businessInfo!;
     const userInfo = loginSession.userInfo!;

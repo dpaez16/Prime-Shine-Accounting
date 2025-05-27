@@ -12,7 +12,7 @@ type DeleteInvoiceModalProps = {
   invoice: WaveInvoice;
 };
 
-export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
+export const DeleteInvoiceModal: React.FC<DeleteInvoiceModalProps> = (props) => {
   const loginSession = useContext(LoginSessionContext);
   const userInfo = loginSession.userInfo!;
 
@@ -67,4 +67,4 @@ export default function DeleteInvoiceModal(props: DeleteInvoiceModalProps) {
       </Modal.Actions>
     </Modal>
   );
-}
+};

@@ -25,7 +25,7 @@ type EditInvoiceModalProps = {
   onClose: () => void;
 };
 
-export default function EditInvoiceModal(props: EditInvoiceModalProps) {
+export const EditInvoiceModal: React.FC<EditInvoiceModalProps> = (props) => {
     const loginSession = useContext(LoginSessionContext);
     const userInfo = loginSession.userInfo!;
     const businessInfo = loginSession.businessInfo!;
@@ -162,4 +162,4 @@ export default function EditInvoiceModal(props: EditInvoiceModalProps) {
             </Modal.Actions>
         </Modal>
     );
-}
+};

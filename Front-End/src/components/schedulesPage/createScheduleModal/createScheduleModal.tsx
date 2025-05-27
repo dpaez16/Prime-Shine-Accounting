@@ -7,7 +7,7 @@ type CreateScheduleModalProps = {
   onSubmit: (startDay: Date) => void;
 };
 
-export default function CreateScheduleModal(props: CreateScheduleModalProps) {
+export const CreateScheduleModal: React.FC<CreateScheduleModalProps> = (props) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [isDateValid, setIsDateValid] = useState(false);
   const { t } = useLocalization();
@@ -73,4 +73,4 @@ export default function CreateScheduleModal(props: CreateScheduleModalProps) {
       </Modal.Actions>
     </Modal>
   );
-}
+};

@@ -14,7 +14,7 @@ type ScheduledCustomerTableProps = {
     scheduledCustomers: FullScheduledCustomer[];
 };
 
-export default function ScheduledCustomerTable(props: ScheduledCustomerTableProps) {
+export const ScheduledCustomerTable: React.FC<ScheduledCustomerTableProps> = (props) => {
     const [ editScheduledCustomer, setEditScheduledCustomer ] = useState<FullScheduledCustomer | null>(null);
     const [ deleteScheduledCustomer, setDeleteScheduledCustomer ] = useState<FullScheduledCustomer | null>(null);
     const { t } = useLocalization();
@@ -101,4 +101,4 @@ export default function ScheduledCustomerTable(props: ScheduledCustomerTableProp
             }
         </div>
     );
-}
+};

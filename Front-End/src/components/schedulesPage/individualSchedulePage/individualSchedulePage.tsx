@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Button, Message } from 'semantic-ui-react';
 import ScheduledCustomerTable from './scheduledCustomerTable/scheduledCustomerTable';
 import PrimeShineAPIClient from '../../../api/primeShineApiClient';
-import LoadingSegment from '../../loadingSegment/loadingSegment';
+import { LoadingSegment } from '../../loadingSegment/loadingSegment';
 import { dateToStr, downloadBuffer } from '../../../utils/helpers';
 import useLocalization from '../../../hooks/useLocalization';
 import { Schedule, ScheduleID } from '@/types/schedule';
@@ -19,7 +19,7 @@ type IndividualCustomerPageQuery = {
     scheduleID?: string;
 };
 
-export default function IndividualSchedulePage() {
+export const IndividualSchedulePage: React.FC = () => {
     const context = useContext(LoginSessionContext);
     const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;

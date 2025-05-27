@@ -29,7 +29,7 @@ type EditCustomerModalProps = {
     onSubmit: (params: CreateCustomerFormParams) => void;
 };
 
-export default function EditCustomerModal(props: EditCustomerModalProps) {
+export const EditCustomerModal: React.FC<EditCustomerModalProps> = (props) => {
     const getOriginalFormParams = () => {
         const customer = props.customer;
         const address = customer.address;
@@ -225,4 +225,4 @@ export default function EditCustomerModal(props: EditCustomerModalProps) {
             </Modal.Actions>
         </Modal>
     );
-}
+};

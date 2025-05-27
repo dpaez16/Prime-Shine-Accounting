@@ -8,7 +8,7 @@ type DeleteCustomerModalProps = {
     onSubmit: () => void;
 }
 
-export default function DeleteCustomerModal(props: DeleteCustomerModalProps) {
+export const DeleteCustomerModal: React.FC<DeleteCustomerModalProps> = (props) => {
     const { t } = useLocalization();
     const [modalOpen, setModalOpen] = useState(false);
 
@@ -44,4 +44,4 @@ export default function DeleteCustomerModal(props: DeleteCustomerModalProps) {
             </Modal.Actions>
         </Modal>
     );
-}
+};

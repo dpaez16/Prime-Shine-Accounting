@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import DeleteCustomerModal from './deleteCustomerModal/deleteCustomerModal';
 import { CreateCustomerFormParams, CreateCustomerModal } from './createCustomerModal/createCustomerModal';
 import { US_COUNTRY_CODE } from '../../utils/consts';
-import LoadingSegment from '../loadingSegment/loadingSegment';
+import { LoadingSegment } from '../loadingSegment/loadingSegment';
 import { Input, Table, Message } from 'semantic-ui-react';
 import useLocalization from '../../hooks/useLocalization';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,7 @@ import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { WaveAPIClient } from '@/api/waveApiClient';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 
-export default function CustomersPage() {
+export const CustomersPage: React.FC = () => {
     const context = useContext(LoginSessionContext);
     const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
@@ -133,4 +133,4 @@ export default function CustomersPage() {
             </Table>
         </div>
     );
-}
+};

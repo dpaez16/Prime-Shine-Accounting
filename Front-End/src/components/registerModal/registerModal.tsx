@@ -14,7 +14,7 @@ type UserParams = {
     password: string;
 };
 
-export default function RegisterModal(props: RegisterModalProps) {
+export const RegisterModal: React.FC<RegisterModalProps> = (props) => {
     const { updateUserInfo, updateBusinessInfo } = useContext(LoginSessionContext);
     const [userParams, setUserParams] = useState({} as UserParams);
     const [modalOpen, setModalOpen] = useState(false);
@@ -121,4 +121,4 @@ export default function RegisterModal(props: RegisterModalProps) {
             </Modal.Actions>
         </Modal>
     );
-}
+};

@@ -15,7 +15,7 @@ type SchedulePDFDocumentProps = {
   scheduleDays: Array<FullScheduledCustomer[]>;
 };
 
-export default function SchedulePDFDocument(props: SchedulePDFDocumentProps) {
+export const SchedulePDFDocument: React.FC<SchedulePDFDocumentProps> = (props) => {
   const { t } = useLocalization();
 
   const constructCustomerAddressStr = (address: WaveCustomerAddress) => {
@@ -125,4 +125,4 @@ export default function SchedulePDFDocument(props: SchedulePDFDocumentProps) {
       </Page>
     </Document>
   );
-}
+};

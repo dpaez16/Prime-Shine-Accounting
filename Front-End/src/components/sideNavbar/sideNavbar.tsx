@@ -8,7 +8,7 @@ import { LoginSessionContext } from '@/context/LoginSessionContext';
 import LanguageDropdown from './languageDropdown';
 import PrimeShineAPIClient from '@/api/primeShineApiClient';
 
-export default function SideNavbar() {
+export const SideNavbar: React.FC = () => {
     const { userInfo, clearSession } = useContext(LoginSessionContext);
     const { t } = useLocalization();
     const navigate = useNavigate();
@@ -100,4 +100,4 @@ export default function SideNavbar() {
             </Menu.Menu>
         </Menu>
     );
-}
+};

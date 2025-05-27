@@ -13,7 +13,7 @@ type UserParams = {
     password: string;
 };
 
-export default function LoginModal(props: LoginModalProps) {
+export const LoginModal: React.FC<LoginModalProps> = (props) => {
     const { updateUserInfo, updateBusinessInfo } = useContext(LoginSessionContext);
     const [userParams, setUserParams] = useState({} as UserParams);
     const [modalOpen, setModalOpen] = useState(false);
@@ -109,4 +109,4 @@ export default function LoginModal(props: LoginModalProps) {
             </Modal.Actions>
         </Modal>
     );
-}
+};
