@@ -3,14 +3,15 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"prime-shine-api/internal/data"
+	"prime-shine-api/internal/db"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type deleteUserBody struct {
-	UserID primitive.ObjectID `json:userID`
+	UserID int `json:"userID"`
 }
 
 // Route for deleting a user.
@@ -24,7 +25,25 @@ func (app *application) deleteUser(w http.ResponseWriter, r *http.Request, _ htt
 		return
 	}
 
-	success, err := app.dbClient.DeleteUser(body.UserID)
+	// TODO: move this to middleware
+	lazyTx := db.NewLazyTx(app.db)
+	defer func() {
+		if rec := recover(); rec != nil {
+			_ = lazyTx.Rollback()
+			err = errors.Errorf("%v", rec)
+			app.serverErrorResponse(w, r, err)
+		} else if r.Context().Err() != nil {
+			// req is cancelled by client, timeout, or app ctx cancelled.
+			_ = lazyTx.Rollback()
+		} else {
+			if err := lazyTx.Commit(); err != nil {
+				err = errors.New("Transaction failed to commit")
+				app.serverErrorResponse(w, r, err)
+			}
+		}
+	}()
+
+	success, err := data.DeleteUser(lazyTx, body.UserID)
 	if err != nil {
 		err = errors.Wrap(err, "DeleteUser")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())

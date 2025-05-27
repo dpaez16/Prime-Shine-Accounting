@@ -13,6 +13,8 @@ services:
 
     go-api:
         image: 'golang:1.23.0-alpine'
+        depends_on:
+            - postgres
         ports:
             - '5000:5000'
         working_dir: /app/
@@ -24,6 +26,19 @@ services:
         command: sh -c 'mkdir -p /.cache && chmod -R 777 /.cache && go run ./cmd/api'
         restart: always
         env_file: './.env'
+
+    postgres:
+        image: 'postgres:17.5-alpine'
+        ports:
+            - '5432:5432'
+        healthcheck:
+            test: ["CMD", "pg_isready"]
+            interval: 30s
+            timeout: 20s
+            retries: 3
+        env_file: './.env'
+        volumes:
+            - '${PWD}/Docker/dev/postgres/:/docker-entrypoint-initdb.d/'
 
     nginx:
         image: 'nginx:1.28.0-alpine'

@@ -1,8 +1,9 @@
 export type UserInfo = {
-  _id: string;
-  token: string;
-  name: string;
-  email: string;
+    userID: number;
+    token: string;
+    name: string;
+    email: string;
 };
 
+export type UserID = UserInfo['userID'];
 export type JWT = UserInfo['token'];

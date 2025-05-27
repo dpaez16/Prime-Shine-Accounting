@@ -1,52 +1,61 @@
 package data
 
 import (
-	"context"
+	"database/sql"
+	"fmt"
 	"prime-shine-api/internal"
+	"prime-shine-api/internal/db"
+	"strings"
 
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type User struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty" json:"_id"`
-	Name     string             `bson:"name" json:"name"`
-	Email    string             `bson:"email" json:"email"`
-	Password []byte             `bson:"password" json:"-"`
-}
-
-func (db *MongoClient) getUsersCollection() *mongo.Collection {
-	return db.Client.Database(db.DatabaseName).Collection("users")
+	ID       int    `db:"userid" json:"userID"`
+	Name     string `db:"name" json:"name"`
+	Email    string `db:"email" json:"email"`
+	Password string `db:"password" json:"-"`
 }
 
 // Finds one user.
 // If a runtime error occurs, a nil user and error is returned.
 // Otherwise, a user and nil error is returned.
-func (db *MongoClient) FindOneUser(filter bson.M) (*User, error) {
-	collection := db.getUsersCollection()
-	var user User
+func FindOneUser(readConn db.ReadDBExecutor, filter map[string]any) (*User, error) {
+	user := &User{}
 
-	err := collection.FindOne(context.TODO(), filter).Decode(&user)
-	if err != nil {
-		switch {
-		case errors.Is(err, mongo.ErrNoDocuments):
-			return nil, nil
-		default:
-			return nil, errors.Wrap(err, "users.FindOne")
-		}
+	var args []any
+	var whereClauses []string
+
+	for k, v := range filter {
+		argNum := len(args) + 1
+		whereClause := fmt.Sprintf("%v = $%v", k, argNum)
+
+		whereClauses = append(whereClauses, whereClause)
+		args = append(args, v)
 	}
 
-	return &user, nil
+	query := fmt.Sprintf(`
+		SELECT *
+		  FROM users
+		 WHERE %v
+	`, strings.Join(whereClauses, " AND "))
+
+	err := readConn.Get(user, query, args...)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	} else if err != nil {
+		return nil, errors.Wrap(err, "Get")
+	}
+
+	return user, nil
 }
 
 // Searches for a user in the context of logging in.
 // If a runtime error occurs, a nil user and error is returned.
 // Otherwise, a user and nil error is returned.
-func (db *MongoClient) QueryUserAndPassword(email string, password string) (*User, error) {
-	filter := bson.M{"email": email}
-	user, err := db.FindOneUser(filter)
+func QueryUserAndPassword(readConn db.ReadDBExecutor, email string, password string) (*User, error) {
+	filter := map[string]any{"email": email}
+	user, err := FindOneUser(readConn, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneUser")
 	}
@@ -68,9 +77,9 @@ func (db *MongoClient) QueryUserAndPassword(email string, password string) (*Use
 }
 
 // Creates a new user.
-func (db *MongoClient) CreateUser(name string, email string, password string) (*User, error) {
-	filter := bson.M{"email": email}
-	foundUser, err := db.FindOneUser(filter)
+func CreateUser(tx db.WriteDBExecutor, name string, email string, password string) (*User, error) {
+	filter := map[string]any{"email": email}
+	foundUser, err := FindOneUser(tx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneUser")
 	}
@@ -84,31 +93,43 @@ func (db *MongoClient) CreateUser(name string, email string, password string) (*
 		return nil, errors.Wrap(err, "HashPassword")
 	}
 
-	newUser := User{
-		Name:     name,
-		Email:    email,
-		Password: hashedPassword,
-	}
+	result, err := tx.Exec(`
+		INSERT INTO users
+		(name, email, password)
+		VALUES ($1, $2, $3)
+	`, name, email, string(hashedPassword))
 
-	collection := db.getUsersCollection()
-	result, err := collection.InsertOne(context.TODO(), newUser)
 	if err != nil {
-		return nil, errors.Wrap(err, "users.InsertOne")
+		return nil, errors.Wrap(err, "tx.Exec")
 	}
 
-	newUser.ID = result.InsertedID.(primitive.ObjectID)
-	return &newUser, nil
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return nil, errors.Wrap(err, "RowsAffected")
+	}
+
+	if rowsAffected != 1 {
+		return nil, errors.New("failed to insert users entry")
+	}
+
+	// Grab the newly created user
+	newUser, err := FindOneUser(tx, filter)
+	if err != nil {
+		return nil, errors.Wrap(err, "FindOneUser")
+	}
+
+	return newUser, nil
 }
 
 // Edits a user.
-func (db *MongoClient) EditUser(userID primitive.ObjectID, newEmail string, newName string, newPassword string) (*User, error) {
+func EditUser(tx db.WriteDBExecutor, userID int, newEmail string, newName string, newPassword string) (*User, error) {
 	hashedPassword, err := internal.HashPassword(newPassword)
 	if err != nil {
 		return nil, errors.Wrap(err, "HashPassword")
 	}
 
-	filter := bson.M{"_id": userID}
-	user, err := db.FindOneUser(filter)
+	filter := map[string]any{"userid": userID}
+	user, err := FindOneUser(tx, filter)
 	if err != nil {
 		return nil, errors.Wrap(err, "FindOneUser")
 	}
@@ -118,8 +139,8 @@ func (db *MongoClient) EditUser(userID primitive.ObjectID, newEmail string, newN
 	}
 
 	if user.Email != newEmail {
-		filter = bson.M{"email": newEmail}
-		foundUser, err := db.FindOneUser(filter)
+		filter = map[string]any{"email": newEmail}
+		foundUser, err := FindOneUser(tx, filter)
 		if err != nil {
 			return nil, errors.Wrap(err, "FindOneUser")
 		}
@@ -132,30 +153,36 @@ func (db *MongoClient) EditUser(userID primitive.ObjectID, newEmail string, newN
 	user.ID = userID
 	user.Name = newName
 	user.Email = newEmail
-	user.Password = hashedPassword
+	user.Password = string(hashedPassword)
 
-	updateFilter := bson.D{{"_id", userID}}
-	update := bson.D{
-		{"$set", bson.D{
-			{"name", user.Name},
-			{"email", user.Email},
-			{"password", user.Password},
-		}},
-	}
-	collection := db.getUsersCollection()
-	_, err = collection.UpdateOne(context.TODO(), updateFilter, update)
+	result, err := tx.Exec(`
+		UPDATE users
+		SET   name     = $1
+		    , email    = $2
+			, password = $3
+		WHERE userid = $4
+	`, user.Name, user.Email, user.Password, user.ID)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "users.UpdateOne")
+		return nil, errors.Wrap(err, "tx.Exec")
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return nil, errors.Wrap(err, "RowsAffected")
+	}
+
+	if rowsAffected == 0 {
+		return nil, errors.New("user was not mutated")
 	}
 
 	return user, nil
 }
 
 // Deletes a user.
-func (db *MongoClient) DeleteUser(userID primitive.ObjectID) (bool, error) {
-	filter := bson.M{"_id": userID}
-	user, err := db.FindOneUser(filter)
+func DeleteUser(tx db.WriteDBExecutor, userID int) (bool, error) {
+	filter := map[string]any{"userid": userID}
+	user, err := FindOneUser(tx, filter)
 	if err != nil {
 		return false, errors.Wrap(err, "FindOneUser")
 	}
@@ -164,35 +191,13 @@ func (db *MongoClient) DeleteUser(userID primitive.ObjectID) (bool, error) {
 		return false, errors.New("User not found.")
 	}
 
-	schedules, err := db.QuerySchedules(userID)
-	if err != nil {
-		return false, errors.Wrap(err, "QuerySchedules")
-	}
-
-	for _, schedule := range schedules {
-		success, err := db.DeleteSchedule(schedule.StartDay, userID)
-		if err != nil {
-			return false, errors.Wrap(err, "DeleteSchedule")
-		}
-
-		if !success {
-			return false, errors.Wrapf(err, "Failed to delete schedule %s", schedule.ID)
-		}
-	}
-
-	collection := db.getUsersCollection()
-
-	deleteFilter := bson.D{{"_id", userID}}
-	result := collection.FindOneAndDelete(context.TODO(), deleteFilter)
-	err = result.Err()
+	_, err = tx.Exec(`
+		DELETE FROM users
+		WHERE userid = $1
+	`, userID)
 
 	if err != nil {
-		switch {
-		case errors.Is(err, mongo.ErrNoDocuments):
-			return false, nil
-		default:
-			return false, errors.Wrap(err, "users.FindOneAndDelete")
-		}
+		return false, errors.Wrap(err, "tx.Exec")
 	}
 
 	return true, nil

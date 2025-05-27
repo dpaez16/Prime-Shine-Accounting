@@ -3,17 +3,20 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"prime-shine-api/internal/data"
+	"prime-shine-api/internal/db"
+	"time"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type createScheduledCustomerBody struct {
-	CustomerID       string             `json:customerID`
-	ServiceStartTime primitive.DateTime `json:serviceStartTime`
-	ServiceEndTime   primitive.DateTime `json:serviceEndTime`
-	ScheduleDayID    primitive.ObjectID `json:scheduleDayID`
+	CustomerID string    `json:"waveCustomerID"`
+	StartTime  time.Time `json:"startTime"`
+	EndTime    time.Time `json:"endTime"`
+	DayOffset  int       `json:"dayOffset"`
+	ScheduleID int       `json:"scheduleID"`
 }
 
 // Route for creating a scheduled customer.
@@ -27,7 +30,33 @@ func (app *application) createScheduledCustomer(w http.ResponseWriter, r *http.R
 		return
 	}
 
-	scheduledCustomer, err := app.dbClient.CreateScheduledCustomer(body.CustomerID, body.ServiceStartTime, body.ServiceEndTime, body.ScheduleDayID)
+	// TODO: move this to middleware
+	lazyTx := db.NewLazyTx(app.db)
+	defer func() {
+		if rec := recover(); rec != nil {
+			_ = lazyTx.Rollback()
+			err = errors.Errorf("%v", rec)
+			app.serverErrorResponse(w, r, err)
+		} else if r.Context().Err() != nil {
+			// req is cancelled by client, timeout, or app ctx cancelled.
+			_ = lazyTx.Rollback()
+		} else {
+			if err := lazyTx.Commit(); err != nil {
+				err = errors.New("Transaction failed to commit")
+				app.serverErrorResponse(w, r, err)
+			}
+		}
+	}()
+
+	scheduledCustomer, err := data.CreateScheduledCustomer(
+		lazyTx,
+		body.CustomerID,
+		db.GetTimestamptzFromTimeStruct(body.StartTime),
+		db.GetTimestamptzFromTimeStruct(body.EndTime),
+		body.DayOffset,
+		body.ScheduleID,
+	)
+
 	if err != nil {
 		err = errors.Wrap(err, "CreateScheduledCustomer")
 		app.errorResponse(w, r, http.StatusBadRequest, err.Error())

@@ -12,10 +12,6 @@ import { WaveCustomerID } from '../../../types/waveCustomer';
 import LoadingSegment from '@/components/loadingSegment/loadingSegment';
 import { useBrowserQuery } from '@/hooks/useBrowserQuery';
 
-interface IndividualCustomerPageData {
-    customer: WaveCustomer;
-}
-
 type IndividualCustomerPageQuery = {
     customerID?: string;
 };
@@ -28,7 +24,7 @@ export default function IndividualCustomerPage() {
     const { t } = useLocalization();
     const params = useBrowserQuery<IndividualCustomerPageQuery>();
 
-    const { data, loading, error, refetch } = useDataFetcher<IndividualCustomerPageData>({ fetcher: () => WaveAPIClient.fetchCustomer(businessInfo.businessId, params.customerID ?? 'undefined', userInfo.token) });
+    const { data: customer, loading, error, refetch } = useDataFetcher({ fetcher: () => WaveAPIClient.fetchCustomer(businessInfo.businessId, params.customerID ?? 'undefined', userInfo.token) });
 
     const constructNameElement = (name: string | null) => {
         if (!name) {
@@ -159,7 +155,6 @@ export default function IndividualCustomerPage() {
         );
     }
 
-    const customer = data?.customer;
     if (!customer || error) {
         return (
             <div>

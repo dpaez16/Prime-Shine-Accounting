@@ -1,149 +1,129 @@
-import React, { useState } from 'react';
-import { Modal, Button, Dropdown, Form, Label, Input } from 'semantic-ui-react';
-import {
-  fuseDateTime,
-  constructMilitaryTimeStr,
-} from '../../../../../utils/helpers';
-import useLocalization from '../../../../../hooks/useLocalization';
-import { ScheduledCustomer } from '@/types/scheduledCustomer';
-import { WaveCustomer } from '@/types/waveCustomer';
+import { LoginSessionContext } from '@/context/LoginSessionContext';
+import { ScheduleID } from '@/types/schedule';
+import { FullScheduledCustomer } from '@/types/scheduledCustomer';
+import React, { useContext } from 'react';
+import { useEditScheduledCustomerForm } from './useEditScheduledCustomerForm';
+import useLocalization from '@/hooks/useLocalization';
+import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { constructMilitaryTimeStr, fuseDateTime } from '@/utils/helpers';
+import { Button, Dropdown, Form, Input, InputOnChangeData, Label, Modal } from 'semantic-ui-react';
+import PrimeShineAPIClient from '@/api/primeShineApiClient';
+import { WaveAPIClient } from '../../../../../api/waveApiClient';
 
 type EditScheduledCustomerModalProps = {
-  allCustomers: WaveCustomer[];
-  scheduledCustomer: ScheduledCustomer;
-  scheduleDayDate: string;
-  onSubmit: (
-    customerId: string,
-    serviceStartTime: Date,
-    serviceEndTime: Date,
-  ) => void;
+    dateOfService: string;
+    scheduleID: ScheduleID;
+    scheduledCustomer: FullScheduledCustomer;
+    onClose: () => void;
+    onSubmit: () => void;
 };
 
 export default function EditScheduledCustomerModal(props: EditScheduledCustomerModalProps) {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [formParams, setFormParams] = useState({
-    customerId: props.scheduledCustomer.customerId,
-    serviceStartTime: constructMilitaryTimeStr(
-      props.scheduledCustomer.serviceStartTime,
-    ),
-    serviceEndTime: constructMilitaryTimeStr(
-      props.scheduledCustomer.serviceEndTime,
-    ),
-  });
-  const { t } = useLocalization();
+    const context = useContext(LoginSessionContext);
+    const businessInfo = context.businessInfo!;
+    const userInfo = context.userInfo!;
 
-  const isFormValid = () => {
-    const { customerId, serviceStartTime, serviceEndTime } = formParams;
+    const { formParams, setFormParam, formValid } = useEditScheduledCustomerForm(props.scheduledCustomer);
+
+    const { t } = useLocalization();
+    const { data, loading } = useDataFetcher({ fetcher: () => WaveAPIClient.fetchAllCustomers(businessInfo.businessId, userInfo.token) });
+
+    const allCustomers = data ?? [];
+    const customerOptions = allCustomers.map(customer => {
+        return {
+            key: customer.id,
+            text: customer.name,
+            value: customer.id,
+        };
+    });
+
+    const handleTimeInputChange = (
+        _: React.ChangeEvent<HTMLInputElement>,
+        data: InputOnChangeData,
+    ) => {
+        const name = data.name;
+        const value = data.value;
+
+        const date = fuseDateTime(props.dateOfService, value);
+        setFormParam(name, date.toUTCString());
+    };
+
+    const handleSubmit = () => {
+        const startTime = new Date(formParams.startTime);
+        const endTime = new Date(formParams.endTime);
+
+        PrimeShineAPIClient.editScheduledCustomer(
+            formParams.scheduledCustomerID,
+            formParams.waveCustomerID,
+            startTime,
+            endTime,
+            formParams.dayOffset,
+            props.scheduleID,
+            userInfo.token,
+        )
+            .then(() => props.onSubmit())
+            .catch((err) => alert('Failed to create scheduled customer' + err.message)); // TODO: use translation hook
+    };
 
     return (
-      customerId &&
-      customerId !== null &&
-      customerId.length > 0 &&
-      serviceStartTime !== null &&
-      serviceEndTime !== null
-    );
-  };
-
-  const handleFormChange = (name: string, value: string) => {
-    setFormParams({
-      ...formParams,
-      [name]: value,
-    });
-  };
-
-  const convertToDropdownOptions = (items: WaveCustomer[]) => {
-    return items.map((item) => {
-      return {
-        key: item.id,
-        value: item.id,
-        text: item.name,
-      };
-    });
-  };
-
-  const defaultServiceStartTime = constructMilitaryTimeStr(
-    props.scheduledCustomer.serviceStartTime,
-  );
-  const defaultServiceEndTime = constructMilitaryTimeStr(
-    props.scheduledCustomer.serviceEndTime,
-  );
-
-  return (
-    <Modal
-      onClose={() => setModalOpen(false)}
-      onOpen={() => setModalOpen(true)}
-      open={modalOpen}
-      trigger={<Button>{t('Edit')}</Button>}
-    >
-      <Modal.Header>{t('Edit Scheduled Customer')}</Modal.Header>
-      <Modal.Content>
-        <Form>
-          <Form.Field>
-            <Label>{t('Customer')}:</Label>
-            <Dropdown
-              placeholder={t('Select Customer')!}
-              fluid
-              search
-              selection
-              options={convertToDropdownOptions(props.allCustomers)}
-              name="customerId"
-              onChange={(_, data) => handleFormChange(data.name, data.value as string)}
-              defaultValue={props.scheduledCustomer.customerId}
-            />
-          </Form.Field>
-          <Form.Field>
-            <Label htmlFor="EditScheduledCustomerModal_serviceStartTime">
-              {t('Service Start Time')}:
-            </Label>
-            <Input
-              type="time"
-              id="EditScheduledCustomerModal_serviceStartTime"
-              min="00:00"
-              max="24:00"
-              required
-              name="serviceStartTime"
-              onChange={(_, data) => handleFormChange(data.name, data.value)}
-              defaultValue={defaultServiceStartTime}
-            />
-          </Form.Field>
-          <Form.Field>
-            <Label htmlFor="EditScheduledCustomerModal_serviceEndTime">
-              {t('Service End Time')}:
-            </Label>
-            <Input
-              type="time"
-              id="EditScheduledCustomerModal_serviceEndTime"
-              min="00:00"
-              max="24:00"
-              required
-              name="serviceEndTime"
-              onChange={(_, data) => handleFormChange(data.name, data.value)}
-              defaultValue={defaultServiceEndTime}
-            />
-          </Form.Field>
-        </Form>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button color="black" onClick={() => setModalOpen(false)}>
-          {t('Cancel')}
-        </Button>
-        <Button
-          onClick={() => {
-            const { customerId, serviceStartTime, serviceEndTime } = formParams;
-            const scheduleDayDate = props.scheduleDayDate;
-            props.onSubmit(
-              customerId,
-              fuseDateTime(scheduleDayDate, serviceStartTime),
-              fuseDateTime(scheduleDayDate, serviceEndTime),
-            );
-            setModalOpen(false);
-          }}
-          positive
-          disabled={!isFormValid()}
+        <Modal
+            onClose={() => props.onClose()}
+            open={true}
         >
-          {t('Ok')}
-        </Button>
-      </Modal.Actions>
-    </Modal>
-  );
+            <Modal.Header>{t('Edit Scheduled Customer')}</Modal.Header>
+            <Modal.Content>
+                <Form>
+                    <Form.Field>
+                        <Label>{t('Customer')}:</Label>
+                        <Dropdown
+                            placeholder={t('Select Customer')!}
+                            fluid
+                            search
+                            selection
+                            options={customerOptions}
+                            loading={loading}
+                            value={formParams.waveCustomerID}
+                            onChange={(_, data) => setFormParam('waveCustomerID', data.value as string)}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <Label>{t('Service Start Time')}:</Label>
+                        <Input
+                            type="time"
+                            name="startTime"
+                            min="00:00"
+                            max="24:00"
+                            required
+                            defaultValue={constructMilitaryTimeStr(formParams.startTime)}
+                            onChange={handleTimeInputChange}
+                        />
+                    </Form.Field>
+                    <Form.Field>
+                        <Label>{t('Service End Time')}:</Label>
+                        <Input
+                            type="time"
+                            name="endTime"
+                            min="00:00"
+                            max="24:00"
+                            required
+                            defaultValue={constructMilitaryTimeStr(formParams.endTime)}
+                            onChange={handleTimeInputChange}
+                        />
+                    </Form.Field>
+                </Form>
+            </Modal.Content>
+            <Modal.Actions>
+                <Button color="black" onClick={() => props.onClose()}>
+                    {t('Cancel')}
+                </Button>
+                <Button
+                    onClick={() => handleSubmit()}
+                    positive
+                    disabled={!formValid || loading}
+                >
+                    {t('Ok')}
+                </Button>
+            </Modal.Actions>
+        </Modal>
+    );
 }

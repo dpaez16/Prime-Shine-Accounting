@@ -7,22 +7,23 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"prime-shine-api/internal/data"
+	"prime-shine-api/internal/db"
 	"syscall"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
 
 type config struct {
 	port int
-	env  string
+	dev  bool
 }
 
 type application struct {
-	config   config
-	logger   *log.Logger
-	dbClient *data.MongoClient
+	config config
+	logger *log.Logger
+	db     *sqlx.DB
 }
 
 func waitForSignals(app *application) {
@@ -32,8 +33,9 @@ func waitForSignals(app *application) {
 	s := <-quit
 
 	app.logger.Printf("Caught signal %s", s.String())
-	app.logger.Printf("Disconnecting from %s database", app.config.env)
-	if err := app.dbClient.Disconnect(); err != nil {
+	app.logger.Println("Disconnecting from database")
+
+	if err := app.db.Close(); err != nil {
 		panic(errors.Wrap(err, "db disconnect"))
 	}
 
@@ -44,16 +46,21 @@ func main() {
 	var cfg config
 
 	flag.IntVar(&cfg.port, "port", 5000, "API server port")
-	flag.StringVar(&cfg.env, "env", "dev", "Environment (prod|env)")
+	flag.BoolVar(&cfg.dev, "dev", true, "Development mode")
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
-	dbClient := data.ConnectDB()
+	db, err := db.SetupDB(logger)
+	if err != nil {
+		logger.Fatalf("Could not connect to database: %v", err.Error())
+	}
+
+	logger.Println("Connected to database")
 
 	app := &application{
-		config:   cfg,
-		logger:   logger,
-		dbClient: dbClient,
+		config: cfg,
+		logger: logger,
+		db:     db,
 	}
 
 	server := &http.Server{
@@ -66,8 +73,12 @@ func main() {
 
 	go waitForSignals(app)
 
-	logger.Printf("Connected to %s database!", cfg.env)
-	logger.Printf("Starting %s server on %s", cfg.env, server.Addr)
-	err := server.ListenAndServe()
+	mode := "development"
+	if !app.config.dev {
+		mode = "production"
+	}
+
+	logger.Printf("Starting %s server on %s", mode, server.Addr)
+	err = server.ListenAndServe()
 	logger.Fatal(errors.Wrap(err, "server.ListenAndServe"))
 }

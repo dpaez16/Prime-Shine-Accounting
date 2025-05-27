@@ -123,4 +123,5 @@ export enum SupportedLanguageLocales {
 
 export enum EventListenerNames {
     mutateInvoice = 'mutateInvoice',
+    mutateScheduledCustomers = 'mutateScheduledCustomers',
 }

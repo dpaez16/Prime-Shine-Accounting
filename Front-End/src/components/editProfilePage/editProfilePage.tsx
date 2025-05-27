@@ -29,7 +29,7 @@ export default function EditProfilePage() {
 
     const handleUserEditProfile = () => {
         const { name, email, password } = userParams;
-        const userId = userInfo._id;
+        const userId = userInfo.userID;
         const token = userInfo.token;
 
         PrimeShineAPIClient.editUser(name, email, password, userId, token)
@@ -43,7 +43,7 @@ export default function EditProfilePage() {
     };
 
     const handleDeleteAccount = () => {
-        PrimeShineAPIClient.deleteUser(userInfo._id, userInfo.token)
+        PrimeShineAPIClient.deleteUser(userInfo.userID, userInfo.token)
             .then((didSucceed) => {
                 if (!didSucceed) {
                     throw new Error('Could not delete user.');

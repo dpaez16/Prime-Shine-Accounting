@@ -5,11 +5,11 @@ export type InternalBusinessInfo = {
 }
 
 export type BusinessInfo = {
-  businessId: string;
-  businessName: string;
-  productId: string;
-  productName: string;
-  identityBusinessID: InternalBusinessInfo['id'];
+    businessId: string;
+    businessName: string;
+    productId: string;
+    productName: string;
+    identityBusinessID: InternalBusinessInfo['id'];
 };
 
 export type BusinessID = BusinessInfo['businessId'];

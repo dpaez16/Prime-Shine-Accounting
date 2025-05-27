@@ -4,15 +4,17 @@ import (
 	"encoding/json"
 	"net/http"
 	"prime-shine-api/internal"
+	"prime-shine-api/internal/data"
 	"prime-shine-api/internal/wave"
+	"strconv"
 
 	"github.com/julienschmidt/httprouter"
 	"github.com/pkg/errors"
 )
 
 type loginUserBody struct {
-	Email    string `json:email`
-	Password string `json:password`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 // Route for user login.
@@ -26,7 +28,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	user, err := app.dbClient.QueryUserAndPassword(body.Email, body.Password)
+	user, err := data.QueryUserAndPassword(app.db, body.Email, body.Password)
 	if err != nil {
 		err = errors.Wrap(err, "QueryUserAndPassword")
 		app.serverErrorResponse(w, r, err)
@@ -45,7 +47,7 @@ func (app *application) loginUser(w http.ResponseWriter, r *http.Request, _ http
 		return
 	}
 
-	token, err := internal.CreateToken(user.ID.String())
+	token, err := internal.CreateToken(strconv.Itoa(user.ID))
 	if err != nil {
 		err = errors.Wrap(err, "CreateToken")
 		app.serverErrorResponse(w, r, err)

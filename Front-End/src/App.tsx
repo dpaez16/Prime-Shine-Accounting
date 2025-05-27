@@ -40,7 +40,7 @@ export default function App() {
                             <>
                                 <Route path="/editProfile" element={<EditProfilePage />} />
                                 <Route path="/schedules" element={<SchedulesPage />} />
-                                <Route path="/viewSchedule" element={<IndividualSchedulePage />} />
+                                <Route path="/schedule" element={<IndividualSchedulePage />} />
                                 <Route path="/customers" element={<CustomersPage />} />
                                 <Route path="/customer" element={<IndividualCustomerPage/>} />
                                 <Route path="/invoices" element={<InvoicesPage />} />

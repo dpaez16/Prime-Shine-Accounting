@@ -1,7 +1,6 @@
 import React, { useState, useContext } from 'react';
 import DeleteCustomerModal from './deleteCustomerModal/deleteCustomerModal';
 import { CreateCustomerFormParams, CreateCustomerModal } from './createCustomerModal/createCustomerModal';
-import { fetchAllCustomers } from '../../utils/helpers';
 import { US_COUNTRY_CODE } from '../../utils/consts';
 import LoadingSegment from '../loadingSegment/loadingSegment';
 import { Input, Table, Message } from 'semantic-ui-react';
@@ -18,7 +17,7 @@ export default function CustomersPage() {
     const userInfo = context.userInfo!;
     const businessInfo = context.businessInfo!;
 
-    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => fetchAllCustomers(businessInfo.businessId, userInfo.token) });
+    const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => WaveAPIClient.fetchAllCustomers(businessInfo.businessId, userInfo.token) });
     const [searchBarValue, setSearchBarValue] = useState('');
     const { t } = useLocalization();
     const navigate = useNavigate();
@@ -73,7 +72,7 @@ export default function CustomersPage() {
     );
 
     return (
-        <div className='flex flex-col'>
+        <div className='flex flex-col mx-auto w-1/2'>
             <h1>{t('Customers')}:</h1>
             {error && <Message negative content={error.message} />}
             <div className='flex flex-row gap-4'>
@@ -106,7 +105,6 @@ export default function CustomersPage() {
                         <Table.Row key={uuidV4()}>
                             <Table.Cell className='flex flex-row justify-between items-center'>
                                 <a onClick={(e) => {
-
                                     e.preventDefault();
                                     const params = new URLSearchParams({
                                         'customerID': customerID,
@@ -117,6 +115,7 @@ export default function CustomersPage() {
                                     {customer.name}
                                 </a>
                                 <DeleteCustomerModal
+                                    customer={customer}
                                     onSubmit={() => {
                                         deleteCustomerHandler(customerID)
                                             .then(() => {
