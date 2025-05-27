@@ -151,11 +151,11 @@ func EditScheduledCustomer(
 	}
 
 	filter = map[string]any{
-		"customerId":       newCustomerID,
-		"serviceStartTime": newServiceStartTime,
-		"serviceEndTime":   newServiceEndTime,
-		"dayOffset":        dayOffset,
-		"scheduleid":       scheduleID,
+		"wave_customerid": newCustomerID,
+		"start_time":      newServiceStartTime,
+		"end_time":        newServiceEndTime,
+		"day_offset":      dayOffset,
+		"scheduleid":      scheduleID,
 	}
 
 	foundScheduledCustomer, err := FindOneScheduledCustomer(tx, filter)
