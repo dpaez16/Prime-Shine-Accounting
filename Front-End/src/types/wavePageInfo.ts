@@ -1,5 +1,5 @@
 export type WavePageInfo = {
-  currentPage: number;
-  totalPages: number;
-  totalCount: number;
+    currentPage: number;
+    totalPages: number;
+    totalCount: number;
 };
