@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { Modal, Button } from 'semantic-ui-react';
 import useLocalization from '../../../hooks/useLocalization';
+import { WaveCustomer } from '@/types/waveCustomer';
 
 type DeleteCustomerModalProps = {
+    customer: WaveCustomer;
     onSubmit: () => void;
 }
 
 export default function DeleteCustomerModal(props: DeleteCustomerModalProps) {
     const { t } = useLocalization();
     const [modalOpen, setModalOpen] = useState(false);
+
+    const customer = props.customer;
 
     return (
         <Modal
@@ -18,7 +22,9 @@ export default function DeleteCustomerModal(props: DeleteCustomerModalProps) {
             trigger={<Button negative>{t('Delete')}</Button>}
         >
             <Modal.Header>{t('Delete Customer?')}</Modal.Header>
-            <Modal.Content>{t('Are you sure?')}</Modal.Content>
+            <Modal.Content>
+                <p>{t('Name')}: {customer.name}</p>
+            </Modal.Content>
             <Modal.Actions>
                 <Button
                     color="black"

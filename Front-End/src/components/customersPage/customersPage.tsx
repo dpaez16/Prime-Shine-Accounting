@@ -72,7 +72,7 @@ export default function CustomersPage() {
     );
 
     return (
-        <div className='flex flex-col'>
+        <div className='flex flex-col mx-auto w-1/2'>
             <h1>{t('Customers')}:</h1>
             {error && <Message negative content={error.message} />}
             <div className='flex flex-row gap-4'>
@@ -116,6 +116,7 @@ export default function CustomersPage() {
                                     {customer.name}
                                 </a>
                                 <DeleteCustomerModal
+                                    customer={customer}
                                     onSubmit={() => {
                                         deleteCustomerHandler(customerID)
                                             .then(() => {
