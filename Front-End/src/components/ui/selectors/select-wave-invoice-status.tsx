@@ -34,7 +34,7 @@ interface SelectWaveInvoiceStatusProps {
 }
 
 export const SelectWaveInvoiceStatus: React.FC<SelectWaveInvoiceStatusProps> = (props) => {
-    const { statuses, filterText, setFilterText, selectedStatus } = usePickerLogic();
+    const { statuses, filterText, setFilterText, selectedStatus } = usePickerLogic(props.status);
 
     const renderStatus = (status: WaveInvoiceStatus) => {
         return renderSingleSelectOption(
