@@ -1,3 +1,4 @@
+import { WaveProvinceCode } from '@/types/waveCustomer';
 import { DAYS_OF_WEEK } from './consts';
 
 /**
@@ -18,11 +19,10 @@ export const dateToStr = (date: Date) => {
 
 /**
  * Constructs a date suitable for WaveApps. Time is set to 00:00.
- * @param date - The day constructed in `mm/dd/yyyy` format.
+ * @param date - The day constructed in `mm/dd/yyyy` or `yyyy-mm-dd` format.
  * @return The constructed date.
  */
 export const constructDate = (date: string) => {
-    // Wave likes invoice dates in yyyy-mm-dd
     return new Date(`${date} 00:00`);
 };
 
@@ -102,4 +102,19 @@ export const downloadBuffer = (buffer: ArrayBuffer, filename: string) => {
     link.remove();
 
     window.URL.revokeObjectURL(url);
+};
+
+export const parseWaveProvinceCode = (provinceCode?: WaveProvinceCode) => {
+    if (!provinceCode) {
+        return {
+            countryCode: undefined,
+            provinceAbbvr: undefined,
+        };
+    }
+
+    const [countryCode, provinceAbbvr] = provinceCode.split('-');
+    return {
+        countryCode,
+        provinceAbbvr,
+    };
 };

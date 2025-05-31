@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { App } from './App';
-import 'semantic-ui-css/semantic.min.css';
 import './i18n';
 import PrimeShineAPIClient from './api/primeShineApiClient';
 import { getLocalStorageObject, removeLocalStorageItem } from './utils/localStorage';
@@ -21,7 +20,12 @@ const main = async () => {
         }
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
+    const rootElem = document.getElementById('root');
+    if (!rootElem) {
+        return null;
+    }
+
+    const root = ReactDOM.createRoot(rootElem);
     root.render(
         <React.StrictMode>
             <App />

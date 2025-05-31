@@ -1,16 +1,15 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Table, Message } from 'semantic-ui-react';
-import { CreateScheduleModal } from './createScheduleModal/createScheduleModal';
-import { EditScheduleModal } from './editScheduleModal/editScheduleModal';
-import { DeleteScheduleModal } from './deleteScheduleModal/deleteScheduleModal';
-import PrimeShineAPIClient from '../../api/primeShineApiClient';
-import useLocalization from '../../hooks/useLocalization';
-import { LoadingSegment } from '../loadingSegment/loadingSegment';
-import { dateToStr } from '../../utils/helpers';
+import { CreateScheduleModal } from './modals/createScheduleModal';
+import PrimeShineAPIClient from '@/api/primeShineApiClient';
+import useLocalization from '@/hooks/useLocalization';
 import { ScheduleID } from '@/types/schedule';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { DataTable } from '@/components/ui/data-table/data-table';
+import { useSchedulesTableColumns } from './useSchedulesTableColumns';
+import { PageTitle } from '@/components/ui/page-title';
+import { DataTablePagination } from '@/components/ui/data-table/data-table-pagination';
 
 export const SchedulesPage: React.FC = () => {
     const context = useContext(LoginSessionContext);
@@ -18,16 +17,6 @@ export const SchedulesPage: React.FC = () => {
 
     const { data, loading, error, refetch } = useDataFetcher({ fetcher: () => PrimeShineAPIClient.fetchSchedules(userInfo.userID, userInfo.token) });
     const { t } = useLocalization();
-    const navigate = useNavigate();
-
-    const createScheduleHandler = (startDay: Date) => {
-        const userId = userInfo.userID;
-        const jwt = userInfo.token;
-
-        PrimeShineAPIClient.createSchedule(startDay, userId, jwt)
-            .then(() => refetch())
-            .catch((err) => alert('Failed to create schedule: ' + err.message)); // TODO: use translation hook
-    };
 
     const editScheduleHandler = (startDay: Date, scheduleId: ScheduleID) => {
         const jwt = userInfo.token;
@@ -48,46 +37,24 @@ export const SchedulesPage: React.FC = () => {
     const schedules = data ?? [];
     const sortedSchedules = schedules.sort((a, b) => a.startDay.getTime() - b.startDay.getTime());
 
-    return (
-        <div className='flex flex-col mx-auto w-1/2'>
-            <h1>{t('Schedules')}:</h1>
-            {loading && <LoadingSegment />}
-            <div>
-                <CreateScheduleModal onSubmit={createScheduleHandler} />
-            </div>
-            {error && <Message negative content={error.message} />}
-            <Table celled>
-                <Table.Body>
-                {sortedSchedules.map((schedule, idx) => {
-                    return (
-                        <Table.Row key={idx}>
-                            <Table.Cell className='flex flex-row justify-between items-center'>
-                                <a onClick={(e) => {
-                                    e.preventDefault();
-                                    const params = new URLSearchParams({
-                                        'scheduleID': schedule.scheduleID.toString(),
-                                    });
+    const columns = useSchedulesTableColumns({
+        onEdit: editScheduleHandler,
+        onDelete: deleteScheduleHandler,
+    });
 
-                                    navigate(`/schedule?${params.toString()}`);
-                                }}>
-                                    {dateToStr(schedule.startDay)}
-                                </a>
-                                <div className='flex flex-row gap-2'>
-                                    <EditScheduleModal
-                                        schedule={schedule}
-                                        onSubmit={(startDay) => editScheduleHandler(startDay, schedule.scheduleID)}
-                                    />
-                                    <DeleteScheduleModal
-                                        startDay={dateToStr(schedule.startDay)}
-                                        onSubmit={() => deleteScheduleHandler(schedule.scheduleID)}
-                                    />
-                                </div>
-                            </Table.Cell>
-                        </Table.Row>
-                    );
-                })}
-                </Table.Body>
-            </Table>
+    return (
+        <div className='flex flex-col mx-auto w-1/2 gap-4'>
+            <PageTitle>{t('Schedules')}</PageTitle>
+            <div>
+                <CreateScheduleModal onSuccess={refetch} />
+            </div>
+            <ErrorMessage message={error?.message} />
+            <DataTable
+                data={sortedSchedules}
+                columns={columns}
+                loading={loading}
+                pagination={DataTablePagination}
+            />
         </div>
     );
 };

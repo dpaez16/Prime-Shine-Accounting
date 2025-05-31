@@ -1,21 +1,21 @@
-import React, { useEffect, useContext, useState } from 'react';
-import {
-    Divider,
-    Button,
-    Message,
-} from 'semantic-ui-react';
-import { InvoicesTable } from './invoicesTable/invoicesTable';
-import { CreateInvoiceModal } from './createInvoiceModal/createInvoiceModal';
-import useLocalization from '../../hooks/useLocalization';
+import React, { useContext, useState } from 'react';
+import { CreateInvoiceModal } from './modals/create/createInvoiceModal';
+import useLocalization from '@/hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';
 import { WavePageInfo } from '@/types/wavePageInfo';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
-import { InvoicesSearchToolbar } from './invoicesSearchToolbar/invoicesSearchToolbar';
-import { useInvoicesSearch, WaveInvoiceFilterObj } from './invoicesSearchToolbar/useInvoicesSearch';
+import { InvoicesSearchToolbar } from './toolbar/invoicesSearchToolbar';
+import { useInvoicesSearch, WaveInvoiceFilterObj } from './toolbar/useInvoicesSearch';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
-import { EventListenerNames } from '@/utils/consts';
 import { WaveAPIClient } from '@/api/waveApiClient';
 import { InvoicesPagination } from './invoicesPagination';
+import { PageTitle } from '@/components/ui/page-title';
+import { Button } from '@/components/ui/button';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { DataTable } from '@/components/ui/data-table/data-table';
+import { useInvoicesTableColumns } from './useInvoicesTableColumns';
+import { DeleteInvoiceModal } from './modals/deleteInvoiceModal';
+import { EditInvoiceModal } from './modals/edit/editInvoiceModal';
 
 interface InvoicesData {
     invoices: WaveInvoice[];
@@ -28,7 +28,10 @@ export const InvoicesPage: React.FC = () => {
     const businessInfo = context.businessInfo!;
 
     const { t } = useLocalization();
-    const [createInvoiceModalOpen, setCreateInvoiceModalOpen] = useState(false);
+    const [createModalOpen, setCreateModalOpen] = useState(false);
+    const [editInvoice, setEditInvoice] = useState<WaveInvoice | null>(null);
+    const [deleteInvoice, setDeleteInvoice] = useState<WaveInvoice | null>(null);
+
     const {
         filterParameters,
         handleFilterChange,
@@ -43,6 +46,10 @@ export const InvoicesPage: React.FC = () => {
     });
 
     const invoices = data?.invoices ?? [];
+    const columns = useInvoicesTableColumns({
+        onEditClick: setEditInvoice,
+        onDeleteClick: setDeleteInvoice,
+    });
 
     const searchHandler = () => {
         const businessId = businessInfo.businessId;
@@ -62,44 +69,63 @@ export const InvoicesPage: React.FC = () => {
         );
     };
 
-    useEffect(() => {
-        const refetchData = () => {
-            refetch();
-        };
-
-        window.addEventListener(EventListenerNames.mutateInvoice, refetchData);
-
-        return () => {
-            window.removeEventListener(EventListenerNames.mutateInvoice, refetchData);
-        };
-    }, []);
-
     return (
         <div className='flex flex-col'>
-            <h1>{t('Invoices')}</h1>
-            {createInvoiceModalOpen && <CreateInvoiceModal onClose={() => setCreateInvoiceModalOpen(false)} />}
-            <div>
-                <Button onClick={() => setCreateInvoiceModalOpen(true)}>
-                    {t('Create Invoice')}
-                </Button>
-            </div>
-            <InvoicesSearchToolbar
-                onSubmit={() => {
-                    setPageNum(1);
-                    refetch();
-                }}
-                handleFilterChange={handleFilterChange}
-                loading={loading}
-            />
-            <Divider hidden />
-            {error && <Message negative content={error.message} />}
+            <PageTitle>{t('Invoices')}</PageTitle>
             {
-                !error &&
-                <>
-                    <InvoicesTable
-                        loading={loading}
-                        invoices={invoices}
-                    />
+                createModalOpen &&
+                <CreateInvoiceModal
+                    onClose={() => setCreateModalOpen(false)}
+                    onSuccess={() => {
+                        setCreateModalOpen(false);
+                        refetch();
+                    }}
+                />
+            }
+            {
+                editInvoice &&
+                <EditInvoiceModal
+                    invoice={editInvoice}
+                    onClose={() => setEditInvoice(null)}
+                    onSuccess={() => {
+                        setEditInvoice(null);
+                        refetch();
+                    }}
+                />
+            }
+            {
+                deleteInvoice &&
+                <DeleteInvoiceModal
+                    invoice={deleteInvoice}
+                    onClose={() => setDeleteInvoice(null)}
+                    onSuccess={() => {
+                        setDeleteInvoice(null);
+                        refetch();
+                    }}
+                />
+            }
+            <div className='flex flex-col gap-2 my-4'>
+                <div>
+                    <Button onClick={() => setCreateModalOpen(true)}>
+                        {t('Create Invoice')}
+                    </Button>
+                </div>
+                <InvoicesSearchToolbar
+                    searchParams={filterParameters}
+                    onSubmit={() => {
+                        setPageNum(1);
+                        refetch();
+                    }}
+                    handleFilterChange={handleFilterChange}
+                    loading={loading}
+                />
+            </div>
+            <ErrorMessage message={error?.message} />
+            <DataTable
+                columns={columns}
+                data={invoices}
+                loading={loading}
+                pagination={() =>
                     <InvoicesPagination
                         currentPageSize={pageSizeRef.current}
                         pageInfo={data?.pageInfo}
@@ -112,8 +138,9 @@ export const InvoicesPage: React.FC = () => {
                             refetch();
                         }}
                     />
-                </>
-            }
+                }
+                manualPagination
+            />
         </div>
     );
 };

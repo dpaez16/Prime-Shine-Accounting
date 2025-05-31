@@ -1,16 +1,17 @@
 import React, { useContext } from 'react';
-import { Message } from 'semantic-ui-react';
-import { EditCustomerModal } from './editCustomerModal/editCustomerModal';
-import { US_COUNTRY_CODE } from '../../../utils/consts';
-import useLocalization from '../../../hooks/useLocalization';
-import { WaveCustomer, WaveCustomerAddress, WaveCustomerPatchInput } from '@/types/waveCustomer';
-import { CreateCustomerFormParams } from '../createCustomerModal/createCustomerModal';
+import { EditCustomerModal } from './modals/editCustomerModal';
+import useLocalization from '@/hooks/useLocalization';
+import { WaveCustomer, WaveCustomerAddress } from '@/types/waveCustomer';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
 import { WaveAPIClient } from '@/api/waveApiClient';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
-import { WaveCustomerID } from '../../../types/waveCustomer';
-import { LoadingSegment } from '@/components/loadingSegment/loadingSegment';
+import { LoadingSegment } from '@/components/ui/loading-segment';
 import { useBrowserQuery } from '@/hooks/useBrowserQuery';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { PageTitle } from '@/components/ui/page-title';
+import { PageHeader } from '@/components/ui/page-header';
+import { DeleteCustomerModal } from './modals/deleteCustomerModal';
+import { useNavigate } from 'react-router-dom';
 
 type IndividualCustomerPageQuery = {
     customerID?: string;
@@ -22,6 +23,7 @@ export const IndividualCustomerPage: React.FC = () => {
     const userInfo = loginSession.userInfo!;
 
     const { t } = useLocalization();
+    const navigate = useNavigate();
     const params = useBrowserQuery<IndividualCustomerPageQuery>();
 
     const { data: customer, loading, error, refetch } = useDataFetcher({ fetcher: () => WaveAPIClient.fetchCustomer(businessInfo.businessId, params.customerID ?? 'undefined', userInfo.token) });
@@ -32,10 +34,10 @@ export const IndividualCustomerPage: React.FC = () => {
         }
 
         return (
-            <div>
-                <h3>{t('Name')}:</h3>
+            <Section>
+                <PageHeader>{t('Name')}</PageHeader>
                 <p>{name}</p>
-            </div>
+            </Section>
         );
     };
 
@@ -45,10 +47,10 @@ export const IndividualCustomerPage: React.FC = () => {
         }
 
         return (
-            <div>
-                <h3>{t('Phone Number')}:</h3>
+            <Section>
+                <PageHeader>{t('Phone Number')}</PageHeader>
                 <p>{phone}</p>
-            </div>
+            </Section>
         );
     };
 
@@ -58,10 +60,10 @@ export const IndividualCustomerPage: React.FC = () => {
         }
 
         return (
-            <div>
-                <h3>{t('Mobile')}:</h3>
+            <Section>
+                <PageHeader>{t('Mobile')}</PageHeader>
                 <p>{mobile}</p>
-            </div>
+            </Section>
         );
     };
 
@@ -71,10 +73,10 @@ export const IndividualCustomerPage: React.FC = () => {
         }
 
         return (
-            <div>
-                <h3>{t('Email')}:</h3>
+            <Section>
+                <PageHeader>{t('Email')}</PageHeader>
                 <p>{email}</p>
-            </div>
+            </Section>
         );
     };
 
@@ -99,14 +101,14 @@ export const IndividualCustomerPage: React.FC = () => {
         const addressLine3 = `${city} ${provinceName}, ${postalCode}`;
 
         return (
-            <div className='flex flex-col'>
-                <h3>{t('Address')}:</h3>
-                <div className='flex flex-col gap-1'>
+            <Section>
+                <PageHeader>{t('Address')}</PageHeader>
+                <Section>
                     <span>{addressLine1}</span>
                     {addressLine2 && <span>{addressLine2}</span>}
                     <span>{addressLine3}</span>
-                </div>
-            </div>
+                </Section>
+            </Section>
         );
     };
 
@@ -122,45 +124,12 @@ export const IndividualCustomerPage: React.FC = () => {
         return elements.filter((element) => element !== null);
     };
 
-    const editCustomerHandler = (customerID: WaveCustomerID, formParams: CreateCustomerFormParams) => {
-        const {
-            name, phone, mobile, email,
-            addressLine1, addressLine2, city, provinceCode, postalCode
-        } = formParams;
-
-        const customerPatchInput: WaveCustomerPatchInput = {
-            id: customerID,
-            name: name,
-            phone: phone,
-            mobile: mobile,
-            email: email,
-            address: {
-                addressLine1: addressLine1,
-                addressLine2: addressLine2,
-                city: city,
-                provinceCode: provinceCode,
-                countryCode: US_COUNTRY_CODE,
-                postalCode: postalCode
-            }
-        };
-
-        return WaveAPIClient.editCustomer(customerPatchInput, userInfo.token);
-    };
-
     if (loading) {
-        return (
-            <div>
-                <LoadingSegment />
-            </div>
-        );
+        return <LoadingSegment />;
     }
 
     if (!customer || error) {
-        return (
-            <div>
-                <Message negative content={`Unable to load customer: ${error?.message}`} />
-            </div>
-        );
+        return <ErrorMessage message={`Unable to load customer: ${error?.message}`} />;
     }
 
     const customerPropElements = constructCustomerPropElements(customer);
@@ -168,15 +137,21 @@ export const IndividualCustomerPage: React.FC = () => {
     return (
         <div className='flex flex-col gap-10'>
             <div>
-                <h1>{customer.name}</h1>
-                <EditCustomerModal
-                    customer={customer}
-                    onSubmit={(formParams) => {
-                        editCustomerHandler(customer.id, formParams)
-                            .then(() => refetch())
-                            .catch(err => alert('Failed to edit customer: ' + err.message)); // TODO: use translation hook
-                    }}
-                />
+                <PageTitle>{customer.name}</PageTitle>
+                <div className='flex flex-row gap-4 mt-4'>
+                    <EditCustomerModal
+                        customer={customer}
+                        onSuccess={() => refetch()}
+                    />
+                    <DeleteCustomerModal
+                        customer={customer}
+                        onSuccess={() => {
+                            navigate('/customers', {
+                                replace: true,
+                            });
+                        }}
+                    />
+                </div>
             </div>
             <div className='flex flex-col gap-6'>
                 {
@@ -189,6 +164,18 @@ export const IndividualCustomerPage: React.FC = () => {
                     })
                 }
             </div>
+        </div>
+    );
+};
+
+interface SectionProps {
+    children: React.ReactNode;
+}
+
+const Section: React.FC<SectionProps> = ({ children }) => {
+    return (
+        <div className='flex flex-col gap-2'>
+            {children}
         </div>
     );
 };

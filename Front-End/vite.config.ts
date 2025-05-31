@@ -14,6 +14,7 @@ export default defineConfig({
         port: 3000,
         hmr: {
             path: '/hmr',
+            port: 3000,
         },
         allowedHosts: [
             'local.prime-shine-cleaning.com',
