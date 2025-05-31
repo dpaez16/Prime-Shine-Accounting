@@ -25,7 +25,8 @@ type WaveInvoicePayment struct {
 }
 
 type queryWaveInvoicePaymentsData struct {
-	Payments []WaveInvoicePayment `json:"payments"`
+	Payments     []WaveInvoicePayment `json:"payments"`
+	ExchangeRate float32              `json:"exchange_rate"`
 }
 
 func GetInvoicePayments(identityBusinessID string, internalInvoiceID string) (*[]WaveInvoicePayment, error) {
@@ -54,4 +55,37 @@ func GetInvoicePayments(identityBusinessID string, internalInvoiceID string) (*[
 	}
 
 	return &data.Payments, nil
+}
+
+func CreateInvoicePayment(identityBusinessID string, internalInvoiceID string, invoicePaymentID string, invoicePayment map[string]any) (bool, error) {
+	path := fmt.Sprintf("/%v/invoices/%v/payments/%v/", identityBusinessID, internalInvoiceID, invoicePaymentID)
+
+	_, err := createWaveBusinessAPIRequest(http.MethodPost, path, &invoicePayment)
+	if err != nil {
+		return false, errors.Wrap(err, "createWaveBusinessAPIRequest")
+	}
+
+	return true, nil
+}
+
+func EditInvoicePayment(identityBusinessID string, internalInvoiceID string, invoicePaymentID string, invoicePayment map[string]any) (bool, error) {
+	path := fmt.Sprintf("/%v/invoices/%v/payments/%v/", identityBusinessID, internalInvoiceID, invoicePaymentID)
+
+	_, err := createWaveBusinessAPIRequest(http.MethodPatch, path, &invoicePayment)
+	if err != nil {
+		return false, errors.Wrap(err, "createWaveBusinessAPIRequest")
+	}
+
+	return true, nil
+}
+
+func DeleteInvoicePayment(identityBusinessID string, internalInvoiceID string, invoicePaymentID string) (bool, error) {
+	path := fmt.Sprintf("/%v/invoices/%v/payments/%v/", identityBusinessID, internalInvoiceID, invoicePaymentID)
+
+	_, err := createWaveBusinessAPIRequest(http.MethodDelete, path, nil)
+	if err != nil {
+		return false, errors.Wrap(err, "createWaveBusinessAPIRequest")
+	}
+
+	return true, nil
 }
