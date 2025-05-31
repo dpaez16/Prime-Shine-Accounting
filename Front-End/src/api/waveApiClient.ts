@@ -1,7 +1,7 @@
 import { BusinessID } from '@/types/businessInfo';
 import { WaveCustomer, WaveCustomerCreateInput, WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
 import { WaveInvoice, WaveInvoiceCreateInput, WaveInvoiceID, WaveInvoicePatchInput } from '@/types/waveInvoice';
-import { WaveInvoiceFilterObj } from '@/components/invoicesPage/invoicesSearchToolbar/useInvoicesSearch';
+import { WaveInvoiceFilterObj } from '@/components/invoicesPage/toolbar/useInvoicesSearch';
 import { JWT } from '@/types/userInfo';
 import { WavePageInfo } from '@/types/wavePageInfo';
 

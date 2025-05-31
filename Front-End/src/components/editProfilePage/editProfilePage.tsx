@@ -1,29 +1,27 @@
 import React, { useContext, useState } from 'react';
-import {
-    Form,
-    Label,
-    Input,
-    Button,
-    Message,
-    InputOnChangeData,
-} from 'semantic-ui-react';
-import { DeleteAccountModal } from './deleteAccountModal/deleteAccountModal';
-import PrimeShineAPIClient from '../../api/primeShineApiClient';
-import useLocalization from '../../hooks/useLocalization';
+import { DeleteAccountModal } from './modals/deleteAccountModal';
+import PrimeShineAPIClient from '@/api/primeShineApiClient';
+import useLocalization from '@/hooks/useLocalization';
 import { useNavigate } from 'react-router-dom';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { GridForm, GridFormItem } from '@/components/ui/grid-form';
+import { PageTitle } from '@/components/ui/page-title';
 
 export const EditProfilePage: React.FC = () => {
     const context = useContext(LoginSessionContext);
-    const { updateUserInfo, clearSession } = context;
+    const { updateUserInfo } = context;
     const userInfo = context.userInfo!;
 
     const { t } = useLocalization();
     const navigate = useNavigate();
 
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<Error | null>(null);
     const [userParams, setUserParams] = useState({
-        ...userInfo,
+        name: '',
+        email: '',
         password: '',
     });
 
@@ -42,28 +40,7 @@ export const EditProfilePage: React.FC = () => {
             });
     };
 
-    const handleDeleteAccount = () => {
-        PrimeShineAPIClient.deleteUser(userInfo.userID, userInfo.token)
-            .then((didSucceed) => {
-                if (!didSucceed) {
-                    throw new Error('Could not delete user.');
-                }
-
-                clearSession();
-                navigate('/', {
-                    replace: true,
-                });
-            })
-            .catch((err) => {
-                setError(err.message);
-            });
-    };
-
-    const handleFormChange = (
-        _: React.ChangeEvent<HTMLInputElement>,
-        data: InputOnChangeData,
-    ) => {
-        const { name, value } = data;
+    const handleFormChange = (name: string, value: string) => {
         setUserParams({
             ...userParams,
             [name]: value,
@@ -72,17 +49,12 @@ export const EditProfilePage: React.FC = () => {
 
     const isFormValid = () => {
         const { name, email, password } = userParams;
-
-        return (
-            name && name.length > 0 &&
-            email && email.length > 0 &&
-            password && password.length > 0
-        );
+        return !!name && !!email && !!password;
     };
 
     return (
         <div className='flex flex-col mx-auto w-1/2'>
-            <h1>{t('Edit Profile')}</h1>
+            <PageTitle>{t('Edit Profile')}</PageTitle>
             <div className='my-8'>
                 <h3>
                     {t('Name')}: {userInfo.name}
@@ -91,34 +63,30 @@ export const EditProfilePage: React.FC = () => {
                     {t('Email')}: {userInfo.email}
                 </h3>
             </div>
-            <Form>
-                <Form.Field>
-                    <Label>{t('Name')}:</Label>
+            <GridForm>
+                <GridFormItem label={t('Name')}>
                     <Input
-                        type='text'
                         name='name'
-                        defaultValue={userInfo.name}
-                        onChange={handleFormChange}
+                        value={userParams.name}
+                        onChange={(e) => handleFormChange(e.target.name, e.target.value)}
                     />
-                </Form.Field>
-                <Form.Field>
-                    <Label>{t('Email')}:</Label>
+                </GridFormItem>
+                <GridFormItem label={t('Email')}>
                     <Input
-                        type='text'
                         name='email'
-                        defaultValue={userInfo.email}
-                        onChange={handleFormChange}
+                        value={userParams.email}
+                        onChange={(e) => handleFormChange(e.target.name, e.target.value)}
                     />
-                </Form.Field>
-                <Form.Field>
-                    <Label>{t('Password')}:</Label>
+                </GridFormItem>
+                <GridFormItem label={t('Password')}>
                     <Input
-                        type='password'
                         name='password'
-                        onChange={handleFormChange}
+                        type='password'
+                        value={userParams.password}
+                        onChange={(e) => handleFormChange(e.target.name, e.target.value)}
                     />
-                </Form.Field>
-            </Form>
+                </GridFormItem>
+            </GridForm>
             <div className='flex flex-row gap-2 mt-4'>
                 <Button
                     disabled={!isFormValid()}
@@ -126,12 +94,9 @@ export const EditProfilePage: React.FC = () => {
                 >
                     {t('Save Changes')}
                 </Button>
-                <DeleteAccountModal
-                    trigger={<Button negative>{t('Delete Account')}</Button>}
-                    onSubmit={() => handleDeleteAccount()}
-                />
+                <DeleteAccountModal />
             </div>
-            {error && <Message negative content={error} />}
+            <ErrorMessage message={error?.message} />
         </div>
     );
 };

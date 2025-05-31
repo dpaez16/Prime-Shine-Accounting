@@ -22,6 +22,7 @@ export type WaveCustomer = {
 };
 
 export type WaveCustomerID = WaveCustomer['id'];
+export type WaveProvinceCode = WaveCustomerAddress['province']['code'];
 
 export type WaveCustomerPatchInput = Prettify<
     Omit<WaveCustomer, 'address'> &

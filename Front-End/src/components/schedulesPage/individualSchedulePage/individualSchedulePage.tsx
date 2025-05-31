@@ -1,10 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, Message } from 'semantic-ui-react';
 import { ScheduledCustomerTable } from './scheduledCustomerTable/scheduledCustomerTable';
-import PrimeShineAPIClient from '../../../api/primeShineApiClient';
-import { LoadingSegment } from '../../loadingSegment/loadingSegment';
-import { dateToStr, downloadBuffer } from '../../../utils/helpers';
-import useLocalization from '../../../hooks/useLocalization';
+import PrimeShineAPIClient from '@/api/primeShineApiClient';
+import { dateToStr, downloadBuffer } from '@/utils/helpers';
+import useLocalization from '@/hooks/useLocalization';
 import { Schedule, ScheduleID } from '@/types/schedule';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useDataFetcher } from '@/hooks/useDataFetcher';
@@ -14,6 +12,10 @@ import { CreateScheduledCustomerModal } from './createScheduledCustomerModal/cre
 import { DAYS_OF_WEEK, EventListenerNames } from '@/utils/consts';
 import { WaveAPIClient } from '@/api/waveApiClient';
 import { useBrowserQuery } from '@/hooks/useBrowserQuery';
+import { Button } from '@/components/ui/button';
+import { ErrorMessage } from '@/components/ui/error-message';
+import { LoadingSegment } from '@/components/ui/loading-segment';
+import { PageTitle } from '@/components/ui/page-title';
 
 type IndividualCustomerPageQuery = {
     scheduleID?: string;
@@ -114,7 +116,7 @@ export const IndividualSchedulePage: React.FC = () => {
     const datesOfService = constructDatesOfService(schedule);
 
     return (
-        <div className='flex flex-col'>
+        <div className='flex flex-col gap-4'>
             {
                 createModalOpen &&
                 <CreateScheduledCustomerModal
@@ -127,17 +129,17 @@ export const IndividualSchedulePage: React.FC = () => {
                     onClose={() => setCreateModalOpen(false)}
                 />
             }
-            <h1>{t('Schedule for Week of')} {datesOfService[0]} - {datesOfService[datesOfService.length - 1]}:</h1>
+            <PageTitle>{t('Schedule for Week of')} {datesOfService[0]} - {datesOfService[datesOfService.length - 1]}</PageTitle>
             <div className='flex flex-row gap-2'>
-                <Button onClick={() => setCreateModalOpen(true)}>
+                <Button variant='outline' onClick={() => setCreateModalOpen(true)}>
                     {t('Add Customer')}
                 </Button>
-                <Button onClick={exportSchedule}>
+                <Button variant='outline' onClick={exportSchedule}>
                     {t('Download Schedule')}
                 </Button>
             </div>
-            {error && <Message negative content={error.message} />}
-            <div className='flex flex-col gap-10 mt-10'>
+            <ErrorMessage message={error?.message} />
+            <div className='flex flex-col gap-10 mt-6'>
                 {
                     datesOfService.map((date, idx) => {
                         return (

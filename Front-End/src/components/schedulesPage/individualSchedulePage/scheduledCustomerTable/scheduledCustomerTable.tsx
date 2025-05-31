@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Button, Table } from 'semantic-ui-react';
-import { constructTimeStr, getDayOfWeekStr } from '../../../../utils/helpers';
-import useLocalization from '../../../../hooks/useLocalization';
+import { getDayOfWeekStr } from '@/utils/helpers';
+import useLocalization from '@/hooks/useLocalization';
 import { FullScheduledCustomer } from '@/types/scheduledCustomer';
 import { ScheduleID } from '@/types/schedule';
-import { DeleteScheduledCustomerModal } from './deleteScheduledCustomerModal/deleteScheduledCustomerModal';
+import { DeleteScheduledCustomerModal } from './modals/deleteScheduledCustomerModal';
 import { EventListenerNames } from '@/utils/consts';
-import { EditScheduledCustomerModal } from './editScheduledCustomerModal/editScheduledCustomerModal';
+import { DataTable } from '@/components/ui/data-table/data-table';
+import { useScheduledCustomerTableColumns } from './useScheduledCustomerTableColumns';
+import { PageHeader } from '@/components/ui/page-header';
+import { EditScheduledCustomerModal } from './modals/edit/editScheduledCustomerModal';
 
 type ScheduledCustomerTableProps = {
     date: string;
@@ -28,6 +30,10 @@ export const ScheduledCustomerTable: React.FC<ScheduledCustomerTableProps> = (pr
     });
 
     const isEmpty = scheduledCustomers.length === 0;
+    const columns = useScheduledCustomerTableColumns({
+        onEditClick: setEditScheduledCustomer,
+        onDeleteClick: setDeleteScheduledCustomer,
+    });
 
     return (
         <div className='flex flex-col'>
@@ -55,50 +61,11 @@ export const ScheduledCustomerTable: React.FC<ScheduledCustomerTableProps> = (pr
                     }}
                 />
             }
-            <h1>
+            <PageHeader>
                 {t(getDayOfWeekStr(scheduleDayDate))} {scheduleDayDate}
-            </h1>
-            {isEmpty && <p>{t('No one is scheduled for this day.')}</p>}
-            {
-                !isEmpty &&
-                <Table celled>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell>{t('Customer')}</Table.HeaderCell>
-                            <Table.HeaderCell>{t('Service Start Time')}</Table.HeaderCell>
-                            <Table.HeaderCell>{t('Service End Time')}</Table.HeaderCell>
-                            <Table.HeaderCell>{t('Options')}</Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Header>
-                    <Table.Body>
-                        {scheduledCustomers.map((scheduledCustomer, idx) => {
-                            const startTime = constructTimeStr(scheduledCustomer.startTime);
-                            const endTime = constructTimeStr(scheduledCustomer.endTime);
-
-                            return (
-                                <Table.Row key={idx}>
-                                    <Table.Cell>{scheduledCustomer.metadata.name}</Table.Cell>
-                                    <Table.Cell>{startTime}</Table.Cell>
-                                    <Table.Cell>{endTime}</Table.Cell>
-                                    <Table.Cell>
-                                    <Button
-                                        onClick={() => setEditScheduledCustomer(scheduledCustomer)}
-                                    >
-                                        {t('Edit')}
-                                    </Button>
-                                    <Button
-                                        negative
-                                        onClick={() => setDeleteScheduledCustomer(scheduledCustomer)}
-                                    >
-                                        {t('Delete')}
-                                    </Button>
-                                    </Table.Cell>
-                                </Table.Row>
-                            );
-                        })}
-                    </Table.Body>
-                </Table>
-            }
+            </PageHeader>
+            {isEmpty && <p className='mt-2'>{t('No one is scheduled for this day.')}</p>}
+            {!isEmpty && <DataTable className='mt-4' data={scheduledCustomers} columns={columns} />}
         </div>
     );
 };

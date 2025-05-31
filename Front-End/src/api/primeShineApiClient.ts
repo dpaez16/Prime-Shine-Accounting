@@ -3,6 +3,7 @@ import { JWT, UserID, UserInfo } from '@/types/userInfo';
 import { Schedule, ScheduleID } from '@/types/schedule';
 import { BusinessInfo } from '../types/businessInfo';
 import { WaveCustomerID } from '@/types/waveCustomer';
+import { constructDate, fuseDateTime } from '@/utils/helpers';
 
 export default class PrimeShineAPIClient {
     static #createFetchRequest(
@@ -167,7 +168,7 @@ export default class PrimeShineAPIClient {
             .then((json) => {
                 const schedules: Schedule[] = json.schedules ?? [];
                 return schedules.map((schedule) => {
-                    const newStartDay = new Date(schedule.startDay);
+                    const newStartDay = constructDate(schedule.startDay.toString());
                     return { ...schedule, startDay: newStartDay } as Schedule;
                 });
             })

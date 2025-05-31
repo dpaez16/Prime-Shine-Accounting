@@ -36,6 +36,7 @@ func FindOneSchedule(readConn db.ReadDBExecutor, filter map[string]any) (*Schedu
 	query := fmt.Sprintf(`
 		SELECT   scheduleid
 			   , start_day
+			   , userid
 		  FROM schedules
 		 WHERE %v
 	`, strings.Join(whereClauses, " AND "))

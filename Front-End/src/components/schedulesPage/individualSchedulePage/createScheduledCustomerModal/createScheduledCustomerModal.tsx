@@ -1,13 +1,17 @@
 import React, { useContext } from 'react';
-import { Modal, Button, Dropdown, Form, Label, Input, InputOnChangeData } from 'semantic-ui-react';
-import { fuseDateTime } from '../../../../utils/helpers';
-import useLocalization from '../../../../hooks/useLocalization';
-import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { fuseDateTime } from '@/utils/helpers';
+import useLocalization from '@/hooks/useLocalization';
 import { LoginSessionContext } from '@/context/LoginSessionContext';
 import { useCreateScheduledCustomerForm } from './useCreateScheduledCustomerForm';
 import PrimeShineAPIClient from '@/api/primeShineApiClient';
 import { ScheduleID } from '@/types/schedule';
-import { WaveAPIClient } from '@/api/waveApiClient';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { GridForm, GridFormItem } from '@/components/ui/grid-form';
+import { DropdownPicker } from '@/components/ui/dropdown-picker';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScheduledCustomerCreateInput } from '@/types/scheduledCustomer';
+import { SelectWaveCustomer } from '@/components/ui/selectors/select-wave-customer';
 
 type CreateScheduledCustomerModalProps = {
     datesOfService: string[];
@@ -18,37 +22,22 @@ type CreateScheduledCustomerModalProps = {
 
 export const CreateScheduledCustomerModal: React.FC<CreateScheduledCustomerModalProps> = (props) => {
     const context = useContext(LoginSessionContext);
-    const businessInfo = context.businessInfo!;
     const userInfo = context.userInfo!;
 
     const { formParams, setFormParam, formValid } = useCreateScheduledCustomerForm();
 
     const { t } = useLocalization();
-    const { data, loading } = useDataFetcher({ fetcher: () => WaveAPIClient.fetchAllCustomers(businessInfo.businessId, userInfo.token) });
-
-    const allCustomers = data ?? [];
-    const customerOptions = allCustomers.map(customer => {
-        return {
-            key: customer.id,
-            text: customer.name,
-            value: customer.id,
-        };
-    });
 
     const dateOptions = props.datesOfService.map((date, idx) => {
         return {
-            key: date,
-            text: date,
+            label: date,
             value: idx.toString(),
         };
     });
 
-    const handleTimeInputChange = (
-        _: React.ChangeEvent<HTMLInputElement>,
-        data: InputOnChangeData,
-    ) => {
-        const name = data.name;
-        const value = data.value;
+    const handleTimeInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const name = event.target.name as keyof ScheduledCustomerCreateInput;
+        const value = event.target.value;
 
         const dateOfService = props.datesOfService[formParams.dayOffset];
         const date = fuseDateTime(dateOfService, value);
@@ -72,37 +61,29 @@ export const CreateScheduledCustomerModal: React.FC<CreateScheduledCustomerModal
     };
 
     return (
-        <Modal
-            onClose={() => props.onClose()}
-            open={true}
-        >
-            <Modal.Header>{t('Add Customer')}</Modal.Header>
-            <Modal.Content>
-                <Form>
-                    <Form.Field>
-                        <Label>{t('Date of Service')}:</Label>
-                        <Dropdown
-                            placeholder={t('Select Date')!}
-                            fluid
-                            selection
+        <Dialog open={true} onOpenChange={isOpen => !isOpen && props.onClose()}>
+            <DialogTrigger asChild></DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>{t('Add Customer')}</DialogTitle>
+                </DialogHeader>
+                <GridForm>
+                    <GridFormItem label={t('Date of Service')}>
+                        <DropdownPicker
+                            placeholder={t('Select Date')}
                             options={dateOptions}
-                            onChange={(_, data) => setFormParam('dayOffset', parseInt(data.value as string))}
+                            value={formParams.dayOffset.toString()}
+                            onChange={(newValue) => setFormParam('dayOffset', parseInt(newValue!))}
                         />
-                    </Form.Field>
-                    <Form.Field>
-                        <Label>{t('Customer')}:</Label>
-                        <Dropdown
-                            placeholder={t('Select Customer')!}
-                            fluid
-                            search
-                            selection
-                            options={customerOptions}
-                            loading={loading}
-                            onChange={(_, data) => setFormParam('waveCustomerID', data.value as string)}
+                    </GridFormItem>
+                    <GridFormItem label={t('Customer')}>
+                        <SelectWaveCustomer
+                            placeholder={t('Select Customer')}
+                            onChange={(newValue) => setFormParam('waveCustomerID', newValue!)}
+                            customerID={formParams.waveCustomerID.toString()}
                         />
-                    </Form.Field>
-                    <Form.Field>
-                        <Label>{t('Service Start Time')}:</Label>
+                    </GridFormItem>
+                    <GridFormItem label={t('Service Start Time')}>
                         <Input
                             type="time"
                             name="startTime"
@@ -111,9 +92,8 @@ export const CreateScheduledCustomerModal: React.FC<CreateScheduledCustomerModal
                             required
                             onChange={handleTimeInputChange}
                         />
-                    </Form.Field>
-                    <Form.Field>
-                        <Label>{t('Service End Time')}:</Label>
+                    </GridFormItem>
+                    <GridFormItem label={t('Service End Time')}>
                         <Input
                             type="time"
                             name="endTime"
@@ -122,21 +102,18 @@ export const CreateScheduledCustomerModal: React.FC<CreateScheduledCustomerModal
                             required
                             onChange={handleTimeInputChange}
                         />
-                    </Form.Field>
-                </Form>
-            </Modal.Content>
-            <Modal.Actions>
-                <Button color="black" onClick={() => props.onClose()}>
-                    {t('Cancel')}
-                </Button>
-                <Button
-                    onClick={() => handleSubmit()}
-                    positive
-                    disabled={!formValid || loading}
-                >
-                    {t('Ok')}
-                </Button>
-            </Modal.Actions>
-        </Modal>
+                    </GridFormItem>
+                </GridForm>
+                <DialogFooter>
+                    <Button
+                        type="submit"
+                        onClick={() => handleSubmit()}
+                        disabled={!formValid}
+                    >
+                        {t('Ok')}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
