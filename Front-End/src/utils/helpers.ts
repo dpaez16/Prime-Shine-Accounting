@@ -1,5 +1,6 @@
 import { WaveProvinceCode } from '@/types/waveCustomer';
 import { DAYS_OF_WEEK } from './consts';
+import { WaveInvoice } from '@/types/waveInvoice';
 
 /**
  * Constructs a date string in `mm/dd/yyyy` format.
@@ -117,4 +118,16 @@ export const parseWaveProvinceCode = (provinceCode?: WaveProvinceCode) => {
         countryCode,
         provinceAbbvr,
     };
+};
+
+export const parseInternalInvoiceID = (invoice: WaveInvoice) => {
+    if (invoice.internalId) {
+        return invoice.internalId;
+    }
+
+    // this assumes the internal invoice ID is located in the pdfUrl like so:
+    // ... /export/<internalInvoiceID>/ ...
+    const url = invoice.pdfUrl;
+    const matches = url.match(/export\/(.+)\//);
+    return matches?.[1] ?? '';
 };

@@ -1,10 +1,14 @@
 export type WaveInvoicePayment = {
-    amount: string,
-    exchange_rate: number, // 1
+    id: string;
+    amount: string;
+    exchange_rate: number; // 1
     memo: string;
     payment_account: {
-        id: number,
+        id: number;
+        name: string;
     },
     payment_date: string; // YYYY-MM-DD
-    payment_method: string; // 'cash'
+    payment_method: string; // 'cash' | 'cheque'
 };
+
+export type WaveInvoicePaymentID = WaveInvoicePayment['id'];

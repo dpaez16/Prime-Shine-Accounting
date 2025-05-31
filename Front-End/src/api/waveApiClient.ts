@@ -1,9 +1,11 @@
 import { BusinessID } from '@/types/businessInfo';
 import { WaveCustomer, WaveCustomerCreateInput, WaveCustomerID, WaveCustomerPatchInput } from '@/types/waveCustomer';
-import { WaveInvoice, WaveInvoiceCreateInput, WaveInvoiceID, WaveInvoicePatchInput } from '@/types/waveInvoice';
+import { WaveInternalInvoiceID, WaveInvoice, WaveInvoiceCreateInput, WaveInvoiceID, WaveInvoicePatchInput } from '@/types/waveInvoice';
 import { WaveInvoiceFilterObj } from '@/components/invoicesPage/toolbar/useInvoicesSearch';
 import { JWT } from '@/types/userInfo';
 import { WavePageInfo } from '@/types/wavePageInfo';
+import { IdentityBusinessID } from '../types/businessInfo';
+import { WaveInvoicePayment } from '@/types/waveInvoicePayment';
 
 export class WaveAPIClient {
     static #createFetchRequest(
@@ -142,5 +144,15 @@ export class WaveAPIClient {
 
         return this.#createFetchRequest('/invoice/delete', body, jwt)
             .then(() => true);
+    }
+
+    static fetchInvoicePayments(identityBusinessID: IdentityBusinessID, internalInvoiceID: WaveInternalInvoiceID, jwt: JWT | null) {
+        const body = {
+            identityBusinessID,
+            internalInvoiceID,
+        };
+
+        return this.#createFetchRequest('/invoice/payments/query', body, jwt)
+            .then(data => data.invoicePayments as WaveInvoicePayment[]);
     }
 }
