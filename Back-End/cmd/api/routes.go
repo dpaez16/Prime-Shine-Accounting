@@ -51,6 +51,9 @@ func (app *application) routes() http.Handler {
 	// wave invoice payment routes
 	router.POST("/api/wave/invoice/payments/query", app.authenticate(app.queryWaveInvoicePayments))
 
+	// wave business account routes
+	router.POST("/api/wave/accounts/query", app.authenticate(app.queryWaveBusinessAccounts))
+
 	router.POST("/api/schedule/pdf", app.authenticate(app.getSchedulePDF))
 
 	return app.recoverPanic(app.enableCORS(router))
