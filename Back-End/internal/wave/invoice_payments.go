@@ -57,8 +57,8 @@ func GetInvoicePayments(identityBusinessID string, internalInvoiceID string) (*[
 	return &data.Payments, nil
 }
 
-func CreateInvoicePayment(identityBusinessID string, internalInvoiceID string, invoicePaymentID string, invoicePayment map[string]any) (bool, error) {
-	path := fmt.Sprintf("/%v/invoices/%v/payments/%v/", identityBusinessID, internalInvoiceID, invoicePaymentID)
+func CreateInvoicePayment(identityBusinessID string, internalInvoiceID string, invoicePayment map[string]any) (bool, error) {
+	path := fmt.Sprintf("/%v/invoices/%v/payments/", identityBusinessID, internalInvoiceID)
 
 	_, err := createWaveBusinessAPIRequest(http.MethodPost, path, &invoicePayment)
 	if err != nil {
