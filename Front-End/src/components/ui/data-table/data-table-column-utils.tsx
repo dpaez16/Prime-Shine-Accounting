@@ -1,17 +1,18 @@
-import { ColumnDef, RowData } from "@tanstack/react-table";
+import { ColumnDef, Row, RowData } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { Button } from "../button";
 
 export const clickableTableItemStyle = 'whitespace-break-spaces font-medium text-left px-2 p-1.5 hover:bg-accent hover:cursor-pointer rounded-sm';
 
-interface ColumnProps {
+interface ColumnProps<T extends RowData> {
     id: string;
     accessorKey: string;
     columnHeader: string;
     enableSorting?: boolean;
+    filterFn?: (row: Row<T>, id: string, value: any) => any;
 }
 
-interface TextColumnProps<T extends RowData> extends ColumnProps {
+interface TextColumnProps<T extends RowData> extends ColumnProps<T> {
     textFormatterFunc?: (text: string) => string;
     onClick?: (entry: T) => void;
 }
@@ -27,6 +28,13 @@ export function generateGenericTextColumn<T extends RowData>(data: TextColumnPro
             return (
                 <DataTableColumnHeader column={column} title={data.columnHeader} />
             );
+        },
+        filterFn: (row, id, value) => {
+            if (data.filterFn) {
+                return data.filterFn(row, id, value);
+            }
+
+            return value.includes(row.getValue(id));
         },
         meta: {
             label: data.columnHeader,
@@ -51,7 +59,7 @@ export function generateGenericTextColumn<T extends RowData>(data: TextColumnPro
     return column;
 }
 
-interface NumericColumnProps<T extends RowData> extends ColumnProps {
+interface NumericColumnProps<T extends RowData> extends ColumnProps<T> {
     numberFormatterFunc?: (num: number | null) => string;
     onClick?: (entry: T) => void;
 }
@@ -67,6 +75,13 @@ export function generateGenericNumericColumn<T extends RowData>(data: NumericCol
             return (
                 <DataTableColumnHeader column={column} title={data.columnHeader} />
             );
+        },
+        filterFn: (row, id, value) => {
+            if (data.filterFn) {
+                return data.filterFn(row, id, value);
+            }
+
+            return value.includes(row.getValue(id));
         },
         meta: {
             label: data.columnHeader,
@@ -91,7 +106,7 @@ export function generateGenericNumericColumn<T extends RowData>(data: NumericCol
     return column;
 }
 
-interface DateColumnProps<T extends RowData> extends ColumnProps {
+interface DateColumnProps<T extends RowData> extends ColumnProps<T> {
     dateFormatterFunc: (date: Date | null) => string;
     onClick?: (entry: T) => void;
 }
