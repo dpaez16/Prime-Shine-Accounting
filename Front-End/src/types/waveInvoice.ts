@@ -40,7 +40,7 @@ export type WaveInvoice = {
     viewUrl: string;
 };
 
-export type WaveInternalInvoiceID = string;
+export type WaveInternalInvoiceID = WaveInvoice['internalId'];
 export type WaveInvoiceID = WaveInvoice['id'];
 
 export type WaveInvoiceService = Prettify<
