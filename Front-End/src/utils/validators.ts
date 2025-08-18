@@ -29,3 +29,14 @@ export const validateAddress = function (
 
     return addressLine1 && city && state && postalCodeRegex.test(postalCode);
 };
+
+export const validateMoney = (money: string) => {
+    // Slight modification of https://regexlib.com/REDetails.aspx?regexp_id=196
+    // - Removed the optional leading $
+    const moneyRegex = new RegExp(
+        /^([1-9]{1}[0-9]{0,2}(\,[0-9]{3})*(\.[0-9]{0,2})?|[1-9]{1}[0-9]{0,}(\.[0-9]{0,2})?|0(\.[0-9]{0,2})?|(\.[0-9]{1,2})?)$/
+    );
+
+    const value = parseFloat(money);
+    return moneyRegex.test(money) && !Number.isNaN(value);
+};
