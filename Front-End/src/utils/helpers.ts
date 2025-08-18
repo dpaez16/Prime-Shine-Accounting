@@ -1,13 +1,17 @@
 import { WaveProvinceCode } from '@/types/waveCustomer';
 import { DAYS_OF_WEEK } from './consts';
 import { WaveInvoice } from '@/types/waveInvoice';
+import { WaveInvoicePaymentMethod } from '@/types/waveInvoicePayment';
 
 /**
  * Constructs a date string in `mm/dd/yyyy` format.
  * @param date - The date to convert to a string.
  * @return The constructed date.
  */
-export const dateToStr = (date: Date) => {
+export const dateToStr = (
+    date: Date,
+    format: 'mm/dd/yyyy' | 'yyyy-mm-dd',
+) => {
     const month = date.getUTCMonth() + 1;
     const day = date.getUTCDate();
     const year = date.getUTCFullYear();
@@ -15,11 +19,15 @@ export const dateToStr = (date: Date) => {
     const monthStr = month.toString().padStart(2, '0');
     const dayStr = day.toString().padStart(2, '0');
 
-    return `${monthStr}/${dayStr}/${year}`;
+    if (format === 'mm/dd/yyyy') {
+        return `${monthStr}/${dayStr}/${year}`;
+    } else {
+        return `${year}-${month}-${day}`;
+    }
 };
 
 /**
- * Constructs a date suitable for WaveApps. Time is set to 00:00.
+ * Constructs a date object suitable for WaveApps. Time is set to 00:00.
  * @param date - The day constructed in `mm/dd/yyyy` or `yyyy-mm-dd` format.
  * @return The constructed date.
  */
@@ -28,7 +36,7 @@ export const constructDate = (date: string) => {
 };
 
 /**
- * Constructs a time in `hh:mm AM/PM` format.
+ * Constructs a time string in `hh:mm AM/PM` format.
  * @param dateEpochStr - The date serialized in epoch format.
  * @return The constructed date.
  */
@@ -47,7 +55,7 @@ export const constructTimeStr = (dateEpochStr: string) => {
 };
 
 /**
- * Constructs a time in `hh:mm` format.
+ * Constructs a time string in `hh:mm` format.
  * @param dateEpochStr - The date serialized in epoch format.
  * @return The constructed date.
  */
@@ -130,4 +138,23 @@ export const parseInternalInvoiceID = (invoice: WaveInvoice) => {
     const url = invoice.pdfUrl;
     const matches = url.match(/export\/(.+)\//);
     return matches?.[1] ?? '';
+};
+
+export const parseWavePaymentMethod = (paymentMethod: WaveInvoicePaymentMethod) => {
+    switch (paymentMethod) {
+        case WaveInvoicePaymentMethod.Cash:
+            return 'Cash';
+        case WaveInvoicePaymentMethod.Check:
+            return 'Check';
+        case WaveInvoicePaymentMethod.BankPayment:
+            return 'Bank Payment';
+        case WaveInvoicePaymentMethod.CreditCard:
+            return 'Credit Card';
+        case WaveInvoicePaymentMethod.PayPal:
+            return 'PayPal';
+        case WaveInvoicePaymentMethod.Other:
+            return 'Other';
+        default:
+            return paymentMethod;
+    }
 };

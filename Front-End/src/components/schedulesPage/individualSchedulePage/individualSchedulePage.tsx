@@ -94,7 +94,7 @@ export const IndividualSchedulePage: React.FC = () => {
         return DAYS_OF_WEEK.map((_, idx) => {
             const date = new Date(schedule!.startDay);
             date.setUTCDate(date.getUTCDate() + idx);
-            return dateToStr(date);
+            return dateToStr(date, 'mm/dd/yyyy');
         });
     };
 

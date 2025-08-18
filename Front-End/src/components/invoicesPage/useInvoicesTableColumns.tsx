@@ -11,6 +11,7 @@ import { DataTableColumnHeader } from '@/components/ui/data-table/data-table-col
 interface UseInvoicesTableColumns {
     onEditClick: (invoice: WaveInvoice) => void;
     onDeleteClick: (invoice: WaveInvoice) => void;
+    onPaymentsClick: (invoice: WaveInvoice) => void;
 }
 
 export const useInvoicesTableColumns = (props: UseInvoicesTableColumns) => {
@@ -45,6 +46,11 @@ export const useInvoicesTableColumns = (props: UseInvoicesTableColumns) => {
                             </span>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
+                            <span onClick={() => props.onPaymentsClick(invoice)}>
+                                {t('Payments')}
+                            </span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
                             <span onClick={() => window.open(invoice.pdfUrl, '_blank')}>
                                 {t('Download PDF')}
                             </span>
@@ -71,7 +77,7 @@ export const useInvoicesTableColumns = (props: UseInvoicesTableColumns) => {
             id: 'invoiceDate',
             accessorKey: 'invoiceDate',
             columnHeader: t('Date'),
-            textFormatterFunc: (text) => dateToStr(constructDate(text)),
+            textFormatterFunc: (text) => dateToStr(constructDate(text), 'mm/dd/yyyy'),
             enableSorting: true,
         }),
         generateGenericTextColumn<WaveInvoice>({

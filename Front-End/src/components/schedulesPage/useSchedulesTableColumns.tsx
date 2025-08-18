@@ -58,7 +58,7 @@ export const useSchedulesTableColumns = (props: UseSchedulesTableColumnsProps) =
             id: 'scheduleDate',
             accessorKey: 'startDay',
             columnHeader: t('Schedule'),
-            dateFormatterFunc: (date) => `${dateToStr(date!)} - ${dateToStr(addDays(date!, 6))}`,
+            dateFormatterFunc: (date) => `${dateToStr(date!, 'mm/dd/yyyy')} - ${dateToStr(addDays(date!, 6), 'mm/dd/yyyy')}`,
             onClick: (entry) => {
                 const params = new URLSearchParams({
                     'scheduleID': entry.scheduleID.toString(),

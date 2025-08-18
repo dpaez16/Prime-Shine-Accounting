@@ -29,7 +29,7 @@ export const DeleteScheduleModal: React.FC<DeleteScheduleModalProps> = (props) =
                     <AlertDialogTitle>{t('Delete Schedule?')}</AlertDialogTitle>
                     <div>
                         <p>
-                            {`${dateToStr(date)} - ${dateToStr(addDays(date, 6))}`}
+                            {`${dateToStr(date, 'mm/dd/yyyy')} - ${dateToStr(addDays(date, 6), 'mm/dd/yyyy')}`}
                         </p>
                     </div>
                 </AlertDialogHeader>
