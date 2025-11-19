@@ -97,7 +97,10 @@ export class WaveAPIClient {
     static fetchInvoices(businessID: BusinessID, waveFilterObj: WaveInvoiceFilterObj, jwt: JWT | null) {
         const body = {
             businessID: businessID,
-            filterStruct: waveFilterObj,
+            filterStruct: {
+              ...waveFilterObj,
+              status: waveFilterObj.status ? waveFilterObj.status.toUpperCase() : undefined,
+            },
         };
 
         return this.#createFetchRequest('/invoices/query', body, jwt)
