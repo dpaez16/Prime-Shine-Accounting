@@ -4,8 +4,9 @@ import { WaveInvoice } from '@/types/waveInvoice';
 import { WaveInvoicePaymentMethod } from '@/types/waveInvoicePayment';
 
 /**
- * Constructs a date string in `mm/dd/yyyy` format.
+ * Constructs a date string in a specific format.
  * @param date - The date to convert to a string.
+ * @param format - The format to output the date to.
  * @return The constructed date.
  */
 export const dateToStr = (
