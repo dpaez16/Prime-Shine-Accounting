@@ -6,6 +6,7 @@ import { JWT } from '@/types/userInfo';
 import { WavePageInfo } from '@/types/wavePageInfo';
 import { IdentityBusinessID } from '../types/businessInfo';
 import { WaveInvoicePayment } from '@/types/waveInvoicePayment';
+import { dateToStr } from '@/utils/helpers';
 
 export class WaveAPIClient {
     static #createFetchRequest(
@@ -100,6 +101,8 @@ export class WaveAPIClient {
             filterStruct: {
               ...waveFilterObj,
               status: waveFilterObj.status ? waveFilterObj.status.toUpperCase() : undefined,
+              invoiceDateStart: waveFilterObj.invoiceDateStart ? dateToStr(new Date(waveFilterObj.invoiceDateStart), 'yyyy-mm-dd') : undefined,
+              invoiceDateEnd: waveFilterObj.invoiceDateEnd ? dateToStr(new Date(waveFilterObj.invoiceDateEnd), 'yyyy-mm-dd') : undefined,
             },
         };
 
