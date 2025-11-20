@@ -25,7 +25,7 @@ export const InvoicePaymentsTable: React.FC<InvoicePaymentsTableProps> = (props)
 
     const renderPayment = (payment: WaveInvoicePayment) => {
         return (
-            <TableRow>
+            <TableRow key={payment.id}>
                 <TableCell>{dateToStr(constructDate(payment.payment_date), 'mm/dd/yyyy')}</TableCell>
                 <TableCell>{t(parseWavePaymentMethod(payment.payment_method as WaveInvoicePaymentMethod))}</TableCell>
                 <TableCell>{'$' + payment.amount.toString()}</TableCell>
@@ -57,10 +57,12 @@ export const InvoicePaymentsTable: React.FC<InvoicePaymentsTableProps> = (props)
     return (
         <Table className={cn(props.className)}>
             <TableHeader>
-                <TableHead>{t('Payment Date')}</TableHead>
-                <TableHead>{t('Payment Method')}</TableHead>
-                <TableHead>{t('Amount')}</TableHead>
-                <TableHead>{t('Options')}</TableHead>
+                <TableRow>
+                    <TableHead>{t('Payment Date')}</TableHead>
+                    <TableHead>{t('Payment Method')}</TableHead>
+                    <TableHead>{t('Amount')}</TableHead>
+                    <TableHead>{t('Options')}</TableHead>
+                </TableRow>
             </TableHeader>
             <TableBody>
                 {props.data.map(renderPayment)}
