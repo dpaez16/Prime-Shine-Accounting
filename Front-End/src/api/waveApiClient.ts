@@ -161,4 +161,16 @@ export class WaveAPIClient {
         return this.#createFetchRequest('/invoice/payments/query', body, jwt)
             .then(data => data.invoicePayments as WaveInvoicePayment[]);
     }
+
+    static editInvoicePayment(identityBusinessID: IdentityBusinessID, internalInvoiceID: WaveInternalInvoiceID, invoicePaymentData: WaveInvoicePayment, jwt: JWT | null) {
+        const body = {
+            identityBusinessID,
+            internalInvoiceID,
+            invoicePaymentID: invoicePaymentData.id,
+            invoicePaymentData,
+        };
+
+        return this.#createFetchRequest('/invoice/payments/edit', body, jwt)
+            .then(() => true);
+    }
 }

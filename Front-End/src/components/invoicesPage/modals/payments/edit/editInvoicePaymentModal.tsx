@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { validateMoney } from '@/utils/validators';
 import { SelectWaveInvoicePaymentMethod } from '@/components/ui/selectors/select-wave-payment-method';
 import { WaveInternalInvoiceID } from '@/types/waveInvoice';
+import { WaveAPIClient } from '@/api/waveApiClient';
 
 type EditInvoicePaymentModalProps = {
     internalInvoiceID: WaveInternalInvoiceID;
@@ -23,6 +24,7 @@ type EditInvoicePaymentModalProps = {
 export const EditInvoicePaymentModal: React.FC<EditInvoicePaymentModalProps> = (props) => {
     const loginSession = useContext(LoginSessionContext);
     const userInfo = loginSession.userInfo!;
+    const businessInfo = loginSession.businessInfo!;
 
     const { invoicePaymentParams, setInvoicePaymentParam } = useEditInvoicePaymentForm(props.invoicePayment);
     const { t } = useLocalization();
@@ -35,13 +37,10 @@ export const EditInvoicePaymentModal: React.FC<EditInvoicePaymentModalProps> = (
         );
     };
 
-    // TODO
     const handleSubmit = () => {
-        //return WaveAPIClient.editInvoicePayment(props.internalInvoiceID, invoicePaymentParams, userInfo.token)
-        //    .then(() => props.onSuccess())
-        //    .catch(err => alert('Error editing invoice payment: ' + err.message)); // TODO: use translation hook
-
-        props.onSuccess();
+        return WaveAPIClient.editInvoicePayment(businessInfo.identityBusinessID, props.internalInvoiceID, invoicePaymentParams, userInfo.token)
+            .then(() => props.onSuccess())
+            .catch(err => alert('Error editing invoice payment: ' + err.message)); // TODO: use translation hook
     };
 
     return (
