@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { DeleteInvoicePaymentModal } from "./deleteInvoicePaymentModal";
 import { CreateInvoicePaymentModal } from "./create/createInvoicePaymentModal";
 import { InvoicePaymentsTable } from "./payments-table/invoicePaymentsTable";
+import { EventListenerNames } from "@/utils/consts";
 
 type InvoicePaymentsModalProps = {
     invoice: WaveInvoice;
@@ -87,6 +88,7 @@ export const InvoicePaymentsModal: React.FC<InvoicePaymentsModalProps> = (props)
                     onClose={() => setCreateModalOpen(false)}
                     onSuccess={() => {
                         setCreateModalOpen(false);
+                        window.dispatchEvent(new Event(EventListenerNames.mutateInvoicePayments));
                         refetch();
                     }}
                 />
@@ -99,6 +101,7 @@ export const InvoicePaymentsModal: React.FC<InvoicePaymentsModalProps> = (props)
                     onClose={() => setEditInvoicePayment(null)}
                     onSuccess={() => {
                         setEditInvoicePayment(null);
+                        window.dispatchEvent(new Event(EventListenerNames.mutateInvoicePayments));
                         refetch();
                     }}
                 />
@@ -111,6 +114,7 @@ export const InvoicePaymentsModal: React.FC<InvoicePaymentsModalProps> = (props)
                     onClose={() => setDeleteInvoicePayment(null)}
                     onSuccess={() => {
                         setDeleteInvoicePayment(null);
+                        window.dispatchEvent(new Event(EventListenerNames.mutateInvoicePayments));
                         refetch();
                     }}
                 />

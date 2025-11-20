@@ -125,4 +125,5 @@ export enum EventListenerNames {
     mutateInvoice = 'mutateInvoice',
     mutateScheduledCustomers = 'mutateScheduledCustomers',
     mutateCustomers = 'mutateCustomers',
+    mutateInvoicePayments = 'mutateInvoicePayments',
 }

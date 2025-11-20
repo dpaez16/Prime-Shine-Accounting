@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { CreateInvoiceModal } from './modals/create/createInvoiceModal';
 import useLocalization from '@/hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';
@@ -17,6 +17,7 @@ import { useInvoicesTableColumns } from './useInvoicesTableColumns';
 import { DeleteInvoiceModal } from './modals/deleteInvoiceModal';
 import { EditInvoiceModal } from './modals/edit/editInvoiceModal';
 import { InvoicePaymentsModal } from './modals/payments/invoicePaymentsModal';
+import { EventListenerNames } from '@/utils/consts';
 
 interface InvoicesData {
     invoices: WaveInvoice[];
@@ -71,6 +72,15 @@ export const InvoicesPage: React.FC = () => {
             userInfo.token,
         );
     };
+
+    useEffect(() => {
+        const refetchData = () => refetch();
+        window.addEventListener(EventListenerNames.mutateInvoicePayments, refetchData);
+
+        return () => {
+            window.removeEventListener(EventListenerNames.mutateInvoicePayments, refetchData);
+        };
+    }, []);
 
     return (
         <div className='flex flex-col'>
