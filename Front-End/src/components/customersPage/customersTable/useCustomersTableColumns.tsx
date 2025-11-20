@@ -20,6 +20,9 @@ export const useCustomersTableColumns = () => {
 
                 navigate(`/customer?${params.toString()}`);
             },
+            filterFn: (row, _, value) => {
+                return row.original.name.toLocaleLowerCase().includes(value.toLocaleLowerCase())
+            },
         }),
     ];
 };
