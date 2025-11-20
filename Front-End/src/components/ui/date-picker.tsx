@@ -12,6 +12,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Cross2Icon } from "@radix-ui/react-icons"
+import useLocalization from "@/hooks/useLocalization"
 
 interface DatePickerProps {
     value?: Date;
@@ -22,6 +24,8 @@ interface DatePickerProps {
 
 export const DatePicker: React.FC<DatePickerProps> = (props) => {
   const date = props.value;
+
+    const { t } = useLocalization();
 
   return (
     <Popover>
@@ -48,6 +52,14 @@ export const DatePicker: React.FC<DatePickerProps> = (props) => {
             dayOfWeek: props.onlyMondays ? [0, 2, 3, 4, 5, 6] : [],
           }}
         />
+        <div className='flex flex-row justify-around pb-2'>
+          <Button
+            variant='outline'
+            onClick={() => props.onChange(undefined)}
+          >
+            {t('Clear Selection')}
+          </Button>
+        </div>
       </PopoverContent>
     </Popover>
   );

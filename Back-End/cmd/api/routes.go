@@ -48,6 +48,15 @@ func (app *application) routes() http.Handler {
 	router.POST("/api/wave/invoice/edit", app.authenticate(app.editWaveInvoice))
 	router.POST("/api/wave/invoice/delete", app.authenticate(app.deleteWaveInvoice))
 
+	// wave invoice payment routes
+	router.POST("/api/wave/invoice/payments/query", app.authenticate(app.queryWaveInvoicePayments))
+	router.POST("/api/wave/invoice/payments/create", app.authenticate(app.createWaveInvoicePayment))
+	router.POST("/api/wave/invoice/payments/edit", app.authenticate(app.editWaveInvoicePayment))
+	router.POST("/api/wave/invoice/payments/delete", app.authenticate(app.deleteWaveInvoicePayment))
+
+	// wave business account routes
+	router.POST("/api/wave/accounts/query", app.authenticate(app.queryWaveBusinessAccounts))
+
 	router.POST("/api/schedule/pdf", app.authenticate(app.getSchedulePDF))
 
 	return app.recoverPanic(app.enableCORS(router))

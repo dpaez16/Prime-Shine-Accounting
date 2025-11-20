@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { CreateInvoiceModal } from './modals/create/createInvoiceModal';
 import useLocalization from '@/hooks/useLocalization';
 import { WaveInvoice } from '@/types/waveInvoice';
@@ -16,6 +16,8 @@ import { DataTable } from '@/components/ui/data-table/data-table';
 import { useInvoicesTableColumns } from './useInvoicesTableColumns';
 import { DeleteInvoiceModal } from './modals/deleteInvoiceModal';
 import { EditInvoiceModal } from './modals/edit/editInvoiceModal';
+import { InvoicePaymentsModal } from './modals/payments/invoicePaymentsModal';
+import { EventListenerNames } from '@/utils/consts';
 
 interface InvoicesData {
     invoices: WaveInvoice[];
@@ -31,6 +33,7 @@ export const InvoicesPage: React.FC = () => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editInvoice, setEditInvoice] = useState<WaveInvoice | null>(null);
     const [deleteInvoice, setDeleteInvoice] = useState<WaveInvoice | null>(null);
+    const [paymentInvoice, setPaymentInvoice] = useState<WaveInvoice | null>(null);
 
     const {
         filterParameters,
@@ -49,6 +52,7 @@ export const InvoicesPage: React.FC = () => {
     const columns = useInvoicesTableColumns({
         onEditClick: setEditInvoice,
         onDeleteClick: setDeleteInvoice,
+        onPaymentsClick: setPaymentInvoice,
     });
 
     const searchHandler = () => {
@@ -68,6 +72,15 @@ export const InvoicesPage: React.FC = () => {
             userInfo.token,
         );
     };
+
+    useEffect(() => {
+        const refetchData = () => refetch();
+        window.addEventListener(EventListenerNames.mutateInvoicePayments, refetchData);
+
+        return () => {
+            window.removeEventListener(EventListenerNames.mutateInvoicePayments, refetchData);
+        };
+    }, []);
 
     return (
         <div className='flex flex-col'>
@@ -100,6 +113,17 @@ export const InvoicesPage: React.FC = () => {
                     onClose={() => setDeleteInvoice(null)}
                     onSuccess={() => {
                         setDeleteInvoice(null);
+                        refetch();
+                    }}
+                />
+            }
+            {
+                paymentInvoice &&
+                <InvoicePaymentsModal
+                    invoice={paymentInvoice}
+                    onClose={() => setPaymentInvoice(null)}
+                    onSuccess={() => {
+                        setPaymentInvoice(null);
                         refetch();
                     }}
                 />

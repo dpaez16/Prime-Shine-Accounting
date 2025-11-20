@@ -34,6 +34,7 @@ type WaveInvoice struct {
 	Status        string            `json:"status"`
 	PDFUrl        string            `json:"pdfUrl"`
 	ViewUrl       string            `json:"viewUrl"`
+	InternalID    string            `json:"internalId"`
 }
 
 type WaveInvoiceFilterData struct {
@@ -143,6 +144,7 @@ func GetInvoices(businessID string, filterStruct WaveInvoiceFilterData) (*[]Wave
 								edges {
 									node {
 										id
+										internalId
 										createdAt
 										modifiedAt
 										pdfUrl
