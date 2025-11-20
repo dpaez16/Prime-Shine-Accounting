@@ -2,8 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"prime-shine-api/internal/data"
 	"prime-shine-api/internal/vec2"
+	"prime-shine-api/internal/wave"
 	"strings"
 
 	"codeberg.org/go-pdf/fpdf"
@@ -12,7 +15,8 @@ import (
 )
 
 type getSchedulePDFBody struct {
-	ScheduleID int `json:"scheduleID"`
+	ScheduleID int    `json:"scheduleID"`
+	BusinessID string `json:"businessID"`
 }
 
 // Route for generating a schedule PDF.
@@ -26,7 +30,27 @@ func (app *application) getSchedulePDF(w http.ResponseWriter, r *http.Request, _
 		return
 	}
 
-	// TODO: gather all schedule data
+	filter := map[string]any{"scheduleid": body.ScheduleID}
+	schedule, err := data.FindOneSchedule(app.db, filter)
+	if err != nil {
+		err = errors.Wrap(err, "FindOneSchedule")
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	scheduledCustomers, err := data.QueryScheduledCustomers(app.db, body.ScheduleID)
+	if err != nil {
+		err = errors.Wrap(err, "QueryScheduledCustomers")
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	waveCustomers, err := wave.GetAllCustomersWithData(body.BusinessID)
+	if err != nil {
+		err = errors.Wrap(err, "wave.GetAllCustomersWithData")
+		app.errorResponse(w, r, http.StatusBadRequest, err.Error())
+		return
+	}
 
 	pdf := fpdf.New("P", "mm", "Letter", "")
 	pdf.SetAutoPageBreak(false, 0)
@@ -38,11 +62,16 @@ func (app *application) getSchedulePDF(w http.ResponseWriter, r *http.Request, _
 	MARGIN_BOTTOM := float64(5)
 
 	// Schedule header
+	headerText := fmt.Sprintf(
+		"Week of %v - %v",
+		schedule.StartDay.Time.UTC().Format("01/02/2006"),
+		schedule.StartDay.Time.UTC().AddDate(0, 0, 6).Format("01/02/2006"),
+	)
 	pdf.SetFont("Arial", "B", 16)
-	pdf.Text(MARGIN_X, MARGIN_TOP-5, "Week of 08/16/2024 - 08/22/2024") // TODO: use schedule
+	pdf.Text(MARGIN_X, MARGIN_TOP-5, headerText)
 
 	drawBoxes(MARGIN_TOP, MARGIN_X, MARGIN_BOTTOM, pdf)
-	fillDayBoxes(MARGIN_TOP, MARGIN_X, MARGIN_BOTTOM, pdf)
+	fillDayBoxes(MARGIN_TOP, MARGIN_X, MARGIN_BOTTOM, schedule, scheduledCustomers, waveCustomers, pdf)
 
 	w.Header().Set("Content-Type", "application/pdf")
 	w.Header().Set("Content-Disposition", "attachment; filename=\"data.pdf\"")
@@ -125,38 +154,48 @@ func fillDayBox(refPoint vec2.Vec2, boxWidth, boxHeight float64, header string, 
 	pdf.MultiCell(boxWidth, fontSize, strings.TrimRight(line, "\r\n"), "", "LT", false)
 }
 
-func fillDayBoxes(marginTop, marginX, marginBottom float64, pdf *fpdf.Fpdf) {
+func fillDayBoxes(
+	marginTop, marginX, marginBottom float64,
+	schedule *data.Schedule,
+	scheduledCustomers []*data.ScheduledCustomer,
+	waveCustomers *[]wave.WaveCustomer,
+	pdf *fpdf.Fpdf,
+) {
 	pdf.SetFont("Arial", "", 10)
 	pageWidth, pageHeight, _ := pdf.PageSize(0)
 
 	BOX_MARGIN_RIGHT := float64(1)
 	BOX_MARGIN_Y := float64(1)
 
-	header := "08/16/2024"
-	lines := []string{
-		"01:00 - 1:00 123 Street Ave",
-		"02:00 - 1:00 123 Street Ave",
-		"03:00 - 1:00 123 Street Ave",
-		"04:00 - 1:00 123 Street Ave",
-		"05:00 - 1:00 123 Street Ave",
-		"06:00 - 1:00 123 Street Ave",
-		"07:00 - 1:00 123 Street Ave",
-		"08:00 - 1:00 123 Street Ave",
-		"09:00 - 1:00 123 Street Ave",
-		"10:00 - 1:00 123 Street Ave",
-		"11:00 - 1:00 123 Street Ave",
-		"12:00 - 1:00 123 Street Ave",
-		"13:00 - 1:00 123 Street Ave",
-		"14:00 - 1:00 123 Street Ave",
-		"15:00 - 1:00 123 Street Ave",
-		"16:00 - 1:00 123 Street Ave",
-		"17:00 - 1:00 123 Street Ave",
-		"18:00 - 1:00 123 Street Ave",
-		"19:00 - 1:00 123 Street Ave",
-		"20:00 - 1:00 123 Street Ave",
-		"21:00 - 1:00 123 Street Ave",
-		"22:00 - 1:00 123 Street Ave",
+	headers := []string{
+		schedule.StartDay.Time.UTC().AddDate(0, 0, 0).Format("01/02/2006"),
+		schedule.StartDay.Time.UTC().AddDate(0, 0, 1).Format("01/02/2006"),
+		schedule.StartDay.Time.UTC().AddDate(0, 0, 2).Format("01/02/2006"),
+		schedule.StartDay.Time.UTC().AddDate(0, 0, 3).Format("01/02/2006"),
+		schedule.StartDay.Time.UTC().AddDate(0, 0, 4).Format("01/02/2006"),
+		schedule.StartDay.Time.UTC().AddDate(0, 0, 5).Format("01/02/2006"),
+		schedule.StartDay.Time.UTC().AddDate(0, 0, 6).Format("01/02/2006"),
 	}
+
+	lines := make(map[int][]string, 7)
+
+	for _, scheduledCustomer := range scheduledCustomers {
+		linesIdx := scheduledCustomer.DayOffset
+		startTime := scheduledCustomer.StartTime
+		endTime := scheduledCustomer.EndTime
+		waveCustomer := findWaveCustomerByID(scheduledCustomer.CustomerID, waveCustomers)
+
+		line := fmt.Sprintf(
+			"[%v - %v] %v",
+			startTime.Time.Format("03:04PM"),
+			endTime.Time.Format("03:04PM"),
+			formatWaveCustomerForPDF(waveCustomer),
+		)
+
+		lines[linesIdx] = append(lines[linesIdx], line)
+	}
+
+	dayIdx := 0
 
 	boxWidth := 0.5 * (pageWidth - 2*marginX)
 	boxHeight := (pageHeight - marginTop - marginBottom) / 3
@@ -166,7 +205,8 @@ func fillDayBoxes(marginTop, marginX, marginBottom float64, pdf *fpdf.Fpdf) {
 
 	for idx := range 3 {
 		point := vec2.Vec2{X: topLeft.X, Y: topLeft.Y + (float64(idx) * boxHeight) + BOX_MARGIN_Y}
-		fillDayBox(point, boxWidth-BOX_MARGIN_RIGHT, boxHeight-BOX_MARGIN_Y, header, lines, pdf)
+		fillDayBox(point, boxWidth-BOX_MARGIN_RIGHT, boxHeight-BOX_MARGIN_Y, headers[dayIdx], lines[dayIdx], pdf)
+		dayIdx++
 	}
 
 	// Filling in top half of right column
@@ -174,20 +214,8 @@ func fillDayBoxes(marginTop, marginX, marginBottom float64, pdf *fpdf.Fpdf) {
 
 	for idx := range 2 {
 		point := vec2.Vec2{X: topLeft.X, Y: topLeft.Y + (float64(idx) * boxHeight) + BOX_MARGIN_Y}
-		fillDayBox(point, boxWidth-BOX_MARGIN_RIGHT, boxHeight-BOX_MARGIN_Y, header, lines, pdf)
-	}
-
-	lines = []string{
-		"01:00 - 1:00 123 Street Ave",
-		"02:00 - 1:00 123 Street Ave",
-		"03:00 - 1:00 123 Street Ave",
-		"04:00 - 1:00 123 Street Ave",
-		"05:00 - 1:00 123 Street Ave",
-		"06:00 - 1:00 123 Street Ave",
-		"07:00 - 1:00 123 Street Ave",
-		"08:00 - 1:00 123 Street Ave",
-		"09:00 - 1:00 123 Street Ave",
-		"10:00 - 1:00 123 Street Ave",
+		fillDayBox(point, boxWidth-BOX_MARGIN_RIGHT, boxHeight-BOX_MARGIN_Y, headers[dayIdx], lines[dayIdx], pdf)
+		dayIdx++
 	}
 
 	// Filling in bottom half of right column
@@ -196,6 +224,34 @@ func fillDayBoxes(marginTop, marginX, marginBottom float64, pdf *fpdf.Fpdf) {
 
 	for idx := range 2 {
 		point := vec2.Vec2{X: topLeft.X, Y: topLeft.Y + (float64(idx) * boxHeight) + BOX_MARGIN_Y}
-		fillDayBox(point, boxWidth-BOX_MARGIN_RIGHT, boxHeight-BOX_MARGIN_Y, header, lines, pdf)
+		fillDayBox(point, boxWidth-BOX_MARGIN_RIGHT, boxHeight-BOX_MARGIN_Y, headers[dayIdx], lines[dayIdx], pdf)
+		dayIdx++
 	}
+}
+
+func findWaveCustomerByID(customerID string, waveCustomers *[]wave.WaveCustomer) *wave.WaveCustomer {
+	for _, customer := range *waveCustomers {
+		if customer.ID != customerID {
+			continue
+		}
+
+		return &customer
+	}
+
+	return nil
+}
+
+func formatWaveCustomerForPDF(customer *wave.WaveCustomer) string {
+	if customer == nil {
+		return "UNKNOWN CUSTOMER"
+	}
+
+	address := fmt.Sprintf("%v %v", customer.Address.AddressLine1, customer.Address.AddressLine2)
+	address = strings.TrimSpace(address)
+
+	if len(address) > 0 {
+		return fmt.Sprintf("%v (%v)", customer.Name, address)
+	}
+
+	return customer.Name
 }

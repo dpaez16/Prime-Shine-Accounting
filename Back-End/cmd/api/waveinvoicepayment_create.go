@@ -10,9 +10,9 @@ import (
 )
 
 type createWaveInvoicePaymentBody struct {
-	IdentityBusinessID   string         `json:"identityBusinessID"`
-	InternalInvoiceID    string         `json:"internalInvoiceID"`
-	InvoicePaymentData   map[string]any `json:"invoicePaymentData"`
+	IdentityBusinessID string         `json:"identityBusinessID"`
+	InternalInvoiceID  string         `json:"internalInvoiceID"`
+	InvoicePaymentData map[string]any `json:"invoicePaymentData"`
 }
 
 // Route for creating a Wave invoice payment.
