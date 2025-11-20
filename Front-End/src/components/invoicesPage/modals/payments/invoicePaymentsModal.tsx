@@ -7,14 +7,13 @@ import { GridForm, GridFormItem } from "@/components/ui/grid-form";
 import { useDataFetcher } from "@/hooks/useDataFetcher";
 import { WaveAPIClient } from "@/api/waveApiClient";
 import { WaveInvoicePayment } from "@/types/waveInvoicePayment";
-import { DataTable } from "@/components/ui/data-table/data-table";
-import { useInvoicePaymentsTableColumns } from "./useInvoicePaymentsTableColumns";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { constructDate, dateToStr } from "@/utils/helpers";
 import { EditInvoicePaymentModal } from "./edit/editInvoicePaymentModal";
 import { Button } from "@/components/ui/button";
 import { DeleteInvoicePaymentModal } from "./deleteInvoicePaymentModal";
 import { CreateInvoicePaymentModal } from "./create/createInvoicePaymentModal";
+import { InvoicePaymentsTable } from "./payments-table/invoicePaymentsTable";
 
 type InvoicePaymentsModalProps = {
     invoice: WaveInvoice;
@@ -36,11 +35,6 @@ export const InvoicePaymentsModal: React.FC<InvoicePaymentsModalProps> = (props)
 
     const { data, loading, error, refetch } = useDataFetcher<WaveInvoicePayment[]>({
         fetcher: () => WaveAPIClient.fetchInvoicePayments(businessInfo.identityBusinessID, invoice.internalId, userInfo.token),
-    });
-
-    const columns = useInvoicePaymentsTableColumns({
-        onEditClick: setEditInvoicePayment,
-        onDeleteClick: setDeleteInvoicePayment,
     });
 
     const invoicePayments = data ?? [];
@@ -67,11 +61,12 @@ export const InvoicePaymentsModal: React.FC<InvoicePaymentsModalProps> = (props)
                     </GridFormItem>
                 </GridForm>
                 <ErrorMessage message={error?.message} />
-                <DataTable
-                    className='w-auto'
-                    columns={columns}
+                <InvoicePaymentsTable
+                    className='w-full'
                     data={invoicePayments}
                     loading={loading}
+                    onEditClick={setEditInvoicePayment}
+                    onDeleteClick={setDeleteInvoicePayment}
                 />
                 <DialogFooter>
                     {
