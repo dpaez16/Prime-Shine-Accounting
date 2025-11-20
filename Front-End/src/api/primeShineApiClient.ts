@@ -1,9 +1,9 @@
 import { ScheduledCustomer, ScheduledCustomerID } from '@/types/scheduledCustomer';
 import { JWT, UserID, UserInfo } from '@/types/userInfo';
 import { Schedule, ScheduleID } from '@/types/schedule';
-import { BusinessInfo } from '../types/businessInfo';
+import { BusinessID, BusinessInfo } from '../types/businessInfo';
 import { WaveCustomerID } from '@/types/waveCustomer';
-import { constructDate, fuseDateTime } from '@/utils/helpers';
+import { constructDate } from '@/utils/helpers';
 
 export default class PrimeShineAPIClient {
     static #createFetchRequest(
@@ -284,10 +284,11 @@ export default class PrimeShineAPIClient {
      * @param jwt - The user's JSON web token.
      * @returns A promise resolving to the PDF contents.
      */
-    static getSchedulePDF(scheduleID: ScheduleID, jwt: JWT) {
+    static getSchedulePDF(scheduleID: ScheduleID, businessID: BusinessID, jwt: JWT) {
         const url = '/api/schedule/pdf';
         const body = {
             scheduleID,
+            businessID,
         };
 
         return fetch(url, {

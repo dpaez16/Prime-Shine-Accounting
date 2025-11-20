@@ -99,7 +99,7 @@ export const IndividualSchedulePage: React.FC = () => {
     };
 
     const exportSchedule = () => {
-        PrimeShineAPIClient.getSchedulePDF(scheduleID, userInfo.token)
+        PrimeShineAPIClient.getSchedulePDF(scheduleID, businessInfo.businessId, userInfo.token)
             .then(pdf => downloadBuffer(pdf, 'schedule.pdf'))
             .catch(err => alert('Unable to export schedule: ' + err.message)); // TODO: use translation hook
     };
