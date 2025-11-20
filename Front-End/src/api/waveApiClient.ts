@@ -5,7 +5,7 @@ import { WaveInvoiceFilterObj } from '@/components/invoicesPage/toolbar/useInvoi
 import { JWT } from '@/types/userInfo';
 import { WavePageInfo } from '@/types/wavePageInfo';
 import { IdentityBusinessID } from '../types/businessInfo';
-import { WaveInvoicePayment, WaveInvoicePaymentCreateInput } from '@/types/waveInvoicePayment';
+import { WaveInvoicePayment, WaveInvoicePaymentCreateInput, WaveInvoicePaymentID } from '@/types/waveInvoicePayment';
 import { dateToStr } from '@/utils/helpers';
 import { WaveBusinessAccount } from '@/types/waveBusinessAccount';
 
@@ -183,6 +183,17 @@ export class WaveAPIClient {
         };
 
         return this.#createFetchRequest('/invoice/payments/edit', body, jwt)
+            .then(() => true);
+    }
+
+    static deleteInvoicePayment(identityBusinessID: IdentityBusinessID, internalInvoiceID: WaveInternalInvoiceID, invoicePaymentID: WaveInvoicePaymentID, jwt: JWT | null) {
+        const body = {
+            identityBusinessID,
+            internalInvoiceID,
+            invoicePaymentID,
+        };
+
+        return this.#createFetchRequest('/invoice/payments/delete', body, jwt)
             .then(() => true);
     }
 

@@ -52,6 +52,7 @@ func (app *application) routes() http.Handler {
 	router.POST("/api/wave/invoice/payments/query", app.authenticate(app.queryWaveInvoicePayments))
 	router.POST("/api/wave/invoice/payments/create", app.authenticate(app.createWaveInvoicePayment))
 	router.POST("/api/wave/invoice/payments/edit", app.authenticate(app.editWaveInvoicePayment))
+	router.POST("/api/wave/invoice/payments/delete", app.authenticate(app.deleteWaveInvoicePayment))
 
 	// wave business account routes
 	router.POST("/api/wave/accounts/query", app.authenticate(app.queryWaveBusinessAccounts))

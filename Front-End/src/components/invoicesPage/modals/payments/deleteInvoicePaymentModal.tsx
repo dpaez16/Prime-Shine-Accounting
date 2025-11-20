@@ -17,18 +17,16 @@ type DeleteInvoicePaymentModalProps = {
 export const DeleteInvoicePaymentModal: React.FC<DeleteInvoicePaymentModalProps> = (props) => {
     const loginSession = useContext(LoginSessionContext);
     const userInfo = loginSession.userInfo!;
+    const businessInfo = loginSession.businessInfo!;
 
     const { t } = useLocalization();
 
     const { invoicePayment } = props;
 
-    // TODO
     const handleSubmit = () => {
-        //return WaveAPIClient.deleteInvoicePayment(props.internalInvoiceID, invoicePayment.id, userInfo.token)
-        //    .then(() => props.onSuccess())
-        //    .catch(err => alert('Error deleting invoice: ' + err.message)); // TODO: use translation hook
-
-        props.onSuccess();
+        return WaveAPIClient.deleteInvoicePayment(businessInfo.identityBusinessID, props.internalInvoiceID, invoicePayment.id, userInfo.token)
+            .then(() => props.onSuccess())
+            .catch(err => alert('Error deleting invoice: ' + err.message)); // TODO: use translation hook
     };
 
     return (
