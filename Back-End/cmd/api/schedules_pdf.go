@@ -187,8 +187,8 @@ func fillDayBoxes(
 
 		line := fmt.Sprintf(
 			"[%v - %v] %v",
-			startTime.Time.UTC().Format("03:04PM"),
-			endTime.Time.UTC().Format("03:04PM"),
+			startTime.Time.Format("03:04PM"),
+			endTime.Time.Format("03:04PM"),
 			formatWaveCustomerForPDF(waveCustomer),
 		)
 
