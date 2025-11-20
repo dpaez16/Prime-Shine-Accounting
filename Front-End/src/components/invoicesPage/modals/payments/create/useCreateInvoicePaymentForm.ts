@@ -9,7 +9,7 @@ export const useCreateInvoicePaymentForm = () => {
         payment_date: '',
         payment_method: WaveInvoicePaymentMethod.Cash,
         payment_account: {
-            id: 1, // TODO: find this
+            id: 1,
         },
     });
 

@@ -5,8 +5,9 @@ import { WaveInvoiceFilterObj } from '@/components/invoicesPage/toolbar/useInvoi
 import { JWT } from '@/types/userInfo';
 import { WavePageInfo } from '@/types/wavePageInfo';
 import { IdentityBusinessID } from '../types/businessInfo';
-import { WaveInvoicePayment } from '@/types/waveInvoicePayment';
+import { WaveInvoicePayment, WaveInvoicePaymentCreateInput } from '@/types/waveInvoicePayment';
 import { dateToStr } from '@/utils/helpers';
+import { WaveBusinessAccount } from '@/types/waveBusinessAccount';
 
 export class WaveAPIClient {
     static #createFetchRequest(
@@ -162,6 +163,17 @@ export class WaveAPIClient {
             .then(data => data.invoicePayments as WaveInvoicePayment[]);
     }
 
+    static createInvoicePayment(identityBusinessID: IdentityBusinessID, internalInvoiceID: WaveInternalInvoiceID, invoicePaymentData: WaveInvoicePaymentCreateInput, jwt: JWT | null) {
+        const body = {
+            identityBusinessID,
+            internalInvoiceID,
+            invoicePaymentData,
+        };
+
+        return this.#createFetchRequest('/invoice/payments/create', body, jwt)
+            .then(() => true);
+    }
+
     static editInvoicePayment(identityBusinessID: IdentityBusinessID, internalInvoiceID: WaveInternalInvoiceID, invoicePaymentData: WaveInvoicePayment, jwt: JWT | null) {
         const body = {
             identityBusinessID,
@@ -172,5 +184,14 @@ export class WaveAPIClient {
 
         return this.#createFetchRequest('/invoice/payments/edit', body, jwt)
             .then(() => true);
+    }
+
+    static getBusinessAccounts(identityBusinessID: IdentityBusinessID, jwt: JWT | null) {
+        const body = {
+            identityBusinessID,
+        };
+
+        return this.#createFetchRequest('/accounts/query', body, jwt)
+            .then(data => data.accounts as WaveBusinessAccount[]);
     }
 }

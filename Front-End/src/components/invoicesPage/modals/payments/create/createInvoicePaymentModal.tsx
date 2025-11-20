@@ -11,6 +11,9 @@ import { Button } from '@/components/ui/button';
 import { validateMoney } from '@/utils/validators';
 import { SelectWaveInvoicePaymentMethod } from '@/components/ui/selectors/select-wave-payment-method';
 import { WaveInternalInvoiceID } from '@/types/waveInvoice';
+import { WaveAPIClient } from '@/api/waveApiClient';
+import { useDataFetcher } from '@/hooks/useDataFetcher';
+import { Spinner } from '@/components/ui/spinner';
 
 type CreateInvoicePaymentModalProps = {
     internalInvoiceID: WaveInternalInvoiceID;
@@ -21,6 +24,11 @@ type CreateInvoicePaymentModalProps = {
 export const CreateInvoicePaymentModal: React.FC<CreateInvoicePaymentModalProps> = (props) => {
     const loginSession = useContext(LoginSessionContext);
     const userInfo = loginSession.userInfo!;
+    const businessInfo = loginSession.businessInfo!;
+
+    const { data: businessAccounts, loading: isLoading } = useDataFetcher({
+        fetcher: () => WaveAPIClient.getBusinessAccounts(businessInfo.identityBusinessID, userInfo.token),
+    });
 
     const { invoicePaymentParams, setInvoicePaymentParam } = useCreateInvoicePaymentForm();
     const { t } = useLocalization();
@@ -33,14 +41,35 @@ export const CreateInvoicePaymentModal: React.FC<CreateInvoicePaymentModalProps>
         );
     };
 
-    // TODO
     const handleSubmit = () => {
-        //return WaveAPIClient.createInvoicePayment(props.internalInvoiceID, invoicePaymentParams, userInfo.token)
-        //    .then(() => props.onSuccess())
-        //    .catch(err => alert('Error creating invoice payment: ' + err.message)); // TODO: use translation hook
+        const paymentAccount = businessAccounts?.find(businessAccount => businessAccount.account_name === 'Cash on Hand');
+        if (!paymentAccount) {
+            alert('Could not create invoice payment.');
+            return;
+        }
 
-        props.onSuccess();
+        const data = {
+            ...invoicePaymentParams,
+            payment_account: {
+                id: paymentAccount.wave_classic_pk,
+            }
+        };
+
+        return WaveAPIClient.createInvoicePayment(businessInfo.identityBusinessID, props.internalInvoiceID, data, userInfo.token)
+            .then(() => props.onSuccess())
+            .catch(err => alert('Error creating invoice payment: ' + err.message)); // TODO: use translation hook
     };
+
+    if (isLoading) {
+        return (
+            <Dialog open={true} onOpenChange={isOpen => !isOpen && props.onClose()}>
+                <DialogTrigger asChild></DialogTrigger>
+                <DialogContent>
+                    <Spinner />
+                </DialogContent>
+            </Dialog>
+        );
+    }
 
     return (
         <Dialog open={true} onOpenChange={isOpen => !isOpen && props.onClose()}>
