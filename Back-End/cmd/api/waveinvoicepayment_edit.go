@@ -10,10 +10,10 @@ import (
 )
 
 type editWaveInvoicePaymentBody struct {
-	IdentityBusinessID   string         `json:"identityBusinessID"`
-	InternalInvoiceID    string         `json:"internalInvoiceID"`
-	InvoicePaymentID     string         `json:"invoicePaymentID"`
-	InvoicePaymentData   map[string]any `json:"invoicePaymentData"`
+	IdentityBusinessID string         `json:"identityBusinessID"`
+	InternalInvoiceID  string         `json:"internalInvoiceID"`
+	InvoicePaymentID   string         `json:"invoicePaymentID"`
+	InvoicePaymentData map[string]any `json:"invoicePaymentData"`
 }
 
 // Route for editing a Wave invoice payment.

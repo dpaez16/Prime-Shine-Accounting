@@ -10,9 +10,9 @@ import (
 )
 
 type deleteWaveInvoicePaymentBody struct {
-	IdentityBusinessID   string         `json:"identityBusinessID"`
-	InternalInvoiceID    string         `json:"internalInvoiceID"`
-	InvoicePaymentID     string         `json:"invoicePaymentID"`
+	IdentityBusinessID string `json:"identityBusinessID"`
+	InternalInvoiceID  string `json:"internalInvoiceID"`
+	InvoicePaymentID   string `json:"invoicePaymentID"`
 }
 
 // Route for deleting a Wave invoice payment.
